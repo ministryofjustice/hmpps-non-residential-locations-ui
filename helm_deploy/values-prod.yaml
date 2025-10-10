@@ -3,7 +3,7 @@
 
 generic-service:
   ingress:
-    host: non-residential-locations-ui.hmpps.service.justice.gov.uk
+    host: non-residential-locations.hmpps.service.justice.gov.uk
 
   env:
     INGRESS_URL: "https://non-residential-locations-ui.hmpps.service.justice.gov.uk"

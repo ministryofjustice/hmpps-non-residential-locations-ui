@@ -5,7 +5,7 @@ generic-service:
   replicaCount: 2
 
   ingress:
-    host: non-residential-locations-ui-preprod.hmpps.service.justice.gov.uk
+    host: non-residential-locations-preprod.hmpps.service.justice.gov.uk
 
   env:
     INGRESS_URL: "https://non-residential-locations-ui-preprod.hmpps.service.justice.gov.uk"
