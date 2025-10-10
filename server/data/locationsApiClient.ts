@@ -1,11 +1,12 @@
-import { RestClient, asSystem } from '@ministryofjustice/hmpps-rest-client'
+import { asSystem } from '@ministryofjustice/hmpps-rest-client'
 import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
 import config from '../config'
-import logger from '../../logger'
+import BaseApiClient from './baseApiClient'
+import { RedisClient } from './redisClient'
 
-export default class ExampleApiClient extends RestClient {
-  constructor(authenticationClient: AuthenticationClient) {
-    super('Example API', config.apis.exampleApi, logger, authenticationClient)
+export default class LocationsApiClient extends BaseApiClient {
+  constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
+    super('LocationsApiClient', redisClient, config.apis.locationsApi, authenticationClient)
   }
 
   /**
@@ -16,7 +17,7 @@ export default class ExampleApiClient extends RestClient {
    *
    */
   getCurrentTime() {
-    return this.get<string>({ path: '/example/time' }, asSystem())
+    return this.get<string>({ path: '/health' }, asSystem())
   }
 
   /**
