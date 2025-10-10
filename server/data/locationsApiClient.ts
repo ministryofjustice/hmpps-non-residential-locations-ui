@@ -17,7 +17,7 @@ export default class LocationsApiClient extends BaseApiClient {
    *
    */
   getCurrentTime() {
-    return this.get<string>({ path: '/health' }, asSystem())
+    return this.get<string>({ path: '/health/ping' }, asSystem())
   }
 
   /**
