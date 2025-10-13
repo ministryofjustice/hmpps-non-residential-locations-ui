@@ -2,13 +2,13 @@ import type { Express } from 'express'
 import request from 'supertest'
 import { appWithAllRoutes, user } from './testutils/appSetup'
 import AuditService, { Page } from '../services/auditService'
-import ExampleService from '../services/exampleService'
+import LocationsService from '../services/locationsService'
 
 jest.mock('../services/auditService')
-jest.mock('../services/exampleService')
+jest.mock('../services/locationsService')
 
 const auditService = new AuditService(null) as jest.Mocked<AuditService>
-const exampleService = new ExampleService(null) as jest.Mocked<ExampleService>
+const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
 let app: Express
 
@@ -16,7 +16,7 @@ beforeEach(() => {
   app = appWithAllRoutes({
     services: {
       auditService,
-      exampleService,
+      locationsService,
     },
     userSupplier: () => user,
   })
@@ -29,7 +29,7 @@ afterEach(() => {
 describe('GET /', () => {
   it('should render index page', () => {
     auditService.logPageView.mockResolvedValue(null)
-    exampleService.getCurrentTime.mockResolvedValue('2025-01-01T12:00:00.000')
+    locationsService.getCurrentTime.mockResolvedValue('2025-01-01T12:00:00.000')
 
     return request(app)
       .get('/')
@@ -42,13 +42,13 @@ describe('GET /', () => {
           who: user.username,
           correlationId: expect.any(String),
         })
-        expect(exampleService.getCurrentTime).toHaveBeenCalled()
+        expect(locationsService.getCurrentTime).toHaveBeenCalled()
       })
   })
 
   it('service errors are handled', () => {
     auditService.logPageView.mockResolvedValue(null)
-    exampleService.getCurrentTime.mockRejectedValue(new Error('Some problem calling external api!'))
+    locationsService.getCurrentTime.mockRejectedValue(new Error('Some problem calling external api!'))
 
     return request(app)
       .get('/')

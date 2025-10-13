@@ -13,18 +13,69 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
 
-  hmpps-template-kotlin:
-    image: ghcr.io/ministryofjustice/hmpps-template-kotlin:latest
+  locations-inside-prison-api:
+    image: ghcr.io/ministryofjustice/hmpps-locations-inside-prison-api:latest
+    container_name: locations-inside-prison-api
+    depends_on:
+      - hmpps-auth
+      - locations-inside-prison-db
+      - localstack
     networks:
       - hmpps
-    container_name: hmpps-template-kotlin
     ports:
-      - "8080:8080"
+      - "8090:8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health/ping"]
     environment:
-      - HMPPS_AUTH_URL=http://hmpps-auth:8080/auth
-      - EXAMPLE_API_URL=http://localhost:8080
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=seed
+      - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
+      - API_BASE_URL_PRISONER_SEARCH=http://prisoner-search:8080
+      - API_BASE_URL_PRISON_REGISTER=http://prison-register:8080
+      - API_BASE_URL_PRISON_API=http://prison-api:8081
+      - API_BASE_URL_MANAGE_USERS=http://manage-users-api:8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://locations-inside-prison-db:5432/locations_inside_prison?sslmode=prefer
+      - HMPPS_SQS_LOCALSTACK_URL=http://localstack:4566
+      - LOCATIONS_INSIDE_PRISON_API_CLIENT_ID=hmpps-locations-inside-prison-api
+      - LOCATIONS_INSIDE_PRISON_API_CLIENT_SECRET=clientsecret
+
+  localstack:
+    image: localstack/localstack:stable
+    networks:
+      - hmpps
+    container_name: localstack
+    ports:
+      - "4566:4566"
+      - "8999:8080"
+    environment:
+      - DEBUG=${DEBUG- }
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  locations-inside-prison-db:
+    image: postgres
+    networks:
+      - hmpps
+    container_name: locations-inside-prison-db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=locations_inside_prison
+      - POSTGRES_USER=locations_inside_prison
+      - POSTGRES_DB=locations_inside_prison
+
+  redis:
+    image: 'redis:8.0'
+    networks:
+      - hmpps
+    container_name: redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - '6379:6379'
 
   app:
     build:
