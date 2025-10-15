@@ -126,6 +126,6 @@ jobs:
       - get-timings
       - cypress-test
     with:
-      repository: ministryofjustice/hmpps-locations-inside-prison
+      repository: ministryofjustice/hmpps-non-residential-locations-ui
       initial-timings: ${{ needs.get-timings.outputs.timings }}
       updated-timings: ${{ toJSON(needs.cypress-test.outputs) }}
