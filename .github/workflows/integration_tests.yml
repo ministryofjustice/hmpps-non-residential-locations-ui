@@ -21,7 +21,7 @@ jobs:
     name: Get timings
     uses: ministryofjustice/hmpps-assess-risks-and-needs-github-actions/.github/workflows/cypress_get_timings.yml@v1
     with:
-      repository: ministryofjustice/hmpps-locations-inside-prison
+      repository: ministryofjustice/hmpps-non-residential-locations-ui
       spec-file-patterns: ${{ inputs.spec-file-patterns }}
 
   cypress-test:
