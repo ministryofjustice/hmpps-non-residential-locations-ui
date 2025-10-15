@@ -68,7 +68,7 @@ services:
       - POSTGRES_DB=locations_inside_prison
 
   redis:
-    image: 'redis:8.0'
+    image: 'redis:8.2'
     networks:
       - hmpps
     container_name: redis
