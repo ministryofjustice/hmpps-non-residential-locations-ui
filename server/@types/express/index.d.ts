@@ -4,6 +4,7 @@ export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
     returnTo: string
+    systemToken: string
   }
 }
 
@@ -19,6 +20,8 @@ export declare global {
       verified?: boolean
       id: string
       logout(done: (err: unknown) => void): void
+      canAccess: (permission: string) => boolean
+      featureFlags?: (typeof config)['featureFlags']
     }
 
     interface Locals {

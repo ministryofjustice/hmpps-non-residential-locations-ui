@@ -81,6 +81,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 180000))),
     },
+    manageUsersApi: {
+      url: get('MANAGE_USERS_API_URL', 'http://localhost:9091', requiredInProduction),
+      healthPath: '/health/ping',
+      timeout: {
+        response: Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 10000))),
+    },
   },
   sqs: {
     audit: auditConfig(),

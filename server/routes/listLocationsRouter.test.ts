@@ -1,7 +1,7 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { appWithAllRoutes, user } from './testutils/appSetup'
-import AuditService, { Page } from '../services/auditService'
+import AuditService from '../services/auditService'
 import LocationsService from '../services/locationsService'
 
 jest.mock('../services/auditService')
@@ -27,28 +27,22 @@ afterEach(() => {
 })
 
 describe('GET /', () => {
-  it('should render index page', () => {
+  it('should render list locations page', () => {
     auditService.logPageView.mockResolvedValue(null)
-    locationsService.getCurrentTime.mockResolvedValue('2025-01-01T12:00:00.000')
+    locationsService.getNonResidentialLocations.mockResolvedValue([])
 
     return request(app)
       .get('/')
       .expect('Content-Type', /html/)
       .expect(200)
       .expect(res => {
-        expect(res.text).toContain('This site is under construction...')
-        expect(res.text).toContain('The time is currently 2025-01-01T12:00:00.000')
-        expect(auditService.logPageView).toHaveBeenCalledWith(Page.EXAMPLE_PAGE, {
-          who: user.username,
-          correlationId: expect.any(String),
-        })
-        expect(locationsService.getCurrentTime).toHaveBeenCalled()
+        expect(locationsService.getNonResidentialLocations).toHaveBeenCalled()
       })
   })
 
   it('service errors are handled', () => {
     auditService.logPageView.mockResolvedValue(null)
-    locationsService.getCurrentTime.mockRejectedValue(new Error('Some problem calling external api!'))
+    locationsService.getNonResidentialLocations.mockRejectedValue(new Error('Some problem calling external api!'))
 
     return request(app)
       .get('/')
