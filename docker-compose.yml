@@ -13,6 +13,40 @@ services:
       - SPRING_PROFILES_ACTIVE=dev
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
 
+  nomis-user-roles-api:
+    image: quay.io/hmpps/nomis-user-roles-api:latest
+    container_name: nomis-user-roles-api
+    networks:
+      - hmpps
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ping" ]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev
+      - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
+
+  manage-users-api:
+    image: quay.io/hmpps/hmpps-manage-users-api:latest
+    container_name: manage-users-api
+    networks:
+      - hmpps
+    depends_on:
+      - nomis-user-roles-api
+      - hmpps-auth
+    ports:
+      - "8082:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ping"]
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=dev,local-docker
+      - HMPPS_AUTH_ENDPOINT_URL=http://hmpps-auth:8080/auth
+      - HMPPS_AUTH_EXTERNAL_ENDPOINT_URL=http://localhost:8080/auth
+      - NOMIS_ENDPOINT_URL=http://nomis-user-roles-api:8080
+      - AUTHORIZATION_SERVER_TOKEN_ENDPOINT_URL=http://hmpps-auth:8080/auth/oauth/token
+
   locations-inside-prison-api:
     image: ghcr.io/ministryofjustice/hmpps-locations-inside-prison-api:latest
     container_name: locations-inside-prison-api

@@ -2,7 +2,7 @@ import express, { Express } from 'express'
 import { NotFound } from 'http-errors'
 
 import { randomUUID } from 'crypto'
-import routes from '../index'
+import routes from '../listLocationsRouter'
 import nunjucksSetup from '../../utils/nunjucksSetup'
 import errorHandler from '../../errorHandler'
 import type { Services } from '../../services'
@@ -21,6 +21,16 @@ export const user: HmppsUser = {
   authSource: 'nomis',
   staffId: 1234,
   userRoles: [],
+  activeCaseload: {
+    id: 'TST',
+    name: 'Test (HMP)',
+  },
+  caseloads: [
+    {
+      id: 'TST',
+      name: 'Test (HMP)',
+    },
+  ],
 }
 
 export const flashProvider = jest.fn()
