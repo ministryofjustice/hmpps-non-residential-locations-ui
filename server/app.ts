@@ -16,8 +16,10 @@ import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
 
-import routes from './routes'
+import routes from './routes/listLocationsRouter'
 import type { Services } from './services'
+import refreshSystemToken from './middleware/refreshSystemToken'
+import setCanAccess from './middleware/setCanAccess'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -34,9 +36,11 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   nunjucksSetup(app)
   app.use(setUpAuthentication())
-  app.use(authorisationMiddleware())
+  app.use(authorisationMiddleware(['MANAGE_RESIDENTIAL_LOCATIONS', 'VIEW_INTERNAL_LOCATION']))
   app.use(setUpCsrf())
-  app.use(setUpCurrentUser())
+  app.use(setUpCurrentUser(services))
+  app.use(refreshSystemToken(services))
+  app.use(setCanAccess())
 
   app.use(routes(services))
 

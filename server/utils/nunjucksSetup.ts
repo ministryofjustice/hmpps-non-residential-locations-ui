@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
@@ -10,10 +9,11 @@ import logger from '../../logger'
 export default function nunjucksSetup(app: express.Express): void {
   app.set('view engine', 'njk')
 
-  app.locals.asset_path = '/assets/'
-  app.locals.applicationName = 'HMPPS Non Residential Locations Ui'
-  app.locals.environmentName = config.environmentName
-  app.locals.environmentNameColour = config.environmentName === 'PRE-PRODUCTION' ? 'govuk-tag--green' : ''
+  const { locals } = app
+  locals.asset_path = '/assets/'
+  locals.applicationName = 'HMPPS Non Residential Locations Ui'
+  locals.environmentName = config.environmentName
+  locals.environmentNameColour = config.environmentName === 'PRE-PRODUCTION' ? 'govuk-tag--green' : ''
   let assetManifest: Record<string, string> = {}
 
   try {
@@ -39,4 +39,10 @@ export default function nunjucksSetup(app: express.Express): void {
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
+
+  njkEnv.addFilter('formatText', function formatText(str) {
+    if (!str) return ''
+    const cleaned = str.replace(/_/g, ' ').toLowerCase()
+    return cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
+  })
 }
