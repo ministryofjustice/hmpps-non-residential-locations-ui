@@ -1,61 +1,16 @@
 {% extends "../partials/layout.njk" %}
 
-{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "../macros/locationsTable.njk" import locationsTable %}
+
 
 {% set pageTitle = applicationName + " - Home" %}
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block content %}
 
-  <h1>Edit non-residential locations</h1>
+  <h1>View non-residential locations</h1>
 
   <div class="govuk-width-container">
-    {% set tableRows = [] %}
-    {% for location in locations %}
-      {% set tableRows = (tableRows.push([
-        {
-          classes: 'govuk-table__cell',
-          text: location.localName
-        },
-        {
-          classes: 'govuk-table__cell',
-          text: location.status | formatText
-        },
-        {
-          classes: 'govuk-table__cell',
-          text: usageTypes(location.usage)
-        },
-        {
-          classes: 'govuk-table__cell',
-          text: 'change | archive'
-        }
-      ]), tableRows) %}
-    {% endfor %}
-
-    {{ govukTable({
-      firstCellIsHeader: true,
-      head: [
-        {
-          text: "Location"
-        },
-        {
-          text: "Status"
-        },
-        {
-          text: "Service that use non-resi locations"
-        },
-        {
-          text: "Actions"
-        }
-      ],
-      rows: tableRows
-    }) }}
+    {{ locationsTable(locations) }}
   </div>
 {% endblock %}
-
-{% macro usageTypes(items) %}
-  {% for item in items %}
-    <div>{{ item.usageType | formatText }}</div>
-  {% endfor %}
-{% endmacro %}
-
