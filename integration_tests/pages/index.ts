@@ -2,7 +2,7 @@ import Page, { PageElement } from './page'
 
 export default class IndexPage extends Page {
   constructor() {
-    super('Edit non-residential locations')
+    super('View non-residential locations')
   }
 
   headerUserName = (): PageElement => cy.get('[data-qa=header-user-name]')
