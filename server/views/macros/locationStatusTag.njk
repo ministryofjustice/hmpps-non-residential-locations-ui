@@ -1,0 +1,11 @@
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{% macro locationStatusTag(location) %}
+  {{ govukTag({
+    text: location | locationStatusTagLabel,
+    classes: location | locationStatusTagClass,
+    attributes: {
+      "data-qa": "status-tag"
+    }
+  }) }}
+{% endmacro %}

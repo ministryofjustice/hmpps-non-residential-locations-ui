@@ -1,0 +1,46 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% from "./locationStatusTag.njk" import locationStatusTag %}
+
+{% macro locationsTable (locations) %}
+
+<h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
+
+  {% if locations | length %}
+    {% set rows = [] %}
+
+    {% for item in locations %}
+
+      {% set rows = (rows.push(
+        [
+          { html: item.localName },
+          { html: locationStatusTag(item) },
+          { html: usageTypes(item.usage) }
+        ]
+      ), rows) %}
+    {% endfor %}
+
+    {{ govukTable({
+      attributes: {
+        "data-qa": "locations-table",
+        "id": "locations-table"
+      },
+      firstCellIsHeader: true,
+      head: [
+        { text: "Location" },
+        { text: "Status" },
+        { text: "Services that use non-resi locations" }
+      ],
+      rows: rows
+    }) }}
+  {% endif %}
+{% endmacro %}
+
+{% macro usageTypes(items) %}
+  <ul class="govuk-list govuk-list--bullet">
+  {% for item in items %}
+    <li>{{ item.usageType | usageLabel }}</li>
+  {% endfor %}
+  </ul>
+{% endmacro %}
