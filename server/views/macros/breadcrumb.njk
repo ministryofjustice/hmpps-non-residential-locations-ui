@@ -1,0 +1,34 @@
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+
+{% macro breadcrumb(pageTitle, breadcrumbList, displayCurrentPageTitle="true") %}
+
+  {% set rows = [] %}
+
+  {% for itemIndex in range(0, breadcrumbList.length - 1) -%}
+    {% set item = breadcrumbList[itemIndex] %}
+
+    {% set rows = (rows.push(
+      {
+        text: item.title,
+        href: item.href
+      }
+    ), rows) %}
+  {% endfor %}
+
+  {% if displayCurrentPageTitle %}
+    {% set completedRows = (rows.push(
+      {
+        text: pageTitle
+      }
+    ), rows) %}
+  {% else %}
+    {% set completedRows = rows %}
+  {% endif %}
+
+{{ govukBreadcrumbs({
+  collapseOnMobile: true,
+  items: completedRows,
+  classes: "govuk-!-display-none-print"
+}) }}
+
+{% endmacro %}

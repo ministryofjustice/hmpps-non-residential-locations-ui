@@ -4,11 +4,12 @@
 
 
 {% set pageTitle = applicationName + " - Home" %}
+{% set heading = 'View non-residential locations' %}
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block content %}
 
-  <h1>View non-residential locations</h1>
+  <h1>{{ heading }}</h1>
 
   <div class="govuk-width-container">
     {{ locationsTable(locations) }}

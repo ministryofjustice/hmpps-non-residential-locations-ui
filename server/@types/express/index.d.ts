@@ -7,7 +7,24 @@ export declare module 'express-session' {
     systemToken: string
   }
 }
+interface TypedLocals {
+  stack?: string
+  status?: number
+  message?: string
+  breadcrumbs?: {
+    title: string
+    href: string
+  }[]
+  canAccess?: (permission: string) => boolean
+  cspNonce?: string
+  user?: HmppsUser
+}
 
+export declare module 'express' {
+  interface Response {
+    locals: TypedLocals
+  }
+}
 export declare global {
   namespace Express {
     interface User {
@@ -25,7 +42,7 @@ export declare global {
     }
 
     interface Locals {
-      user: HmppsUser
+      user?: HmppsUser
     }
   }
 }

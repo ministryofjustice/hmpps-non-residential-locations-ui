@@ -95,5 +95,10 @@ export default {
     audit: auditConfig(),
   },
   ingressUrl: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
+  services: {
+    dps: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
+    locationsLanding: get('SERVICE_LOCATIONS_LANDING_URL', 'http://localhost:3000', requiredInProduction),
+    residentialLocations: get('SERVICE_RESIDENTIAL_LOCATIONS_URL', 'http://localhost:3000', requiredInProduction),
+  },
   environmentName: get('ENVIRONMENT_NAME', ''),
 }
