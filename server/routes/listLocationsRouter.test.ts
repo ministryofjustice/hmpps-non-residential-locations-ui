@@ -27,12 +27,25 @@ afterEach(() => {
 })
 
 describe('GET /', () => {
-  it('should render list locations page', () => {
+  it('should redirect to view for current caseload', () => {
     auditService.logPageView.mockResolvedValue(null)
     locationsService.getNonResidentialLocations.mockResolvedValue([])
 
     return request(app)
       .get('/')
+      .expect('Content-Type', /text\/plain; charset=utf-8/)
+      .expect(302)
+      .expect('location', /prison\/TST/)
+  })
+})
+
+describe('GET /prison/TST', () => {
+  it('should render list locations page', () => {
+    auditService.logPageView.mockResolvedValue(null)
+    locationsService.getNonResidentialLocations.mockResolvedValue([])
+
+    return request(app)
+      .get('/prison/TST')
       .expect('Content-Type', /html/)
       .expect(200)
       .expect(res => {
@@ -45,7 +58,7 @@ describe('GET /', () => {
     locationsService.getNonResidentialLocations.mockRejectedValue(new Error('Some problem calling external api!'))
 
     return request(app)
-      .get('/')
+      .get('/prison/TST')
       .expect('Content-Type', /html/)
       .expect(500)
       .expect(res => {
