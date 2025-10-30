@@ -1,4 +1,7 @@
 const usageMap: { [usage: string]: { label: string } } = {
+  ADJUDICATION_HEARING: {
+    label: 'Adjudications and Hearings',
+  },
   APPOINTMENT: {
     label: 'Activities and Appointments',
   },

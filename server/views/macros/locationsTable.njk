@@ -24,12 +24,21 @@
     {{ govukTable({
       attributes: {
         "data-qa": "locations-table",
-        "id": "locations-table"
+        "id": "locations-table",
+        "data-module": "moj-sortable-table"
       },
       firstCellIsHeader: true,
       head: [
-        { text: "Location" },
-        { text: "Status" },
+        { text: "Location",
+          attributes: {
+            "aria-sort": "ascending"
+          }
+        },
+        { text: "Status",
+          attributes: {
+            "aria-sort": "none"
+          }
+        },
         { text: "Services that use non-resi locations" }
       ],
       rows: rows
