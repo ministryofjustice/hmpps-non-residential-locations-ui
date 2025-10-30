@@ -16,7 +16,7 @@ import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
 
-import routes from './routes/listLocationsRouter'
+import routes from './routes/index'
 import type { Services } from './services'
 import refreshSystemToken from './middleware/refreshSystemToken'
 import setCanAccess from './middleware/setCanAccess'
