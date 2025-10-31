@@ -1,11 +1,11 @@
 const usageMap: { [usage: string]: { label: string } } = {
-  ADJUDICATION_HEARING: {
+  ADJUDICATIONS: {
     label: 'Adjudications and Hearings',
   },
-  APPOINTMENT: {
+  ACTIVITIES_APPOINTMENTS: {
     label: 'Activities and Appointments',
   },
-  MOVEMENT: {
+  INTERNAL_MOVEMENTS: {
     label: 'Internal movements',
   },
   OCCURRENCE: {
@@ -17,11 +17,14 @@ const usageMap: { [usage: string]: { label: string } } = {
   OTHER: {
     label: 'Other',
   },
-  VISIT: {
+  OFFICIAL_VISITS: {
     label: 'Official Visits',
   },
   PROPERTY: {
     label: 'Property',
+  },
+  USE_OF_FORCE: {
+    label: 'Use of Force',
   },
 }
 

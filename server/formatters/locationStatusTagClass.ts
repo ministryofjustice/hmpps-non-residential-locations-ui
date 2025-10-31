@@ -1,4 +1,4 @@
-import { Location } from '../@types/locationsApi'
+import { Location } from '../@types/locationsApi/locationsApiTypes'
 import LocationStatusMap from '../@types/locationsApi/locationStatusMap'
 
 export default function locationStatusTagClass(location: Location): string {

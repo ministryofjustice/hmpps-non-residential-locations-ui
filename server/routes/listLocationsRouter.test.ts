@@ -29,7 +29,6 @@ afterEach(() => {
 describe('GET /', () => {
   it('should redirect to view for current caseload', () => {
     auditService.logPageView.mockResolvedValue(null)
-    locationsService.getNonResidentialLocations.mockResolvedValue([])
 
     return request(app)
       .get('/')
@@ -42,7 +41,7 @@ describe('GET /', () => {
 describe('GET /prison/TST', () => {
   it('should render list locations page', () => {
     auditService.logPageView.mockResolvedValue(null)
-    locationsService.getNonResidentialLocations.mockResolvedValue([])
+    locationsService.getNonResidentialLocations.mockResolvedValue({ prisonId: null, locations: { content: [] } })
 
     return request(app)
       .get('/prison/TST')

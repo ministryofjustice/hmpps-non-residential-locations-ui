@@ -9,13 +9,15 @@ describe('LocationsService', () => {
 
   beforeEach(() => {
     locationsApiClient.locations = {
-      getNonResidential: Object.assign(jest.fn(), { clearCache: jest.fn() }),
+      getNonResidentialSummary: Object.assign(jest.fn(), { clearCache: jest.fn() }),
     }
     locationsService = new LocationsService(locationsApiClient)
   })
 
   it('should call get non residential locations', async () => {
     await locationsService.getNonResidentialLocations('some-token', 'MDI')
-    expect(locationsApiClient.locations.getNonResidential).toHaveBeenCalledWith('some-token', { prisonId: 'MDI' })
+    expect(locationsApiClient.locations.getNonResidentialSummary).toHaveBeenCalledWith('some-token', {
+      prisonId: 'MDI',
+    })
   })
 })
