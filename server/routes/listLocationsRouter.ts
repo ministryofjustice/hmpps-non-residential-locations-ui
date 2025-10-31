@@ -2,7 +2,6 @@ import { Router } from 'express'
 
 import type { Services } from '../services'
 import addBreadcrumb from '../middleware/addBreadcrumb'
-import { Location } from '../@types/locationsApi/location'
 
 export default function routes({ locationsService }: Services): Router {
   const router = Router()
