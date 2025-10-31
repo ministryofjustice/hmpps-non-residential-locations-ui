@@ -2,7 +2,7 @@ import type { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients
 import config from '../config'
 import BaseApiClient from './baseApiClient'
 import { RedisClient } from './redisClient'
-import { Location } from '../@types/locationsApi'
+import { NonResidentialSummary } from '../@types/locationsApi/locationsApiTypes'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
@@ -10,8 +10,8 @@ export default class LocationsApiClient extends BaseApiClient {
   }
 
   locations = {
-    getNonResidential: this.apiCall<Location[], { prisonId: string }>({
-      path: '/locations/prison/:prisonId/non-residential',
+    getNonResidentialSummary: this.apiCall<NonResidentialSummary, { prisonId: string }>({
+      path: '/locations/non-residential/summary/:prisonId',
       requestType: 'get',
     }),
   }

@@ -16,7 +16,7 @@
         [
           { html: item.localName },
           { html: locationStatusTag(item) },
-          { html: usageTypes(item.usage) }
+          { html: usageTypes(item.usedByGroupedServices) }
         ]
       ), rows) %}
     {% endfor %}
@@ -49,7 +49,7 @@
 {% macro usageTypes(items) %}
   <ul class="govuk-list govuk-list--bullet">
   {% for item in items %}
-    <li>{{ item.usageType | usageLabel }}</li>
+    <li>{{ item | usageLabel }}</li>
   {% endfor %}
   </ul>
 {% endmacro %}
