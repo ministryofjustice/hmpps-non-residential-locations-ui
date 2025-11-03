@@ -24,7 +24,8 @@
     "rebuild": "npm run clean && npm i && npm run build",
     "precommit:secrets": "gitleaks git --pre-commit --redact --staged --verbose --config .gitleaks/config.toml --gitleaks-ignore-path .gitleaks/.gitleaksignore",
     "precommit:lint": "node_modules/.bin/lint-staged",
-    "precommit:verify": "npm run typecheck && npm test"
+    "precommit:verify": "npm run typecheck && npm test",
+    "generate-location-api-types": "openapi-typescript https://locations-inside-prison-api-dev.hmpps.service.justice.gov.uk/v3/api-docs > ./server/@types/locationsApi/index.d.ts"
   },
   "engines": {
     "node": "^22",
@@ -97,6 +98,7 @@
     "lint-staged": "^16.2.6",
     "mocha-junit-reporter": "^2.2.1",
     "nock": "^14.0.10",
+    "openapi-typescript": "^7.6.1",
     "prettier": "^3.6.2",
     "prettier-plugin-jinja-template": "^2.1.0",
     "supertest": "^7.1.4",

@@ -1,7 +1,6 @@
 import { Router } from 'express'
 
 import type { Services } from '../services'
-import { Location } from '../@types/locationsApi'
 import addBreadcrumb from '../middleware/addBreadcrumb'
 
 export default function routes({ locationsService }: Services): Router {
@@ -17,7 +16,8 @@ export default function routes({ locationsService }: Services): Router {
     async (req, res, next) => {
       const { systemToken } = req.session
       const { prisonId } = req.params
-      const locations: Location[] = await locationsService.getNonResidentialLocations(systemToken, prisonId)
+      const { locations } = await locationsService.getNonResidentialLocations(systemToken, prisonId)
+
       return res.render('pages/index', { ...res.locals, locations })
     },
   )
