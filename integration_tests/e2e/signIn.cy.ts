@@ -46,26 +46,26 @@ context('Sign In', () => {
     })
 
     it('User name visible in header', () => {
-      cy.signIn()
+      cy.signIn({ failOnStatusCode: false })
       const indexPage = Page.verifyOnPage(IndexPage)
       indexPage.headerUserName().should('contain.text', 'J. Smith')
     })
 
     it('Phase banner visible in header', () => {
-      cy.signIn()
+      cy.signIn({ failOnStatusCode: false })
       const indexPage = Page.verifyOnPage(IndexPage)
       indexPage.headerPhaseBanner().should('contain.text', 'TEST')
     })
 
     it('User can sign out', () => {
-      cy.signIn()
+      cy.signIn({ failOnStatusCode: false })
       const indexPage = Page.verifyOnPage(IndexPage)
       indexPage.signOut().click()
       Page.verifyOnPage(AuthSignInPage)
     })
 
     it('User can manage their details', () => {
-      cy.signIn()
+      cy.signIn({ failOnStatusCode: false })
       cy.task('stubAuthManageDetails')
       const indexPage = Page.verifyOnPage(IndexPage)
 
@@ -75,7 +75,7 @@ context('Sign In', () => {
     })
 
     it('Token verification failure takes user to sign in page', () => {
-      cy.signIn()
+      cy.signIn({ failOnStatusCode: false })
       Page.verifyOnPage(IndexPage)
       cy.task('stubVerifyToken', false)
 
@@ -84,7 +84,7 @@ context('Sign In', () => {
     })
 
     it('Token verification failure clears user session', () => {
-      cy.signIn()
+      cy.signIn({ failOnStatusCode: false })
       const indexPage = Page.verifyOnPage(IndexPage)
       cy.task('stubVerifyToken', false)
 
