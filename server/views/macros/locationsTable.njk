@@ -21,7 +21,7 @@
         ]
       ), rows) %}
     {% endfor %}
-
+    {{ simplePagination(pagingData) }}
     {{ govukTable({
       attributes: {
         "data-qa": "locations-table",
