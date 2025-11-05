@@ -41,7 +41,10 @@ describe('GET /', () => {
 describe('GET /prison/TST', () => {
   it('should render list locations page', () => {
     auditService.logPageView.mockResolvedValue(null)
-    locationsService.getNonResidentialLocations.mockResolvedValue({ prisonId: null, locations: { content: [] } })
+    locationsService.getNonResidentialLocations.mockResolvedValue({
+      prisonId: null,
+      locations: { numberOfElements: 100, content: [], pageable: { pageSize: 100, pageNumber: 0 } },
+    })
 
     return request(app)
       .get('/prison/TST')

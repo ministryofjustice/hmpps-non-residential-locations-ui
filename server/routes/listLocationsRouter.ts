@@ -16,7 +16,29 @@ export default function routes({ locationsService }: Services): Router {
     async (req, res, next) => {
       const { systemToken } = req.session
       const { prisonId } = req.params
-      const { locations } = await locationsService.getNonResidentialLocations(systemToken, prisonId)
+      const { page } = req.query
+
+      const pageNo = page && !Number.isNaN(Number(page)) ? Number(page) - 1 : null
+      const { locations } = await locationsService.getNonResidentialLocations(
+        systemToken,
+        prisonId,
+        pageNo ? `${pageNo}` : undefined,
+      )
+      const { pageable } = locations
+
+      const rowFrom = pageable.pageSize * pageable.pageNumber + 1
+      const rowTo = rowFrom + locations.numberOfElements - 1
+
+      res.locals.paginationLocals = {
+        totalPages: locations.totalPages,
+        pageSize: pageable.pageSize,
+        currentPage: pageable.pageNumber,
+        totalRows: locations.totalElements,
+        rowCount: locations.numberOfElements,
+        rowFrom,
+        rowTo,
+        hrefTemplate: '?page={page}',
+      }
 
       return res.render('pages/index', { ...res.locals, locations })
     },
