@@ -17,7 +17,9 @@ describe('LocationsService', () => {
   it('should call get non residential locations', async () => {
     await locationsService.getNonResidentialLocations('some-token', 'MDI')
     expect(locationsApiClient.locations.getNonResidentialSummary).toHaveBeenCalledWith('some-token', {
+      page: undefined,
       prisonId: 'MDI',
+      size: '35',
     })
   })
 })
