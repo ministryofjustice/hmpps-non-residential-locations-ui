@@ -13,7 +13,7 @@
                     selected: page === params.currentPage + 1,
                     href: params.hrefTemplate | replace ('{page}', page)
                 }), items) %}
-            {% elseif page == 2 or page == params.totalPages %}
+            {% elseif page == 2 or page == params.totalPages - 1 %}
                 {% set items = (items.push({
                     type: 'dots'
                 }), items) %}
