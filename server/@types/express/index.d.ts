@@ -18,6 +18,16 @@ interface TypedLocals {
   canAccess?: (permission: string) => boolean
   cspNonce?: string
   user?: HmppsUser
+  paginationLocals?: PaginationLocals
+}
+
+interface PaginationLocals {
+  totalPages: number
+  pageSize: number
+  currentPage: number
+  totalRows: number
+  rowCount: number
+  hrefTemplate: string
 }
 
 export declare module 'express' {

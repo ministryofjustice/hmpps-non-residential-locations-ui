@@ -2,8 +2,9 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% from "./locationStatusTag.njk" import locationStatusTag %}
+{% from "../partials/simplePagination/macro.njk" import simplePagination %}
 
-{% macro locationsTable (locations) %}
+{% macro locationsTable (locations, pagingData) %}
 
 <h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
 
@@ -24,26 +25,18 @@
     {{ govukTable({
       attributes: {
         "data-qa": "locations-table",
-        "id": "locations-table",
-        "data-module": "moj-sortable-table"
+        "id": "locations-table"
       },
       firstCellIsHeader: true,
       head: [
-        { text: "Location",
-          attributes: {
-            "aria-sort": "ascending"
-          }
-        },
-        { text: "Status",
-          attributes: {
-            "aria-sort": "none"
-          }
-        },
+        { text: "Location" },
+        { text: "Status" },
         { text: "Services that use non-resi locations" }
       ],
       rows: rows
     }) }}
   {% endif %}
+  {{ simplePagination(pagingData) }}
 {% endmacro %}
 
 {% macro usageTypes(items) %}

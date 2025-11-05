@@ -10,9 +10,10 @@ export default class LocationsApiClient extends BaseApiClient {
   }
 
   locations = {
-    getNonResidentialSummary: this.apiCall<NonResidentialSummary, { prisonId: string }>({
+    getNonResidentialSummary: this.apiCall<NonResidentialSummary, { prisonId: string; page?: string }>({
       path: '/locations/non-residential/summary/:prisonId',
       requestType: 'get',
+      queryParams: ['page'],
     }),
   }
 }
