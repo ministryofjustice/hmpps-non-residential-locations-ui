@@ -22,7 +22,7 @@ export default function routes({ locationsService }: Services): Router {
       const { locations } = await locationsService.getNonResidentialLocations(
         systemToken,
         prisonId,
-        pageNo ? `${pageNo}` : null,
+        pageNo ? `${pageNo}` : undefined,
       )
       const { pageable } = locations
 
