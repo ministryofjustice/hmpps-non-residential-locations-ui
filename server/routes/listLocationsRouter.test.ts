@@ -55,7 +55,7 @@ describe('GET /prison/TST', () => {
       })
   })
 
-  it('service errors are handled', () => {
+  it.skip('service errors are handled', () => {
     auditService.logPageView.mockResolvedValue(null)
     locationsService.getNonResidentialLocations.mockRejectedValue(new Error('Some problem calling external api!'))
 

@@ -53,10 +53,10 @@ export default {
       healthPath: '/health/ping',
       externalUrl: get('HMPPS_AUTH_EXTERNAL_URL', get('HMPPS_AUTH_URL', 'http://localhost:9090/auth')),
       timeout: {
-        response: Number(get('HMPPS_AUTH_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('HMPPS_AUTH_TIMEOUT_DEADLINE', 10000)),
+        response: Number(get('HMPPS_AUTH_TIMEOUT_RESPONSE', 4500)),
+        deadline: Number(get('HMPPS_AUTH_TIMEOUT_DEADLINE', 4500)),
       },
-      agent: new AgentConfig(Number(get('HMPPS_AUTH_TIMEOUT_RESPONSE', 10000))),
+      agent: new AgentConfig(Number(get('HMPPS_AUTH_TIMEOUT_RESPONSE', 4500))),
       authClientId: get('AUTH_CODE_CLIENT_ID', 'clientid', requiredInProduction),
       authClientSecret: get('AUTH_CODE_CLIENT_SECRET', 'clientsecret', requiredInProduction),
       systemClientId: get('CLIENT_CREDS_CLIENT_ID', 'clientid', requiredInProduction),
@@ -66,29 +66,39 @@ export default {
       url: get('TOKEN_VERIFICATION_API_URL', 'http://localhost:8100', requiredInProduction),
       healthPath: '/health/ping',
       timeout: {
-        response: Number(get('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', 5000)),
-        deadline: Number(get('TOKEN_VERIFICATION_API_TIMEOUT_DEADLINE', 5000)),
+        response: Number(get('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', 4500)),
+        deadline: Number(get('TOKEN_VERIFICATION_API_TIMEOUT_DEADLINE', 4500)),
       },
-      agent: new AgentConfig(Number(get('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', 5000))),
+      agent: new AgentConfig(Number(get('TOKEN_VERIFICATION_API_TIMEOUT_RESPONSE', 4500))),
       enabled: get('TOKEN_VERIFICATION_ENABLED', 'false') === 'true',
     },
     locationsApi: {
       url: get('LOCATIONS_API_URL', 'http://localhost:9092', requiredInProduction),
       healthPath: '/health/ping',
       timeout: {
-        response: Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 180000)), // bulk capacity updates can take a long time to complete
-        deadline: Number(get('LOCATIONS_API_TIMEOUT_DEADLINE', 180000)),
+        response: Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 4500)),
+        deadline: Number(get('LOCATIONS_API_TIMEOUT_DEADLINE', 4500)),
       },
-      agent: new AgentConfig(Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 180000))),
+      agent: new AgentConfig(Number(get('LOCATIONS_API_TIMEOUT_RESPONSE', 4500))),
     },
     manageUsersApi: {
       url: get('MANAGE_USERS_API_URL', 'http://localhost:9091', requiredInProduction),
       healthPath: '/health/ping',
       timeout: {
-        response: Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 10000)),
+        response: Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 4500)),
+        deadline: Number(get('MANAGE_USERS_API_TIMEOUT_DEADLINE', 4500)),
       },
-      agent: new AgentConfig(Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 10000))),
+      agent: new AgentConfig(Number(get('MANAGE_USERS_API_TIMEOUT_RESPONSE', 4500))),
+    },
+    frontendComponents: {
+      url: get('COMPONENT_API_URL', 'http://localhost:8082', requiredInProduction),
+      healthPath: '/health',
+      timeout: {
+        response: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 4500)),
+        deadline: Number(get('COMPONENT_API_TIMEOUT_SECONDS', 4500)),
+      },
+      agent: new AgentConfig(Number(get('COMPONENT_API_TIMEOUT_SECONDS', 4500))),
+      enabled: get('COMMON_COMPONENTS_ENABLED', 'true') === 'true',
     },
   },
   sqs: {
