@@ -25,6 +25,7 @@ export default defineConfig({
         ...tokenVerification,
         ...locationsApi,
         ...manageUsersApi,
+        ...components,
       })
       cypressSplit(on, config)
       return config
@@ -33,6 +34,5 @@ export default defineConfig({
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: 'integration_tests/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'integration_tests/support/index.ts',
-    ...components,
   },
 })
