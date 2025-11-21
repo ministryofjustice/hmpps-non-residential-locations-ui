@@ -79,4 +79,57 @@ export default {
         },
       },
     }),
+
+  stubLocationsConstantsNonResidentialUsageType: () =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/locations-api/constants/non-residential-usage-type',
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          nonResidentialUsageTypes: [{ key: 'TEST_TYPE', description: 'Test type' }],
+        },
+      },
+    }),
+
+  stubLocationsConstantsServiceTypes: () =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/locations-api/constants/service-types',
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          nonResidentialServiceTypes: [{ key: 'TEST_TYPE', description: 'Test type' }],
+        },
+      },
+    }),
+
+  stubLocationsConstantsServiceFamilyTypes: () =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/locations-api/constants/service-family-types',
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          serviceFamilyTypes: [
+            { key: 'TEST_TYPE', description: 'Test type', values: [{ key: 'TEST_TYPE', description: 'Test type' }] },
+          ],
+        },
+      },
+    }),
 }
