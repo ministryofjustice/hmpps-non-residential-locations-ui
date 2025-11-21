@@ -33,6 +33,9 @@ context('Sign In', () => {
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
+      cy.task('stubLocationsConstantsNonResidentialUsageType')
+      cy.task('stubLocationsConstantsServiceTypes')
+      cy.task('stubLocationsConstantsServiceFamilyTypes')
     })
 
     it('Unauthenticated user directed to auth', () => {
