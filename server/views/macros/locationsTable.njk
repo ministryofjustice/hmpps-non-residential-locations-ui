@@ -17,7 +17,8 @@
         [
           { html: item.localName },
           { html: locationStatusTag(item) },
-          { html: usageTypes(item.usedByGroupedServices) }
+          { html: usageTypes(item.usedByGroupedServices) },
+          { html: editLink(item.id) }
         ]
       ), rows) %}
     {% endfor %}
@@ -31,7 +32,8 @@
       head: [
         { text: "Location" },
         { text: "Status" },
-        { text: "Services that use non-resi locations" }
+        { text: "Services that use non-resi locations" },
+        { text: "Actions" }
       ],
       rows: rows
     }) }}
@@ -45,4 +47,8 @@
     <li>{{ item | usageLabel }}</li>
   {% endfor %}
   </ul>
+{% endmacro %}
+
+{% macro editLink(locationId) %}
+    <a href='/location/{{ locationId }}/edit'>Edit</a>
 {% endmacro %}

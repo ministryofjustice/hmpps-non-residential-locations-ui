@@ -10,6 +10,8 @@ describe('LocationsService', () => {
   beforeEach(() => {
     locationsApiClient.locations = {
       getNonResidentialSummary: Object.assign(jest.fn(), { clearCache: jest.fn() }),
+      getNonResidentialLocation: Object.assign(jest.fn(), { clearCache: jest.fn() }),
+      updateNonResidentialLocation: Object.assign(jest.fn(), { clearCache: jest.fn() }),
     }
     locationsService = new LocationsService(locationsApiClient)
   })
