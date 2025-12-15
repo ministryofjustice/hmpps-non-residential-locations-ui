@@ -49,7 +49,13 @@ export default class LocationsApiClient extends BaseApiClient {
       options: { cacheDuration: 86_400 },
     }),
     getServiceFamilyTypes: this.apiCall<
-      { serviceFamilyTypes: { key: string; description: string; values: unknown }[] },
+      {
+        serviceFamilyTypes: {
+          key: string
+          description: string
+          values: { key: string; description: string; additionalInformation?: string }[]
+        }[]
+      },
       null
     >({
       path: '/constants/service-family-types',

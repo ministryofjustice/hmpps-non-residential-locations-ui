@@ -24,10 +24,15 @@
       <div class="govuk-checkboxes__item">
         {% set isChecked = 'checked' if val.key in (options.value or []) %}
 
-        <input class="govuk-checkboxes__input" id="{{options.id}}{{'-' + n if n > 1}}" name="{{options.id}}" type="checkbox" value="{{val.key}}" {{ isChecked }}>
-        <label class="govuk-label govuk-checkboxes__label" for="{{options.id}}{{'-' + n if n > 1}}"">
+        <input class="govuk-checkboxes__input" id="{{options.id}}{{'-' + n if n > 1}}" name="{{options.id}}" type="checkbox" value="{{val.key}}" {{ isChecked }}{% if val.additionalInformation %} aria-describedby="{{options.id}}{{'-' + n if n > 1}}-hint"{% endif %}>
+        <label class="govuk-label govuk-checkboxes__label" for="{{options.id}}{{'-' + n if n > 1}}">
           {{ val.description }}
         </label>
+        {% if val.additionalInformation %}
+        <div id="{{options.id}}{{'-' + n if n > 1}}-hint" class="govuk-hint govuk-checkboxes__hint">
+          {{ val.additionalInformation }}
+        </div>
+        {% endif %}
       </div>
 
       {% set n = n + 1 %}
