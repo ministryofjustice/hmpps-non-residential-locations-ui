@@ -127,7 +127,13 @@ export default {
         },
         jsonBody: {
           serviceFamilyTypes: [
-            { key: 'TEST_TYPE', description: 'Test type', values: [{ key: 'TEST_TYPE', description: 'Test type' }] },
+            {
+              key: 'TEST_TYPE',
+              description: 'Test type',
+              values: [
+                { key: 'TEST_TYPE', description: 'Test type', additionalInformation: 'Additional info for test type' },
+              ],
+            },
           ],
         },
       },
