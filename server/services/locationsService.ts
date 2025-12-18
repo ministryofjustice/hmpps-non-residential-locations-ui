@@ -1,4 +1,5 @@
 import LocationsApiClient from '../data/locationsApiClient'
+import { Constant, CompoundConstant } from '../@types/locationsApi/locationsApiTypes'
 
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
@@ -39,7 +40,9 @@ export default class LocationsService {
 
   private async getConstantDataMap(token: string, apiCallName: keyof LocationsApiClient['constants']) {
     return Object.fromEntries(
-      Object.values(await this.locationsApiClient.constants[apiCallName](token))[0].map(i => [i.key, i.description]),
+      Object.values(await this.locationsApiClient.constants[apiCallName](token))[0].map(
+        (i: Constant | CompoundConstant) => [i.key, i.description],
+      ),
     )
   }
 }
