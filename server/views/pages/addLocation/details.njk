@@ -1,0 +1,15 @@
+{% extends "../../partials/formStep.njk" %}
+{% from "moj/components/page-header-actions/macro.njk" import mojPageHeaderActions %}
+
+
+{% block content %}
+  <div class="govuk-width-container">
+  {{ mojPageHeaderActions({
+    heading: {
+      text: "Add non-residential location"
+    }
+  }) }}
+</div>
+
+{{ super() }}
+{% endblock %}

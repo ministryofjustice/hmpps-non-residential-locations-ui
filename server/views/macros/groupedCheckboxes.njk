@@ -2,7 +2,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% macro groupedCheckboxes (options) %}
-<div class="govuk-form-group">
+<div class="govuk-form-group {% if options.errorMessage %}govuk-form-group--error{% endif %}">
   <fieldset class="govuk-fieldset" aria-describedby="{{options.id}}-hint">
     <legend class="govuk-fieldset__legend {{ options.fieldset.legend.classes }}">
       <h2 class="govuk-fieldset__heading">

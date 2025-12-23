@@ -8,6 +8,7 @@ import config from '../config'
 
 import listLocationsRouter from './listLocationsRouter'
 import editLocationRouter from './editLocation'
+import addLocationRouter from './addLocation'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -23,6 +24,7 @@ export default function routes(services: Services): Router {
   )
 
   router.use('/location/:locationId/edit', editLocationRouter)
+  router.use('/add-location', addLocationRouter)
 
   return router
 }

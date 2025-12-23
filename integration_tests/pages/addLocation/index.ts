@@ -1,0 +1,23 @@
+import Page, { PageElement } from '../page'
+
+export default class IndexPage extends Page {
+  constructor() {
+    super('Add non-residential location')
+  }
+
+  static goTo = () => cy.visit('/add-location')
+
+  errorSummary = (): PageElement => cy.get('[data-module="govuk-error-summary"]')
+
+  errorSummaryList = (): PageElement => cy.get('[data-module="govuk-error-summary"] ul li')
+
+  localNameInput = (): PageElement => cy.get('[data-qa="local-name"]')
+
+  serviceCheckbox = (value: string): PageElement => cy.get(`input[name="services"][value="${value}"]`)
+
+  locationStatusRadios = (): PageElement => cy.get('[data-qa="location-status"]')
+
+  helptext = (): PageElement => cy.get('[data-qa="helptext"]')
+
+  continueButton = (): PageElement => cy.get('button[type="submit"]')
+}
