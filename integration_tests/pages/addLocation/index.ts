@@ -2,7 +2,7 @@ import Page, { PageElement } from '../page'
 
 export default class IndexPage extends Page {
   constructor() {
-    super('Add non-residential location')
+    super('Add a non-residential location')
   }
 
   static goTo = () => cy.visit('/add-location')
