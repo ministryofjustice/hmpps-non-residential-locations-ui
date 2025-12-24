@@ -1,7 +1,7 @@
 services:
 
   hmpps-auth:
-    image: quay.io/hmpps/hmpps-auth:latest
+    image: ghcr.io/ministryofjustice/hmpps-auth:latest
     networks:
       - hmpps
     container_name: hmpps-auth
@@ -28,7 +28,7 @@ services:
       - API_BASE_URL_OAUTH=http://hmpps-auth:8080/auth
 
   manage-users-api:
-    image: quay.io/hmpps/hmpps-manage-users-api:latest
+    image: ghcr.io/ministryofjustice/hmpps-manage-users-api:latest
     container_name: manage-users-api
     networks:
       - hmpps
@@ -102,7 +102,7 @@ services:
       - POSTGRES_DB=locations_inside_prison
 
   redis:
-    image: 'redis:8.2'
+    image: 'redis:8.4'
     networks:
       - hmpps
     container_name: redis

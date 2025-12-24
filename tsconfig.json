@@ -1,7 +1,9 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
+  "extends": "@tsconfig/node24/tsconfig.json",
   "compileOnSave": true,
   "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
     "isolatedModules": true,
     "outDir": "./dist",
     "sourceMap": true,
@@ -11,6 +13,7 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
+    "noImplicitOverride": true,
     "experimentalDecorators": true,
     "typeRoots": ["./server/@types", "./node_modules/@types"]
   },

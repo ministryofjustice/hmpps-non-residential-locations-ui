@@ -2,12 +2,12 @@ import path from 'path'
 import nunjucks from 'nunjucks'
 import express from 'express'
 import fs from 'fs'
+import { isFunction } from 'lodash'
 import { initialiseName } from './utils'
 import config from '../config'
 import logger from '../../logger'
 import locationStatusTagLabel from '../formatters/locationStatusTagLabel'
 import locationStatusTagClass from '../formatters/locationStatusTagClass'
-import usageLabel from '../formatters/usageLabel'
 
 export default function nunjucksSetup(app: express.Express): void {
   app.set('view engine', 'njk')
@@ -40,11 +40,24 @@ export default function nunjucksSetup(app: express.Express): void {
     },
   )
 
+  function callAsMacro(name: string) {
+    const macro = this.ctx[name]
+
+    if (!isFunction(macro)) {
+      // eslint-disable-next-line no-console
+      console.log(`'${name}' macro does not exist`)
+      return () => ''
+    }
+
+    return macro
+  }
+
+  njkEnv.addGlobal('callAsMacro', callAsMacro)
+
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)
   njkEnv.addFilter('locationStatusTagClass', locationStatusTagClass)
   njkEnv.addFilter('locationStatusTagLabel', locationStatusTagLabel)
-  njkEnv.addFilter('usageLabel', usageLabel)
 
   njkEnv.addFilter('formatText', function formatText(str) {
     if (!str) return ''

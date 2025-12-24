@@ -1,0 +1,49 @@
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+
+{% macro groupedCheckboxes (options) %}
+<div class="govuk-form-group {% if options.errorMessage %}govuk-form-group--error{% endif %}">
+  <fieldset class="govuk-fieldset" aria-describedby="{{options.id}}-hint">
+    <legend class="govuk-fieldset__legend {{ options.fieldset.legend.classes }}">
+      <h2 class="govuk-fieldset__heading">
+        {{ options.fieldset.legend.text }}
+      </h2>
+    </legend>
+    <div id="{{options.id}}-hint" class="govuk-hint">
+      Select all that apply
+    </div>
+    <div class="govuk-checkboxes govuk-!-margin-bottom-4" data-module="govuk-checkboxes">
+
+
+   {% set n = 1 %}
+   {% for group in options.items %}
+   <h2 class="govuk-heading-s govuk-!-margin-bottom-3 govuk-!-margin-top-2"> {{ group.description }} </h2>
+
+
+      {% for val in group.values %}
+      <div class="govuk-checkboxes__item">
+        {% set isChecked = 'checked' if val.key in (options.value or []) %}
+
+        <input class="govuk-checkboxes__input" id="{{options.id}}{{'-' + n if n > 1}}" name="{{options.id}}" type="checkbox" value="{{val.key}}" {{ isChecked }}{% if val.additionalInformation %} aria-describedby="{{options.id}}{{'-' + n if n > 1}}-hint"{% endif %}>
+        <label class="govuk-label govuk-checkboxes__label" for="{{options.id}}{{'-' + n if n > 1}}">
+          {{ val.description }}
+        </label>
+        {% if val.additionalInformation %}
+        <div id="{{options.id}}{{'-' + n if n > 1}}-hint" class="govuk-hint govuk-checkboxes__hint">
+          {{ val.additionalInformation }}
+        </div>
+        {% endif %}
+      </div>
+
+      {% set n = n + 1 %}
+     {% endfor %}
+ {% endfor %}
+ </div>
+
+   </fieldset>
+</div>
+{% if options.helptext %}
+  {{ govukDetails(options.helptext) }}
+{% endif %}
+
+{% endmacro %}

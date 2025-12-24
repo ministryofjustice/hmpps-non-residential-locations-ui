@@ -4,7 +4,7 @@
 {% from "./locationStatusTag.njk" import locationStatusTag %}
 {% from "../partials/simplePagination/macro.njk" import simplePagination %}
 
-{% macro locationsTable (locations, pagingData) %}
+{% macro locationsTable (locations, pagingData, usageTypesData) %}
 
 <h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
 
@@ -17,7 +17,8 @@
         [
           { html: item.localName },
           { html: locationStatusTag(item) },
-          { html: usageTypes(item.usedByGroupedServices) }
+          { html: usageTypes(item.usedByGroupedServices, usageTypesData) },
+          { html: editLink(item.id) }
         ]
       ), rows) %}
     {% endfor %}
@@ -31,7 +32,8 @@
       head: [
         { text: "Location" },
         { text: "Status" },
-        { text: "Services that use non-resi locations" }
+        { text: "Services that use non-resi locations" },
+        { text: "Actions" }
       ],
       rows: rows
     }) }}
@@ -39,10 +41,20 @@
   {{ simplePagination(pagingData) }}
 {% endmacro %}
 
-{% macro usageTypes(items) %}
+{% macro usageTypes(items, usageTypesData) %}
   <ul class="govuk-list govuk-list--bullet">
   {% for item in items %}
-    <li>{{ item | usageLabel }}</li>
+    {% set label = item %}
+    {% for usageType in usageTypesData %}
+      {% if usageType.key == item %}
+        {% set label = usageType.description %}
+      {% endif %}
+    {% endfor %}
+    <li>{{ label }}</li>
   {% endfor %}
   </ul>
+{% endmacro %}
+
+{% macro editLink(locationId) %}
+    <a href='/location/{{ locationId }}/edit'>Edit</a>
 {% endmacro %}
