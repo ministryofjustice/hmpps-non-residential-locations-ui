@@ -22,14 +22,14 @@ context('Start journey', () => {
     indexPage.continueButton().click()
     indexPage.errorSummary().should('exist')
     indexPage.errorSummaryList().should('have.length', 3)
-    indexPage.errorSummaryList().eq(0).should('contain.text', 'Enter a local name')
+    indexPage.errorSummaryList().eq(0).should('contain.text', 'Enter a location name')
     indexPage.errorSummaryList().eq(1).should('contain.text', 'Select at least one service')
     indexPage
       .errorSummaryList()
       .eq(2)
       .should('contain.text', 'Select \u2018yes\u2019 if the location is already active')
 
-    indexPage.localNameInput().type('Loc A')
+    indexPage.locationNameInput().type('Loc A')
     indexPage.locationStatusRadios().find('input[value="ACTIVE"]').click()
     indexPage.continueButton().click()
     indexPage.errorSummary().should('exist')
