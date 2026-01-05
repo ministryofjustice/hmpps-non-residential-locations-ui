@@ -17,6 +17,7 @@ import HmppsAuditClient from './hmppsAuditClient'
 import logger from '../../logger'
 import LocationsApiClient from './locationsApiClient'
 import ManageUsersApiClient from './manageUsersApiClient'
+import FeComponentsClient from './feComponentsClient'
 
 export const dataAccess = () => {
   const hmppsAuthClient = new AuthenticationClient(
@@ -31,6 +32,7 @@ export const dataAccess = () => {
     locationsApiClient: new LocationsApiClient(redisClient, hmppsAuthClient),
     manageUsersApiClient: new ManageUsersApiClient(redisClient, hmppsAuthClient),
     hmppsAuditClient: new HmppsAuditClient(config.sqs.audit),
+    feComponentsClient: new FeComponentsClient(hmppsAuthClient),
   }
 }
 
