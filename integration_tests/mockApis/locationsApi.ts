@@ -15,7 +15,12 @@ export default {
       },
     }),
 
-  stubNonResidentialLocationByPrisonAndLocalName: ({ prisonId, localName, reponseStatus, responseBody }): SuperAgentRequest =>
+  stubNonResidentialLocationByPrisonAndLocalName: ({
+    prisonId,
+    localName,
+    reponseStatus,
+    responseBody,
+  }): SuperAgentRequest =>
     stubFor({
       request: {
         method: 'GET',
