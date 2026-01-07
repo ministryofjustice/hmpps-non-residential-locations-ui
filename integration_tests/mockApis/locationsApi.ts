@@ -15,6 +15,21 @@ export default {
       },
     }),
 
+  stubNonResidentialLocationByPrisonAndLocalName: ({ prisonId, localName, reponseStatus, responseBody }): SuperAgentRequest =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/locations-api/locations/non-residential/prison/${prisonId}/local-name/${localName}`,
+      },
+      response: {
+        status: reponseStatus,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: responseBody,
+      },
+    }),
+
   stubNonResidentialLocation: ({ prisonId }): SuperAgentRequest =>
     stubFor({
       request: {

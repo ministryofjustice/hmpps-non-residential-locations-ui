@@ -12,6 +12,11 @@
   <h1>{{ heading }}</h1>
 
   <div class="govuk-width-container">
+    
+    {% if canAccess('view_non_resi') %}
+      <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-6" href="/add-location" role="button" data-qa="add-location-button">Add a non-residential location</a>
+    {% endif %}
+
     {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes) }}
   </div>
 {% endblock %}

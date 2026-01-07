@@ -8,6 +8,22 @@ export default class LocationsService {
     return this.locationsApiClient.locations.getNonResidentialSummary(token, { prisonId, page, size: '35' })
   }
 
+  async getNonResidentialLocationByLocalName(token: string, prisonId: string, localName: string) {
+    try {
+      const location = await this.locationsApiClient.locations.getNonResidentialLocationByLocalName(token, {
+        prisonId,
+        localName,
+      })
+
+      return location
+    } catch (error) {
+      if (error?.responseStatus === 404) {
+        return null
+      }
+      throw error
+    }
+  }
+
   async getNonResidentialLocationDetails(token: string, locationId: string) {
     return this.locationsApiClient.locations.getNonResidentialLocation(token, { locationId })
   }
