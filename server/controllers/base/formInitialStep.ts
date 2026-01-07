@@ -117,6 +117,7 @@ export default class FormInitialStep extends FormWizard.Controller {
       numeric: `${fieldName} must be a number`,
       required: `Enter a ${unCapFirst(fieldName)}`,
       taken: `A location with this ${unCapFirst(fieldName)} already exists`,
+      uniqueNameRequired: 'Location already exists. Enter a unique location name',
       noChange: `You must change something, archive the location or select ‘cancel’`,
     }
 

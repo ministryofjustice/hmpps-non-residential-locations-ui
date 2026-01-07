@@ -134,7 +134,7 @@ describe('Add Location - Details controller', () => {
       expect(errors.localName).toBeDefined()
     })
 
-    it('adds "taken" error when sanitized localName already exists', async () => {
+    it('adds error when sanitized localName already exists', async () => {
       mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
 
       getNonResidentialLocationByLocalName.mockResolvedValue({
@@ -144,7 +144,7 @@ describe('Add Location - Details controller', () => {
 
       const errors = await runValidateFields({ localName: 'Study room ' })
       expect(getNonResidentialLocationByLocalName).toHaveBeenCalled()
-      expect(errors.localName).toEqual(expect.objectContaining({ key: 'localName', type: 'taken' }))
+      expect(errors.localName).toEqual(expect.objectContaining({ key: 'localName', type: 'uniqueNameRequired' }))
     })
 
     it('does not add error when localName is unique', async () => {

@@ -43,7 +43,7 @@ context('Start journey', () => {
     indexPage.locationNameInput().type('Gym') // ensure existing location can't be added again
     indexPage.continueButton().click()
     indexPage.errorSummaryList().should('have.length', 3)
-    indexPage.errorSummaryList().eq(0).should('contain.text', 'A location with this name already exists')
+    indexPage.errorSummaryList().eq(0).should('contain.text', 'Location already exists. Enter a unique location name')
 
     indexPage.locationNameInput().type('Loc A')
     indexPage.locationStatusRadios().find('input[value="ACTIVE"]').click()

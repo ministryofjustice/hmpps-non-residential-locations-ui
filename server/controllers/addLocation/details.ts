@@ -55,7 +55,7 @@ export default class Details extends FormInitialStep {
         )
 
         if (locationExistsAlready) {
-          validationErrors.localName = this.formError('localName', 'taken')
+          validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
         }
       }
 
