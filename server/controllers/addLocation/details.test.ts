@@ -145,7 +145,7 @@ describe('Add Location - Details controller', () => {
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(locationsService.getNonResidentialLocationByLocalName).toHaveBeenCalled()
-      expect(callback).toHaveBeenLastCalledWith()
+      expect(callback).toHaveBeenLastCalledWith({})
       expect(deepReq.form.values).toStrictEqual({
         localName: 'Study room',
         services: ['APPOINTMENT'],
