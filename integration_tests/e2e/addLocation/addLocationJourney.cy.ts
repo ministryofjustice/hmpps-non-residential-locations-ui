@@ -23,6 +23,7 @@ context('Start journey', () => {
       reponseStatus: 200,
       responseBody: { id: 1 },
     })
+    cy.task('stubComponents')
   })
 
   it('Should display error messages correctly', () => {

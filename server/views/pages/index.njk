@@ -2,9 +2,8 @@
 
 {% from "../macros/locationsTable.njk" import locationsTable %}
 
-
-{% set pageTitle = applicationName + " - Home" %}
-{% set heading = 'View non-residential locations' %}
+{% set pageTitle = ('Edit non-residential locations' if canEdit else 'View non-residential locations') + ' - ' + applicationName %}
+{% set heading = 'Edit non-residential locations' if canEdit else 'View non-residential locations' %}
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block content %}
@@ -12,11 +11,11 @@
   <h1>{{ heading }}</h1>
 
   <div class="govuk-width-container">
-    
-    {% if canAccess('view_non_resi') %}
+
+    {% if canEdit %}
       <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-6" href="/add-location" role="button" data-qa="add-location-button">Add a non-residential location</a>
     {% endif %}
 
-    {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes) }}
+    {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes, canEdit) }}
   </div>
 {% endblock %}

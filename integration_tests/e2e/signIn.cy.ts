@@ -36,6 +36,7 @@ context('Sign In', () => {
       cy.task('stubLocationsConstantsNonResidentialUsageType')
       cy.task('stubLocationsConstantsServiceTypes')
       cy.task('stubLocationsConstantsServiceFamilyTypes')
+      cy.task('stubComponents')
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -50,19 +51,19 @@ context('Sign In', () => {
 
     it('User name visible in header', () => {
       cy.signIn({ failOnStatusCode: false })
-      const indexPage = Page.verifyOnPage(IndexPage)
+      const indexPage = IndexPage.forViewUser()
       indexPage.headerUserName().should('contain.text', 'J. Smith')
     })
 
     it('Phase banner visible in header', () => {
       cy.signIn({ failOnStatusCode: false })
-      const indexPage = Page.verifyOnPage(IndexPage)
+      const indexPage = IndexPage.forViewUser()
       indexPage.headerPhaseBanner().should('contain.text', 'TEST')
     })
 
     it('User can sign out', () => {
       cy.signIn({ failOnStatusCode: false })
-      const indexPage = Page.verifyOnPage(IndexPage)
+      const indexPage = IndexPage.forViewUser()
       indexPage.signOut().click()
       Page.verifyOnPage(AuthSignInPage)
     })
@@ -70,7 +71,7 @@ context('Sign In', () => {
     it('User can manage their details', () => {
       cy.signIn({ failOnStatusCode: false })
       cy.task('stubAuthManageDetails')
-      const indexPage = Page.verifyOnPage(IndexPage)
+      const indexPage = IndexPage.forViewUser()
 
       indexPage.manageDetails().get('a').invoke('removeAttr', 'target')
       indexPage.manageDetails().click()
@@ -79,7 +80,7 @@ context('Sign In', () => {
 
     it('Token verification failure takes user to sign in page', () => {
       cy.signIn({ failOnStatusCode: false })
-      Page.verifyOnPage(IndexPage)
+      IndexPage.forViewUser()
       cy.task('stubVerifyToken', false)
 
       // can't do a visit here as cypress requires only one domain
@@ -88,7 +89,7 @@ context('Sign In', () => {
 
     it('Token verification failure clears user session', () => {
       cy.signIn({ failOnStatusCode: false })
-      const indexPage = Page.verifyOnPage(IndexPage)
+      const indexPage = IndexPage.forViewUser()
       cy.task('stubVerifyToken', false)
 
       cy.visit('/')
@@ -96,6 +97,7 @@ context('Sign In', () => {
 
       cy.task('stubVerifyToken', true)
       cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'], name: 'bobby brown' })
+      cy.task('stubComponents', { userName: 'B. Brown' })
       cy.signIn()
       indexPage.headerUserName().contains('B. Brown')
     })
