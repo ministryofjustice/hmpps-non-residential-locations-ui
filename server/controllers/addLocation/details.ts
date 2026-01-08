@@ -45,21 +45,29 @@ export default class Details extends FormInitialStep {
     const { locationsService } = req.services
     const sanitizedLocalName = sanitizeString(String(localName))
 
-    const validationErrors: FormWizard.Errors = {}
     super.validateFields(req, res, async errors => {
-      if (!errors.localName) {
-        const locationExistsAlready = await locationsService.getNonResidentialLocationByLocalName(
-          req.session.systemToken,
-          res.locals.user.activeCaseload.id,
-          sanitizedLocalName,
-        )
+      const validationErrors: FormWizard.Errors = {}
 
-        if (locationExistsAlready) {
-          validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
+      if (!errors.localName) {
+        let location
+        try {
+          location = await locationsService.getNonResidentialLocationByLocalName(
+            req.session.systemToken,
+            res.locals.user.activeCaseload.id,
+            sanitizedLocalName,
+          )
+          if (location) {
+            validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
+          }
+        } catch (error) {
+          if (error.responseStatus === 404) {
+            return callback(errors)
+          }
+          throw error
         }
       }
 
-      callback({ ...errors, ...validationErrors })
+      return callback({ ...errors, ...validationErrors })
     })
   }
 }
