@@ -52,6 +52,8 @@ describe('GET /prison/TST', () => {
       .expect(200)
       .expect(res => {
         expect(locationsService.getNonResidentialLocations).toHaveBeenCalled()
+        expect(res.text).toContain('Add a non-residential location')
+        expect(res.text).toContain('/add-location')
       })
   })
 

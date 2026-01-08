@@ -3,6 +3,7 @@ import { NextFunction, Response } from 'express'
 import FormInitialStep from '../base/formInitialStep'
 import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
+import { sanitizeString } from '../../utils/utils'
 
 export default class Details extends FormInitialStep {
   override middlewareSetup() {
@@ -37,5 +38,28 @@ export default class Details extends FormInitialStep {
       cancelLink: '/',
       buttonText: 'Continue',
     }
+  }
+
+  override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+    const { localName } = req.form.values
+    const { locationsService } = req.services
+    const sanitizedLocalName = sanitizeString(String(localName))
+
+    const validationErrors: FormWizard.Errors = {}
+    super.validateFields(req, res, async errors => {
+      if (!errors.localName) {
+        const locationExistsAlready = await locationsService.getNonResidentialLocationByLocalName(
+          req.session.systemToken,
+          res.locals.user.activeCaseload.id,
+          sanitizedLocalName,
+        )
+
+        if (locationExistsAlready) {
+          validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
+        }
+      }
+
+      callback({ ...errors, ...validationErrors })
+    })
   }
 }

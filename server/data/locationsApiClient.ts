@@ -21,6 +21,11 @@ export default class LocationsApiClient extends BaseApiClient {
       requestType: 'get',
     }),
 
+    getNonResidentialLocationByLocalName: this.apiCall<Location, { prisonId: string; localName: string }>({
+      path: '/locations/non-residential/prison/:prisonId/local-name/:localName',
+      requestType: 'get',
+    }),
+
     updateNonResidentialLocation: this.apiCall<
       Location,
       { locationId: string },

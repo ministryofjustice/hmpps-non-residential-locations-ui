@@ -9,6 +9,7 @@ import type { Services } from '../../services'
 import AuditService from '../../services/auditService'
 import { HmppsUser } from '../../interfaces/hmppsUser'
 import setUpWebSession from '../../middleware/setUpWebSession'
+import setCanAccess from '../../middleware/setCanAccess'
 
 jest.mock('../../services/auditService')
 
@@ -20,7 +21,7 @@ export const user: HmppsUser = {
   displayName: 'First Last',
   authSource: 'nomis',
   staffId: 1234,
-  userRoles: [],
+  userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'VIEW_INTERNAL_LOCATION'],
   activeCaseload: {
     id: 'TST',
     name: 'Test (HMP)',
@@ -50,6 +51,7 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
     }
     next()
   })
+  app.use(setCanAccess())
   app.use((req, res, next) => {
     req.id = randomUUID()
     next()
