@@ -1,7 +1,6 @@
 import { DeepPartial } from 'fishery'
 import { Response } from 'express'
 import FormWizard from 'hmpo-form-wizard'
-
 import Details from './details'
 import FormInitialStep from '../base/formInitialStep'
 import LocationsService from '../../services/locationsService'
@@ -13,12 +12,7 @@ describe('Add Location - Details controller', () => {
   let deepRes: DeepPartial<Response>
   let next: jest.Mock
   const mockSuperValidateFields = jest.spyOn(FormInitialStep.prototype, 'validateFields')
-  const getNonResidentialLocationByLocalName = jest.fn()
-
-  const locationsService = new LocationsService({
-    locations: { getNonResidentialLocationByLocalName },
-    constants: {},
-  } as any)
+  const locationsService = new LocationsService(null) as jest.Mocked<LocationsService>
 
   beforeEach(() => {
     next = jest.fn()
@@ -30,12 +24,7 @@ describe('Add Location - Details controller', () => {
         referrerUrl: undefined as unknown as string,
       },
       services: {
-        locationsService: {
-          getServiceTypes: jest.fn().mockResolvedValue({
-            typeA: { key: 'A', description: 'Alpha' },
-            typeB: { key: 'B', description: 'Bravo' },
-          }),
-        },
+        locationsService,
       },
       form: {
         options: {
@@ -60,10 +49,17 @@ describe('Add Location - Details controller', () => {
           { text: 'Education', value: 'EDU' },
           { text: 'Healthcare', value: 'HEALTH' },
         ],
+        user: {
+          activeCaseload: { id: 'TST', name: 'Test Prison' },
+        },
       },
     }
-  })
 
+    locationsService.getServiceTypes = jest.fn().mockResolvedValue({
+      typeA: { key: 'A', description: 'Alpha' },
+      typeB: { key: 'B', description: 'Bravo' },
+    })
+  })
   describe('setOptions', () => {
     it('populates services items from service types and calls next', async () => {
       await controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, next)
@@ -102,60 +98,59 @@ describe('Add Location - Details controller', () => {
     })
   })
   describe('validateFields', () => {
-    const runValidateFields = async (values: FormWizard.Values = {}): Promise<FormWizard.Errors> => {
-      deepReq = {
-        ...deepReq,
-        form: {
-          values,
-          options: {} as any,
-        },
-        services: {
-          locationsService,
-        },
-      }
-
-      deepRes.locals.user = {
-        activeCaseload: { id: 'TST', name: 'Test Prison' },
-      }
-
-      // wrap callback-based method in a helper
-      return new Promise<FormWizard.Errors>(done => {
-        controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, done)
-      })
-    }
-
-    it('does not call locations api when base validation has localName error', async () => {
-      mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({ localName: { message: 'bad' } as any }))
-
-      const errors = await runValidateFields({ localName: 'some name' })
+    const callback = jest.fn()
+    it('does not call locations api if base validation identifies localName error', async () => {
+      mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({ localName: expectedError }))
+      const expectedError = controller.formError('localName', 'taken')
+      locationsService.getNonResidentialLocationByLocalName = jest.fn()
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(mockSuperValidateFields).toHaveBeenCalled()
-      expect(getNonResidentialLocationByLocalName).not.toHaveBeenCalled()
-      expect(errors.localName).toBeDefined()
+      expect(locationsService.getNonResidentialLocationByLocalName).not.toHaveBeenCalled()
+      expect(callback).toHaveBeenCalledWith({ localName: expectedError })
     })
 
-    it('adds error when sanitized localName already exists', async () => {
+    it('adding existing localName causes error', async () => {
+      deepReq.form.values.localName = 'Study room'
       mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
-
-      getNonResidentialLocationByLocalName.mockResolvedValue({
-        id: 'LOC-1',
+      const expectedError = controller.formError('localName', 'uniqueNameRequired')
+      locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue({
+        id: 'Loc 1',
         localName: 'Study room',
       })
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      const errors = await runValidateFields({ localName: 'Study room ' })
-      expect(getNonResidentialLocationByLocalName).toHaveBeenCalled()
-      expect(errors.localName).toEqual(expect.objectContaining({ key: 'localName', type: 'uniqueNameRequired' }))
+      expect(locationsService.getNonResidentialLocationByLocalName).toHaveBeenCalledWith(
+        'token-123',
+        'TST',
+        'Study room',
+      )
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({ localName: expectedError }))
     })
 
-    it('does not add error when localName is unique', async () => {
+    it('adding a unique localName does not cause error', async () => {
+      deepReq.form.values.localName = 'gym'
       mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+      locationsService.getNonResidentialLocationByLocalName = jest.fn().mockRejectedValue({ responseStatus: 404 })
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      getNonResidentialLocationByLocalName.mockRejectedValue({ responseStatus: 404 })
+      expect(locationsService.getNonResidentialLocationByLocalName).toHaveBeenCalled()
+      expect(callback).toHaveBeenCalledWith(expect.objectContaining({}))
+    })
 
-      const errors = await runValidateFields({ localName: 'Study room' })
+    it('updates form values correctly when no errors', async () => {
+      deepReq.form.values = { localName: 'Study room', services: ['APPOINTMENT'], locationStatus: 'ACTIVE' }
+      mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+      locationsService.getNonResidentialLocationByLocalName = jest.fn().mockRejectedValue({ responseStatus: 404 })
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(getNonResidentialLocationByLocalName).toHaveBeenCalled()
-      expect(errors.localName).toBeUndefined()
+      expect(locationsService.getNonResidentialLocationByLocalName).toHaveBeenCalled()
+      expect(callback).toHaveBeenLastCalledWith({})
+      expect(deepReq.form.values).toStrictEqual({
+        localName: 'Study room',
+        services: ['APPOINTMENT'],
+        locationStatus: 'ACTIVE',
+      })
     })
   })
 })

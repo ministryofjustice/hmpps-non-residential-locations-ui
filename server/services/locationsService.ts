@@ -9,19 +9,10 @@ export default class LocationsService {
   }
 
   async getNonResidentialLocationByLocalName(token: string, prisonId: string, localName: string) {
-    try {
-      const location = await this.locationsApiClient.locations.getNonResidentialLocationByLocalName(token, {
-        prisonId,
-        localName,
-      })
-
-      return location
-    } catch (error) {
-      if (error?.responseStatus === 404) {
-        return null
-      }
-      throw error
-    }
+    return this.locationsApiClient.locations.getNonResidentialLocationByLocalName(token, {
+      prisonId,
+      localName,
+    })
   }
 
   async getNonResidentialLocationDetails(token: string, locationId: string) {
