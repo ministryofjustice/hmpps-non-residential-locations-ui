@@ -4,18 +4,16 @@
 
   {% set rows = [] %}
 
-  {% for itemIndex in range(0, breadcrumbList.length - 1) -%}
-    {% set item = breadcrumbList[itemIndex] %}
-
+  {% for item in breadcrumbList %}
     {% set rows = (rows.push(
       {
         text: item.title,
-        href: item.href
+        href: item.href if not loop.last else undefined
       }
     ), rows) %}
   {% endfor %}
 
-  {% if displayCurrentPageTitle %}
+  {% if displayCurrentPageTitle and pageTitle %}
     {% set completedRows = (rows.push(
       {
         text: pageTitle

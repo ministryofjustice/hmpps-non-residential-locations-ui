@@ -4,7 +4,7 @@
 {% from "./locationStatusTag.njk" import locationStatusTag %}
 {% from "../partials/simplePagination/macro.njk" import simplePagination %}
 
-{% macro locationsTable (locations, pagingData, usageTypesData) %}
+{% macro locationsTable (locations, pagingData, usageTypesData, canEdit) %}
 
 <h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
 
@@ -12,29 +12,43 @@
     {% set rows = [] %}
 
     {% for item in locations %}
-
-      {% set rows = (rows.push(
-        [
-          { html: item.localName },
-          { html: locationStatusTag(item) },
-          { html: usageTypes(item.usedByGroupedServices, usageTypesData) },
-          { html: editLink(item.id) }
-        ]
-      ), rows) %}
+      {% if canEdit %}
+        {% set rows = (rows.push(
+          [
+            { html: item.localName },
+            { html: locationStatusTag(item) },
+            { html: usageTypes(item.usedByGroupedServices, usageTypesData) },
+            { html: editLink(item.id) }
+          ]
+        ), rows) %}
+      {% else %}
+        {% set rows = (rows.push(
+          [
+            { html: item.localName },
+            { html: locationStatusTag(item) },
+            { html: usageTypes(item.usedByGroupedServices, usageTypesData) }
+          ]
+        ), rows) %}
+      {% endif %}
     {% endfor %}
     {{ simplePagination(pagingData) }}
+
+    {% set tableHead = [
+      { text: "Location" },
+      { text: "Status" },
+      { text: "Services that use non-resi locations" }
+    ] %}
+    {% if canEdit %}
+      {% set tableHead = tableHead.concat([{ text: "Actions" }]) %}
+    {% endif %}
+
     {{ govukTable({
       attributes: {
         "data-qa": "locations-table",
         "id": "locations-table"
       },
       firstCellIsHeader: false,
-      head: [
-        { text: "Location" },
-        { text: "Status" },
-        { text: "Services that use non-resi locations" },
-        { text: "Actions" }
-      ],
+      head: tableHead,
       rows: rows
     }) }}
   {% endif %}

@@ -36,7 +36,12 @@ export const user: HmppsUser = {
 
 export const flashProvider = jest.fn()
 
-function appSetup(services: Services, production: boolean, userSupplier: () => HmppsUser): Express {
+function appSetup(
+  services: Services,
+  production: boolean,
+  userSupplier: () => HmppsUser,
+  canAccessFn: (permission: string) => boolean = () => true,
+): Express {
   const app = express()
 
   app.set('view engine', 'njk')
@@ -52,6 +57,11 @@ function appSetup(services: Services, production: boolean, userSupplier: () => H
     next()
   })
   app.use(setCanAccess())
+  app.use((req, res, next) => {
+    req.canAccess = canAccessFn
+    res.locals.canAccess = req.canAccess
+    next()
+  })
   app.use((req, res, next) => {
     req.id = randomUUID()
     next()
@@ -71,10 +81,12 @@ export function appWithAllRoutes({
     auditService: new AuditService(null) as jest.Mocked<AuditService>,
   },
   userSupplier = () => user,
+  canAccess = () => true,
 }: {
   production?: boolean
   services?: Partial<Services>
   userSupplier?: () => HmppsUser
+  canAccess?: (permission: string) => boolean
 }): Express {
-  return appSetup(services as Services, production, userSupplier)
+  return appSetup(services as Services, production, userSupplier, canAccess)
 }
