@@ -2,14 +2,10 @@
 
 {% from "../macros/locationsTable.njk" import locationsTable %}
 
-{% set pageTitle = ('Edit non-residential locations' if canEdit else 'View non-residential locations') + ' - ' + applicationName %}
-{% set heading = 'Edit non-residential locations' if canEdit else 'View non-residential locations' %}
 {% set mainClasses = "app-container govuk-body" %}
 
 {% block content %}
-
-  <h1>{{ heading }}</h1>
-
+  <h1>{{ title }}</h1>
   <div class="govuk-width-container">
 
     {% if canEdit %}

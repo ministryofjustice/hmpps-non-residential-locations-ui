@@ -32,6 +32,8 @@ export default class Details extends FormInitialStep {
       fallbackUrl: `/`,
     })
 
+    locals.title = 'Add a non-residential location'
+
     return {
       ...locals,
       backLink,
