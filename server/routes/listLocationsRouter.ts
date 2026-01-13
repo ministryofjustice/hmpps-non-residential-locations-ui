@@ -18,6 +18,7 @@ export default function routes({ locationsService }: Services): Router {
 
     // Set breadcrumb based on permission
     res.locals.breadcrumbs = res.locals.breadcrumbs || []
+    res.locals.title = canEdit ? 'Edit non-residential locations' : 'View non-residential locations'
     res.locals.breadcrumbs.push({
       title: canEdit ? 'Edit the list of non-residential locations' : 'View non-residential locations',
       href: '/',
