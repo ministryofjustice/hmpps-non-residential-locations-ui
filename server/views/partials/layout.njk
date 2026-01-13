@@ -21,6 +21,7 @@
   {% endif %}
 {% endblock %}
 
+{% set pageTitle = title if title === applicationName else title + ' - ' + applicationName %}
 {% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
 
 {% block header %}

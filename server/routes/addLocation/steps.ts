@@ -12,7 +12,7 @@ const steps: FormWizard.Steps = {
   '/details': {
     fields: ['localName', 'services', 'locationStatus'],
     controller: Details,
-    template: 'details',
+    template: '../../partials/formStep',
     next: 'check-your-answers',
   },
   '/check-your-answers': {

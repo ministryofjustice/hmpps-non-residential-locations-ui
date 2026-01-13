@@ -31,7 +31,6 @@ interface AllLocals {
   canAccess?: (permission: string) => boolean
   cspNonce?: string
   user?: HmppsUser
-  pageTitle?: string
   paginationLocals?: PaginationLocals
   titleCaption?: string
   validationErrors: { text: string; href: string }[]

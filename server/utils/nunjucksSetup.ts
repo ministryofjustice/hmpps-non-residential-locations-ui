@@ -14,7 +14,7 @@ export default function nunjucksSetup(app: express.Express): void {
 
   const { locals } = app
   locals.asset_path = '/assets/'
-  locals.applicationName = 'HMPPS Non Residential Locations Ui'
+  locals.applicationName = 'Non-residential locations'
   locals.environmentName = config.environmentName
   locals.environmentNameColour = config.environmentName === 'PRE-PRODUCTION' ? 'govuk-tag--green' : ''
   let assetManifest: Record<string, string> = {}
