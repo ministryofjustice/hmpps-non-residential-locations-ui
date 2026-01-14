@@ -1,5 +1,5 @@
 import FormWizard from 'hmpo-form-wizard'
-import { NextFunction, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { isEqual, sortBy } from 'lodash'
 
 import FormInitialStep from '../base/formInitialStep'
@@ -7,6 +7,7 @@ import backUrl from '../../utils/backUrl'
 import { sanitizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
+import addAction from '../../middleware/addAction'
 
 export default class Details extends FormInitialStep {
   override middlewareSetup() {
@@ -39,6 +40,15 @@ export default class Details extends FormInitialStep {
     const backLink = backUrl(req, {
       fallbackUrl: `/prison/${prisonId}`,
     })
+
+    if (req.canAccess('edit_non_resi')) {
+      addAction({
+        text: 'Archive',
+        classes: 'govuk-button--warning',
+        preventDoubleClick: true,
+        href: `/location/${locationDetails.id}/archive`,
+      })(req as unknown as Request, res, null)
+    }
 
     return {
       ...locals,
