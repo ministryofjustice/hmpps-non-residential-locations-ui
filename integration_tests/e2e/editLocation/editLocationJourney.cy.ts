@@ -1,4 +1,5 @@
 import EditDetailsPage from '../../pages/editLocation/details'
+import CheckYourAnswersPage from '../../pages/editLocation/checkYourAnswers'
 
 const TEST_LOCATION_ID = '2475f250-434a-4257-afe7-b911f1773a4d'
 const TEST_LOCATION_NAME = 'Gym'
@@ -48,6 +49,82 @@ context('Edit Location Journey', () => {
       page.continueButton().click()
       page.errorSummary().should('exist')
       page.errorSummaryList().should('contain.text', 'You must change something')
+    })
+
+    it('should navigate to check your answers when changes are made', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const page = new EditDetailsPage(TEST_LOCATION_NAME)
+      page.locationNameInput().clear().type('New Location Name')
+      page.continueButton().click()
+      cy.get('h1').should('contain.text', 'Confirm changes to this location')
+    })
+  })
+
+  describe('Check Your Answers Page', () => {
+    beforeEach(() => {
+      cy.task('stubUpdateNonResidentialLocation', { locationId: TEST_LOCATION_ID })
+    })
+
+    it('should display the correct page title in browser tab', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const detailsPage = new EditDetailsPage(TEST_LOCATION_NAME)
+      detailsPage.locationNameInput().clear().type('New Location Name')
+      detailsPage.continueButton().click()
+      cy.title().should('contain', 'Confirm changes to this location')
+    })
+
+    it('should show only changed fields in the table', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const detailsPage = new EditDetailsPage(TEST_LOCATION_NAME)
+      detailsPage.locationNameInput().clear().type('New Location Name')
+      detailsPage.continueButton().click()
+
+      const checkYourAnswersPage = new CheckYourAnswersPage()
+      checkYourAnswersPage.changesTable().should('exist')
+      checkYourAnswersPage.changesTable().should('contain.text', 'What is the location name?')
+      checkYourAnswersPage.changesTable().should('contain.text', TEST_LOCATION_NAME)
+      checkYourAnswersPage.changesTable().should('contain.text', 'New Location Name')
+    })
+
+    it('should return to details page when clicking Change link', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const detailsPage = new EditDetailsPage(TEST_LOCATION_NAME)
+      detailsPage.locationNameInput().clear().type('New Location Name')
+      detailsPage.continueButton().click()
+
+      const checkYourAnswersPage = new CheckYourAnswersPage()
+      checkYourAnswersPage.changeLinks().first().click()
+      cy.get('h1').should('contain.text', `Change ${TEST_LOCATION_NAME}`)
+    })
+
+    it('should return to locations list without saving when clicking Cancel', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const detailsPage = new EditDetailsPage(TEST_LOCATION_NAME)
+      detailsPage.locationNameInput().clear().type('New Location Name')
+      detailsPage.continueButton().click()
+
+      const checkYourAnswersPage = new CheckYourAnswersPage()
+      checkYourAnswersPage.cancelLink().click()
+      cy.url().should('include', '/prison/TST')
+    })
+
+    it('should save changes and show success banner when clicking Confirm and save', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const detailsPage = new EditDetailsPage(TEST_LOCATION_NAME)
+      detailsPage.locationNameInput().clear().type('New Location Name')
+      detailsPage.continueButton().click()
+
+      const checkYourAnswersPage = new CheckYourAnswersPage()
+      checkYourAnswersPage.confirmButton().click()
+      cy.url().should('include', '/prison/TST')
+      cy.get('.govuk-notification-banner--success').should('exist')
+      cy.get('.govuk-notification-banner--success').should('contain.text', 'Location updated')
     })
   })
 })
