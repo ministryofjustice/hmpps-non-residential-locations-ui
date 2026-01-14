@@ -44,7 +44,7 @@ export default class Details extends FormInitialStep {
     if (req.canAccess('edit_non_resi')) {
       addAction({
         text: 'Archive',
-        class: 'govuk-button--warning',
+        classes: 'govuk-button--warning',
         preventDoubleClick: true,
         href: `/location/${locationDetails.id}/archive`,
       })(req as unknown as Request, res, null)

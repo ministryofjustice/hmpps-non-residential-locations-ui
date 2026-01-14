@@ -29,7 +29,7 @@ describe('addAction middleware', () => {
     const action = { text: 'Test', href: '/test', class: 'custom-class' }
     const middleware = addAction(action)
     await middleware(req as Request, res as Response, next as NextFunction)
-    expect(res.locals.actions[0].class).toBe('custom-class')
+    expect(res.locals.actions[0].classes).toBe('custom-class')
   })
 
   it('should add preventDoubleClick if provided', async () => {
@@ -40,7 +40,7 @@ describe('addAction middleware', () => {
   })
 
   it('should append to existing actions array', async () => {
-    res.locals.actions = [{ text: 'Existing', href: '/existing', class: 'govuk-button--secondary' }]
+    res.locals.actions = [{ text: 'Existing', href: '/existing', classes: 'govuk-button--secondary' }]
     const action = { text: 'Test', href: '/test' }
     const middleware = addAction(action)
     await middleware(req as Request, res as Response, next as NextFunction)

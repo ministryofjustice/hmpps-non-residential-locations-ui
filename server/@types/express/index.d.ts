@@ -12,7 +12,7 @@ export declare module 'express-session' {
 }
 
 interface AllLocals {
-  actions: { text: string; href: string; class: string; preventDoubleClick?: boolean }[]
+  actions: { text: string; href: string; classes: string; preventDoubleClick?: boolean }[]
   stack?: string
   status?: number
   message?: string
