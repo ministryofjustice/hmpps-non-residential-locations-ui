@@ -20,13 +20,13 @@ describe('addAction middleware', () => {
     expect(res.locals.actions[0]).toMatchObject({
       text: 'Test',
       href: '/test',
-      class: 'govuk-button--secondary',
+      classes: 'govuk-button--secondary',
     })
     expect(next).toHaveBeenCalled()
   })
 
   it('should merge custom class with default class', async () => {
-    const action = { text: 'Test', href: '/test', class: 'custom-class' }
+    const action = { text: 'Test', href: '/test', classes: 'custom-class' }
     const middleware = addAction(action)
     await middleware(req as Request, res as Response, next as NextFunction)
     expect(res.locals.actions[0].classes).toBe('custom-class')
