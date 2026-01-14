@@ -1,15 +1,92 @@
-{% extends "../../partials/formStep.njk" %}
+{% extends "../../partials/layout.njk" %}
 {% from "moj/components/page-header-actions/macro.njk" import mojPageHeaderActions %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
+{% set servicesList %}
+  <ul class="govuk-list govuk-list--bullet">
+    {% for service in values.services %}
+      <li>{{ service | formatText }}</li>
+    {% endfor %}
+  </ul>
+{% endset %}
 
 {% block content %}
   <div class="govuk-width-container">
-  {{ mojPageHeaderActions({
-    heading: {
-      text: "Check your answers"
-    }
-  }) }}
-</div>
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-7">{{ title }}</h1>
+        <h2 class="govuk-heading-m">New non-residential location</h2>
+        {{ govukSummaryList({
+          rows: [
+            {
+              key: {
+                text: "What is the location name?"
+              },
+              value: {
+                text: values.localName
+              },
+              actions: {
+                items: [
+                  {
+                    href: "/add-location/details",
+                    text: "Change",
+                    visuallyHiddenText: "location name"
+                  }
+                ]
+              }
+            },
+            {
+              key: {
+                text: "What services must be able to use this location?"
+              },
 
-{{ super() }}
+          value: {
+                html: servicesList
+            },
+
+              actions: {
+                items: [
+                  {
+                    classes: "govuk-link--no-visited-state",
+                    href: "/add-location/details",
+                    text: "Change",
+                    visuallyHiddenText: "services"
+                  }
+                ]
+              }
+            },
+            {
+              key: {
+                text: "Is this location currently active?"
+              },
+              value: {
+                text: values.locationStatus | toYesNo('ACTIVE')
+              },
+              actions: {
+                items: [
+                  {
+                    href: "/add-location/details",
+                    text: "Change",
+                    visuallyHiddenText: "location status"
+                  }
+                ]
+              }
+            }
+          ]
+        }) }}
+        <form method="post">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: buttonText,
+              preventDoubleClick: true,
+              type: "submit"
+            }) }}
+            <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 {% endblock %}

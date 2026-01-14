@@ -13,6 +13,7 @@ describe('LocationsService', () => {
       getNonResidentialLocation: Object.assign(jest.fn(), { clearCache: jest.fn() }),
       getNonResidentialLocationByLocalName: Object.assign(jest.fn(), { clearCache: jest.fn() }),
       updateNonResidentialLocation: Object.assign(jest.fn(), { clearCache: jest.fn() }),
+      addNonResidentialLocation: Object.assign(jest.fn(), { clearCache: jest.fn() }),
     }
     locationsService = new LocationsService(locationsApiClient)
   })

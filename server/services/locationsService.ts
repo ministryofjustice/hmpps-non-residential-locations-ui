@@ -33,6 +33,14 @@ export default class LocationsService {
     )
   }
 
+  async addNonResidentialLocation(
+    token: string,
+    prisonId: string,
+    data: { localName: string; servicesUsingLocation: string[]; status: string },
+  ) {
+    return this.locationsApiClient.locations.addNonResidentialLocation(token, { prisonId }, data)
+  }
+
   async getNonResidentialUsageTypes(token: string) {
     return (await this.locationsApiClient.constants.getNonResidentialUsageTypes(token)).nonResidentialUsageTypes
   }

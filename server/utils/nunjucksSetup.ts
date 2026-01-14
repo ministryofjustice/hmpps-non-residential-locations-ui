@@ -64,4 +64,9 @@ export default function nunjucksSetup(app: express.Express): void {
     const cleaned = str.replace(/_/g, ' ').toLowerCase()
     return cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
   })
+
+  njkEnv.addFilter('toYesNo', function toYesNo(str, yesVal) {
+    if (!str) return ''
+    return str === yesVal ? 'Yes' : 'No'
+  })
 }

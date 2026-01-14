@@ -110,7 +110,10 @@ export declare module 'hmpo-form-wizard' {
       params: Record<string, string>
       cookies: Record<string, string>
       body: Record<string, string>
-      flash: (type: string, data?: { title: string; content: string }) => void
+      flash: (
+        type: string,
+        data?: { title: string; content?: string; variant?: string; dismissible?: boolean; html?: string },
+      ) => void
       form: {
         values: FormWizard.Values
         options: Omit<FormWizard.Step, 'fields'> & {

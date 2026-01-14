@@ -5,7 +5,7 @@ import Page from '../../pages/page'
 context('Start journey', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+    cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION', 'NONRESI__MAINTAIN_LOCATION'] })
     cy.task('stubManageUsersMe')
     cy.task('stubManageUsersMeCaseloads')
     cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
@@ -23,7 +23,8 @@ context('Start journey', () => {
       reponseStatus: 200,
       responseBody: { id: 1 },
     })
-    cy.task('stubComponents')
+
+    cy.task('stubAddNonResidentialLocation', { prisonId: 'TST' })
   })
 
   it('Should display error messages correctly', () => {
@@ -46,6 +47,7 @@ context('Start journey', () => {
     indexPage.errorSummaryList().should('have.length', 3)
     indexPage.errorSummaryList().eq(0).should('contain.text', 'Location already exists. Enter a unique location name')
 
+    indexPage.locationNameInput().clear()
     indexPage.locationNameInput().type('Loc A')
     indexPage.locationStatusRadios().find('input[value="ACTIVE"]').click()
 
@@ -56,6 +58,30 @@ context('Start journey', () => {
     indexPage.errorSummaryList().should('not.exist')
 
     // continue to check your answers page if no errors
-    Page.verifyOnPage(CheckYourAnswersPage)
+    const checkYourAnswersPagePage = Page.verifyOnPage(CheckYourAnswersPage)
+    checkYourAnswersPagePage.summaryListRow(0, 0).should('include.text', 'What is the location name?')
+    checkYourAnswersPagePage.summaryListRow(0, 1).should('include.text', 'Loc A')
+    checkYourAnswersPagePage.summaryListRow(0, 2).should('include.text', 'Change')
+
+    checkYourAnswersPagePage
+      .summaryListRow(1, 0)
+      .should('include.text', 'What services must be able to use this location?')
+    checkYourAnswersPagePage.summaryListRow(1, 1).should('include.text', 'Test type')
+    checkYourAnswersPagePage.summaryListRow(1, 2).should('include.text', 'Change')
+
+    checkYourAnswersPagePage.summaryListRow(2, 0).should('include.text', 'Is this location currently active?')
+    checkYourAnswersPagePage.summaryListRow(2, 1).should('include.text', 'Yes')
+    checkYourAnswersPagePage.summaryListRow(2, 2).should('include.text', 'Change')
+
+    checkYourAnswersPagePage.changeLink().should('exist').and('have.attr', 'href', '/add-location/details')
+    checkYourAnswersPagePage.cancelLink().should('exist').and('have.attr', 'href', '/prison/TST')
+    checkYourAnswersPagePage.continueButton().should('exist')
+
+    checkYourAnswersPagePage.continueButton().click()
+
+    // return to home page and check success banner
+    cy.url().should('include', '/prison/TST')
+    cy.get('.moj-alert').should('exist')
+    cy.get('.moj-alert').should('exist').should('contain.text', 'Location added')
   })
 })
