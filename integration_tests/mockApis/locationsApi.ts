@@ -35,6 +35,43 @@ export default {
       },
     }),
 
+  stubNonResidentialLocationById: ({
+    locationId,
+    localName = 'Gym',
+    prisonId = 'TST',
+    status = 'ACTIVE',
+  }: {
+    locationId: string
+    localName?: string
+    prisonId?: string
+    status?: string
+  }): SuperAgentRequest =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/locations-api/locations/non-residential/${locationId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          id: locationId,
+          prisonId,
+          localName,
+          code: '001',
+          pathHierarchy: 'A-1-001',
+          locationType: 'ADJUDICATION_ROOM',
+          permanentlyInactive: false,
+          usedByGroupedServices: ['ACTIVITIES_APPOINTMENTS'],
+          usedByServices: ['TEST_TYPE'],
+          status,
+          level: 1,
+        },
+      },
+    }),
+
   stubNonResidentialLocation: ({ prisonId }): SuperAgentRequest =>
     stubFor({
       request: {

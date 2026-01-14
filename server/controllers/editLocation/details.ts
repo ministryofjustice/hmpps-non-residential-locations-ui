@@ -50,6 +50,8 @@ export default class Details extends FormInitialStep {
       })(req as unknown as Request, res, null)
     }
 
+    res.locals.title = `Change ${localName}`
+
     return {
       ...locals,
       backLink,
