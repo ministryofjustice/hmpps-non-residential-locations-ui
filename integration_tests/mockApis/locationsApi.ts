@@ -72,6 +72,27 @@ export default {
       },
     }),
 
+  stubUpdateNonResidentialLocation: ({ locationId }: { locationId: string }): SuperAgentRequest =>
+    stubFor({
+      request: {
+        method: 'PUT',
+        urlPath: `/locations-api/locations/non-residential/${locationId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          id: locationId,
+          prisonId: 'TST',
+          localName: 'Updated Location',
+          code: '001',
+          status: 'ACTIVE',
+        },
+      },
+    }),
+
   stubNonResidentialLocation: ({ prisonId }): SuperAgentRequest =>
     stubFor({
       request: {

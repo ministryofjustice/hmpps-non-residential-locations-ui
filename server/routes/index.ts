@@ -16,6 +16,15 @@ export default function routes(services: Services): Router {
   router.use(addServicesToRequest(services))
   router.use(populateConstants)
 
+  // Convert flash messages to banner for templates
+  router.use((req, res, next) => {
+    const successFlash = req.flash('success')
+    res.locals.banner = {
+      success: successFlash.length > 0 ? successFlash[0] : null,
+    }
+    next()
+  })
+
   router.use(
     '/',
     addBreadcrumb({ title: 'Digital Prison Services', href: config.services.dps }),

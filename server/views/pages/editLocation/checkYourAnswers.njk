@@ -1,0 +1,73 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l">{{ title }}</h1>
+
+        {% set rows = [] %}
+        {% for field in changedFields %}
+          {% set changedFromHtml %}
+            {% if field.changedFrom is iterable and field.changedFrom is not string %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for item in field.changedFrom %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              {{ field.changedFrom }}
+            {% endif %}
+          {% endset %}
+
+          {% set changedToHtml %}
+            {% if field.changedTo is iterable and field.changedTo is not string %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for item in field.changedTo %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              {{ field.changedTo }}
+            {% endif %}
+          {% endset %}
+
+          {% set rows = (rows.push([
+            { html: '<strong>' + field.question + '</strong>' },
+            { html: changedFromHtml },
+            { html: changedToHtml },
+            { html: '<a href="' + field.changeLink + '" class="govuk-link">Change</a>' }
+          ]), rows) %}
+        {% endfor %}
+
+        {{ govukTable({
+          attributes: {
+            "data-qa": "changes-table"
+          },
+          head: [
+            { text: "Question" },
+            { text: "Changed from" },
+            { text: "Changed to" },
+            { text: "Actions" }
+          ],
+          rows: rows
+        }) }}
+
+        <form method="post">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: buttonText,
+              preventDoubleClick: true,
+              type: "submit"
+            }) }}
+            <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

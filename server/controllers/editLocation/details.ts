@@ -94,39 +94,4 @@ export default class Details extends FormInitialStep {
       return callback({ ...errors, ...validationErrors })
     })
   }
-
-  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    try {
-      const { systemToken } = req.session
-      const { locationDetails } = res.locals
-      const { locationsService } = req.services
-      const { localName, services, locationStatus } = req.form.values
-
-      const sanitizedLocalName = sanitizeString(String(localName))
-      await locationsService.updateNonResidentialLocationDetails(
-        systemToken,
-        locationDetails.id,
-        sanitizedLocalName,
-        services,
-        locationStatus,
-      )
-
-      // req.services.analyticsService.sendEvent(req, 'update_location', { prison_id: locationDetails.prisonId })
-
-      next()
-    } catch (error) {
-      next(error)
-    }
-  }
-
-  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { prisonId } = res.locals.locationDetails
-    req.journeyModel.reset()
-    req.sessionModel.reset()
-    req.flash('success', {
-      title: 'Location updated',
-      content: `You have updated this location`,
-    })
-    res.redirect(`/prison/${prisonId}`)
-  }
 }
