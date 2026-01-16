@@ -35,6 +35,21 @@ export default {
       },
     }),
 
+  stubAddNonResidentialLocation: ({ prisonId }): SuperAgentRequest =>
+    stubFor({
+      request: {
+        method: 'POST',
+        urlPath: `/locations-api/locations/non-residential/${prisonId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {},
+      },
+    }),
+
   stubNonResidentialLocationById: ({
     locationId,
     localName = 'Gym',

@@ -4,6 +4,7 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 
 {% block head %}
@@ -39,7 +40,14 @@
 {% block beforeContent %}
     <div class="govuk-width-container">
       <div class="govuk-grid-row govuk-!-margin-bottom-0">
-        <div class="govuk-grid-column-{{ minLayout }}">
+
+        <div class="
+          {% if minLayout %}
+            govuk-grid-column-{{ minLayout }}
+          {% else %}
+            govuk-grid-column-two-thirds
+          {% endif %}
+        ">
           {% if backLink %}
             {% block backButton %}
               {{ govukBackLink({
@@ -79,6 +87,21 @@
               html: html,
               type: "success",
               classes: "govuk-!-margin-top-7 govuk-!-margin-bottom-0"
+            }) }}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% if mojBanner %}
+      <div class="govuk-width-container">
+        <div class="govuk-grid-row govuk-!-margin-bottom-0">
+          <div class="govuk-grid-column-full">
+            {{ mojAlert({
+              variant: mojBanner.variant,
+              title: mojBanner.title,
+              dismissible: mojBanner.dismissible,
+              html: mojBanner.title
             }) }}
           </div>
         </div>

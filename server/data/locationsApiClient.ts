@@ -34,6 +34,15 @@ export default class LocationsApiClient extends BaseApiClient {
       path: '/locations/non-residential/:locationId',
       requestType: 'put',
     }),
+
+    addNonResidentialLocation: this.apiCall<
+      Location,
+      { prisonId: string },
+      { localName: string; servicesUsingLocation: string[]; status: string }
+    >({
+      path: '/locations/non-residential/:prisonId',
+      requestType: 'post',
+    }),
   }
 
   constants = {

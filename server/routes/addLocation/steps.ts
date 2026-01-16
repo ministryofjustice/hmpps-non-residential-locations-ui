@@ -1,5 +1,6 @@
 import FormWizard from 'hmpo-form-wizard'
 import Details from '../../controllers/addLocation/details'
+import CheckYourAnswers from '../../controllers/addLocation/checkYourAnswers'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -17,6 +18,8 @@ const steps: FormWizard.Steps = {
   },
   '/check-your-answers': {
     template: 'checkYourAnswers',
+    controller: CheckYourAnswers,
+    next: '/',
   },
 }
 
