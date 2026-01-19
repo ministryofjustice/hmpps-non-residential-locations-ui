@@ -26,4 +26,10 @@ export default class IndexPage extends Page {
   actionsColumn = (): PageElement => cy.get('[data-qa=locations-table] th').contains('Actions')
 
   changeLinks = (): PageElement => cy.get('[data-qa=locations-table] a').contains('Change')
+
+  locationSortLink = (): PageElement => cy.get('tr :nth-child(1) button')
+
+  statusSortLink = (): PageElement => cy.get('tr :nth-child(2) button')
+
+  tableData = (row, col): PageElement => cy.get(`tbody tr:nth-child(${row}) td:nth-child(${col})`)
 }
