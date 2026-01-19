@@ -2,11 +2,13 @@
 
 {% from "../macros/locationsTable.njk" import locationsTable %}
 
-{% set mainClasses = "app-container govuk-body" %}
+{% set mainClasses =
+  "app-container govuk-body" ~ (" govuk-!-padding-top-0" if mojBanner else "")
+%}
 
 {% block content %}
   <h1>{{ title }}</h1>
-  <div class="govuk-width-container">
+  <div class="{{ mainClasses }}">
 
     {% if canEdit %}
       <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-6" href="/add-location" role="button" data-qa="add-location-button">Add a non-residential location</a>
