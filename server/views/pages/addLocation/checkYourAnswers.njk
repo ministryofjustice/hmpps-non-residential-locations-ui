@@ -5,8 +5,8 @@
 
 {% set servicesList %}
   <ul class="govuk-list govuk-list--bullet">
-    {% for service in values.services %}
-      <li>{{ service | formatText }}</li>
+    {% for service in values.serviceTypeDescriptions %}
+      <li>{{ service }}</li>
     {% endfor %}
   </ul>
 {% endset %}

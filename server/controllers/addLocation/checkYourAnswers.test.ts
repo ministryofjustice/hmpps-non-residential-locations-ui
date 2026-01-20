@@ -33,6 +33,10 @@ describe('CheckYourAnswers controller', () => {
           services: ['EDU'],
           locationStatus: 'ACTIVE',
         }),
+        get: jest.fn().mockImplementation(key => {
+          if (key === 'services') return ['EDU']
+          return undefined
+        }),
         reset: jest.fn(),
       },
       journeyModel: {
@@ -49,6 +53,13 @@ describe('CheckYourAnswers controller', () => {
             id: 'MDI',
           },
         } as HmppsUser,
+        serviceTypes: [
+          { key: 'EDU', description: 'Education' },
+          { key: 'GYM', description: 'Gym' },
+        ],
+        values: {
+          services: ['EDU'],
+        },
       },
       redirect: jest.fn(),
     }
@@ -57,13 +68,17 @@ describe('CheckYourAnswers controller', () => {
   })
 
   describe('locals()', () => {
-    it('returns correct page locals', () => {
+    it('returns correct page locals and sets serviceTypeDescriptions', () => {
       const locals = controller.locals(req as FormWizard.Request, res as Response)
 
       expect(locals).toEqual({
         title: 'Check your answers',
         cancelLink: '/prison/MDI',
         buttonText: 'Confirm and save',
+      })
+      expect(res.locals.values).toEqual({
+        services: ['EDU'],
+        serviceTypeDescriptions: ['Education'],
       })
     })
   })
@@ -81,6 +96,27 @@ describe('CheckYourAnswers controller', () => {
       expect(next).toHaveBeenCalled()
     })
 
+    it('calls locationsService with multiple services and continues', async () => {
+      req.sessionModel.toJSON = jest.fn().mockReturnValue({
+        localName: 'Room B',
+        services: ['EDU', 'GYM'],
+        locationStatus: 'ACTIVE',
+      })
+      req.sessionModel.get = jest.fn().mockImplementation(key => {
+        if (key === 'services') return ['EDU', 'GYM']
+        return undefined
+      })
+
+      await controller.saveValues(req as FormWizard.Request, res as Response, next)
+
+      expect(addNonResidentialLocation).toHaveBeenCalledWith('token-123', 'MDI', {
+        localName: 'Room B',
+        servicesUsingLocation: ['EDU', 'GYM'],
+        active: true,
+      })
+      expect(next).toHaveBeenCalled()
+    })
+
     it('logs error and passes error to next on failure', async () => {
       const error = new Error('API failure')
       addNonResidentialLocation.mockRejectedValue(error)
@@ -88,7 +124,6 @@ describe('CheckYourAnswers controller', () => {
       await controller.saveValues(req as FormWizard.Request, res as Response, next)
 
       expect(logger.error).toHaveBeenCalledWith('Failed to create location Room A at MDI', error)
-
       expect(next).toHaveBeenCalledWith(error)
     })
   })
