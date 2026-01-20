@@ -34,8 +34,8 @@
     {{ simplePagination(pagingData) }}
 
     {% set tableHead = [
-      { text: "Location", attributes: { "aria-sort": "ascending" } },
-      { text: "Status", attributes: { "aria-sort": "none" } },
+      { text: "Location" },
+      { text: "Status" },
       { text: "Services that use non-resi locations" }
     ] %}
     {% if canEdit %}
@@ -45,8 +45,7 @@
     {{ govukTable({
       attributes: {
         "data-qa": "locations-table",
-        "id": "locations-table",
-        "data-module": "moj-sortable-table"
+        "id": "locations-table"
       },
       firstCellIsHeader: false,
       head: tableHead,
