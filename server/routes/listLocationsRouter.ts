@@ -1,8 +1,6 @@
 import { Router } from 'express'
 
-import { randomUUID } from 'crypto'
 import type { Services } from '../services'
-import logger from '../../logger'
 
 export default function routes({ locationsService }: Services): Router {
   const router = Router()
@@ -25,8 +23,7 @@ export default function routes({ locationsService }: Services): Router {
       title: canEdit ? 'Edit the list of non-residential locations' : 'View non-residential locations',
       href: '/',
     })
-    const uuid: string = randomUUID()
-    logger.debug(`listLocationsRouter get locations ${uuid}`)
+
     const pageNo = page && !Number.isNaN(Number(page)) ? Number(page) - 1 : null
     const { locations } = await locationsService.getNonResidentialLocations(
       systemToken,
@@ -49,7 +46,6 @@ export default function routes({ locationsService }: Services): Router {
       hrefTemplate: '?page={page}',
     }
 
-    logger.debug(`listLocationsRouter complete ${uuid}`)
     return res.render('pages/index', { ...res.locals, locations, canEdit })
   })
 

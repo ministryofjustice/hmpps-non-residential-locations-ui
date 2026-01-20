@@ -1,6 +1,5 @@
 import { asUser, RestClient } from '@ministryofjustice/hmpps-rest-client'
 import { AuthenticationClient } from '@ministryofjustice/hmpps-auth-clients'
-import { randomUUID } from 'crypto'
 import config from '../config'
 import logger from '../../logger'
 import { RedisClient } from './redisClient'
@@ -40,14 +39,13 @@ export default class BaseApiClient extends RestClient {
       const filledPath = path.replace(/:(\w+)/g, (_, name) => parameters[name])
       const query = queryParams?.length ? Object.fromEntries(queryParams.map(p => [p, parameters[p]])) : undefined
 
-      const uuid: string = randomUUID()
       const cacheDuration = options?.cacheDuration || 0
       if (cacheDuration && this.redisClient) {
-        logger.debug(`Getting ${filledPath} from redis uuid ${uuid}`)
+        logger.debug(`Getting ${filledPath} from redis`)
         const cachedResult = await this.redisClient.get(filledPath)
-        logger.debug(`Getting ${filledPath} from redis complete uuid ${uuid}`)
+
         if (cachedResult) {
-          logger.debug(`Found ${filledPath} in redis, value: ${cachedResult} uuid ${uuid}`)
+          logger.debug(`Found ${filledPath} in redis, value: ${cachedResult}`)
 
           if (typeof cachedResult === 'string') {
             return JSON.parse(cachedResult)
@@ -58,7 +56,7 @@ export default class BaseApiClient extends RestClient {
       }
 
       logger.debug(
-        `${requestType.toUpperCase()} ${filledPath} with query ${JSON.stringify(query)} - params ${JSON.stringify(parameters)} - data ${JSON.stringify(data)} uuid ${uuid}`,
+        `${requestType.toUpperCase()} ${filledPath} with query ${JSON.stringify(query)} - params ${JSON.stringify(parameters)} - data ${JSON.stringify(data)}`,
       )
       const result = await this[requestType]<ReturnType>(
         {
@@ -68,18 +66,11 @@ export default class BaseApiClient extends RestClient {
         },
         asUser(token),
       )
-      logger.debug(
-        `${requestType.toUpperCase()} ${filledPath} with query ${JSON.stringify(query)} - params ${JSON.stringify(parameters)} - data ${JSON.stringify(data)} uuid ${uuid} complete`,
-      )
 
       if (cacheDuration && this.redisClient) {
-        logger.debug(
-          `Setting ${filledPath} in redis for ${cacheDuration} seconds, value: ${JSON.stringify(result)} uuid ${uuid}`,
-        )
+        logger.debug(`Setting ${filledPath} in redis for ${cacheDuration} seconds, value: ${JSON.stringify(result)}`)
+
         await this.redisClient.set(filledPath, JSON.stringify(result), { EX: cacheDuration })
-        logger.debug(
-          `Setting ${filledPath} in redis for ${cacheDuration} seconds, value: ${JSON.stringify(result)} uuid ${uuid} complete`,
-        )
       }
 
       return result
