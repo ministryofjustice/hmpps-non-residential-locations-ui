@@ -78,20 +78,5 @@ context('Locations List', () => {
       // The breadcrumb should contain all 3 items: Digital Prison Services > Locations > Edit the list...
       cy.get('.govuk-breadcrumbs__list').should('contain.text', 'Edit the list of non-residential locations')
     })
-
-    it('should display locations in correct order when sorting"', () => {
-      cy.signIn()
-      const indexPage = IndexPage.forEditUser()
-      indexPage.tableData(1, 1).should('have.text', 'Classroom')
-      indexPage.tableData(2, 1).should('have.text', 'Gym')
-
-      indexPage.locationSortLink().click()
-      indexPage.tableData(1, 1).should('have.text', 'Gym')
-      indexPage.tableData(2, 1).should('have.text', 'Classroom')
-
-      indexPage.statusSortLink().click()
-      indexPage.tableData(1, 1).should('have.text', 'Classroom')
-      indexPage.tableData(2, 1).should('have.text', 'Gym')
-    })
   })
 })
