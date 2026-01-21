@@ -1,0 +1,36 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "moj/components/interruption-card/macro.njk" import interruptionCard %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <form method="post">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+          {% call interruptionCard({
+            heading: heading | safe,
+            primaryAction: {
+              text: buttonText,
+              type: "submit"
+            },
+            secondaryAction: {
+              text: "Go back",
+              href: goBackLink
+            }
+          }) %}
+            {% if servicesAffected and servicesAffected.length > 0 %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for service in servicesAffected %}
+                  <li>{{ service }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            <p>References to the location will remain in existing documents such as use of force reports.</p>
+          {% endcall %}
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

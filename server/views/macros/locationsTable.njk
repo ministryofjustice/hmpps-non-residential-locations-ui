@@ -18,7 +18,7 @@
             { html: item.localName },
             { html: locationStatusTag(item) },
             { html: usageTypes(item.usedByGroupedServices, usageTypesData) },
-            { html: editLink(item.id) }
+            { html: editLink(item) }
           ]
         ), rows) %}
       {% else %}
@@ -69,6 +69,6 @@
   </ul>
 {% endmacro %}
 
-{% macro editLink(locationId) %}
-    <a href='/location/{{ locationId }}/edit'>Change</a>
+{% macro editLink(item) %}
+    <a href='/location/{{ item.id }}/edit'>Change</a>{% if item.status !== 'ARCHIVED' %} | <a href='/location/{{ item.id }}/archive'>Archive</a>{% endif %}
 {% endmacro %}

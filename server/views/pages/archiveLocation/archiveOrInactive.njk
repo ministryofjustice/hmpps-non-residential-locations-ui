@@ -1,0 +1,81 @@
+{% extends "../../partials/layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-l">{{ title }}</h1>
+
+        {{ govukWarningText({
+          text: "If you archive a location, it is permanently removed. Services that currently use the location will no longer be able to use it. However, references to the location will remain in existing documents such as use of force reports.",
+          iconFallbackText: "Warning"
+        }) }}
+
+        <form method="post">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+          {% set servicesConditionalHtml %}
+            {% if servicesAffected and servicesAffected.length > 0 %}
+              <p class="govuk-body govuk-!-font-weight-bold">Services that won't be able to use this location</p>
+              <ul class="govuk-list govuk-list--bullet">
+                {% for service in servicesAffected %}
+                  <li>{{ service }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endset %}
+
+          {{ govukRadios({
+            name: "archiveOrInactive",
+            id: "archiveOrInactive",
+            fieldset: {
+              legend: {
+                text: "Do you want to archive this location or make it inactive?",
+                classes: "govuk-fieldset__legend--m"
+              }
+            },
+            errorMessage: fields.archiveOrInactive.errorMessage if fields.archiveOrInactive.errorMessage,
+            items: [
+              {
+                value: "ARCHIVE",
+                text: "Archive this location",
+                hint: {
+                  text: "Permanently remove this location. Services currently using it will no longer have access to it."
+                },
+                conditional: {
+                  html: servicesConditionalHtml
+                },
+                checked: fields.archiveOrInactive.value == "ARCHIVE"
+              },
+              {
+                value: "INACTIVE",
+                text: "Make this location inactive",
+                hint: {
+                  text: "Keep the location in the list but temporarily remove access for services until you make it active again."
+                },
+                conditional: {
+                  html: servicesConditionalHtml
+                },
+                checked: fields.archiveOrInactive.value == "INACTIVE"
+              }
+            ]
+          }) }}
+
+          <div class="govuk-button-group">
+            {{ govukButton({
+              text: buttonText,
+              preventDoubleClick: true,
+              type: "submit"
+            }) }}
+            <a href="{{ cancelLink }}" class="govuk-link govuk-link--no-visited-state">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

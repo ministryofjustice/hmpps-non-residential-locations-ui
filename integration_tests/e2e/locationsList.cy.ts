@@ -79,4 +79,36 @@ context('Locations List', () => {
       cy.get('.govuk-breadcrumbs__list').should('contain.text', 'Edit the list of non-residential locations')
     })
   })
+
+  context('Archive link visibility', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION', 'NONRESI__MAINTAIN_LOCATION'] })
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubNonResidentialLocation', { prisonId: 'TST', includeArchived: true })
+      cy.task('stubLocationsConstantsNonResidentialUsageType')
+      cy.task('stubLocationsConstantsServiceTypes')
+      cy.task('stubLocationsConstantsServiceFamilyTypes')
+      cy.task('stubComponents')
+    })
+
+    it('should display Archive link for active locations', () => {
+      cy.signIn()
+      IndexPage.forEditUser()
+      cy.get('[data-qa=locations-table]').contains('tr', 'Gym').should('contain.text', 'Archive')
+    })
+
+    it('should not display Archive link for archived locations', () => {
+      cy.signIn()
+      IndexPage.forEditUser()
+      cy.get('[data-qa=locations-table]').contains('tr', 'Old Chapel').find('a').should('not.contain.text', 'Archive')
+    })
+
+    it('should still display Change link for archived locations', () => {
+      cy.signIn()
+      IndexPage.forEditUser()
+      cy.get('[data-qa=locations-table]').contains('tr', 'Old Chapel').should('contain.text', 'Change')
+    })
+  })
 })

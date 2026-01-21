@@ -59,6 +59,33 @@ context('Edit Location Journey', () => {
       page.continueButton().click()
       cy.get('h1').should('contain.text', 'Confirm changes to this location')
     })
+
+    it('should display Archive button for active locations', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      cy.get('.govuk-button--warning').should('exist')
+      cy.get('.govuk-button--warning').should('contain.text', 'Archive')
+    })
+  })
+
+  describe('Archive button visibility for archived locations', () => {
+    const ARCHIVED_LOCATION_ID = 'archived-location-id'
+    const ARCHIVED_LOCATION_NAME = 'Old Chapel'
+
+    beforeEach(() => {
+      cy.task('stubNonResidentialLocationById', {
+        locationId: ARCHIVED_LOCATION_ID,
+        localName: ARCHIVED_LOCATION_NAME,
+        prisonId: 'TST',
+        status: 'ARCHIVED',
+      })
+    })
+
+    it('should not display Archive button for archived locations', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(ARCHIVED_LOCATION_ID)
+      cy.get('.govuk-button--warning').should('not.exist')
+    })
   })
 
   describe('Check Your Answers Page', () => {
