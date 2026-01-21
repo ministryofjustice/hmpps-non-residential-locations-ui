@@ -5,8 +5,16 @@ import { TypedLocals } from '../../@types/express'
 import logger from '../../../logger'
 
 export default class CheckYourAnswers extends FormInitialStep {
-  override locals(_req: FormWizard.Request, res: Response): TypedLocals {
+  override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const prisonId = res.locals.user.activeCaseload.id
+    const services = res.locals.values.services as string[]
+    const { serviceTypes } = res.locals
+    const serviceTypeDescriptions = serviceTypes
+      .filter(serviceType => services.includes(serviceType.key))
+      .map(serviceType => serviceType.description)
+
+    res.locals.values.serviceTypeDescriptions = serviceTypeDescriptions
+
     return {
       title: 'Check your answers',
       cancelLink: `/prison/${prisonId}`,
