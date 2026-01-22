@@ -41,6 +41,7 @@ interface AllLocals {
   nonResiUsageTypes?: ReferenceData[]
   serviceTypes?: ReferenceData[]
   serviceFamilyTypes?: ReferenceData[]
+  servicesAffected?: string[]
   feComponents?: {
     header?: string
     footer?: string

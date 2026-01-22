@@ -132,12 +132,19 @@ export default class CheckYourAnswers extends FormInitialStep {
       const { localName, services, locationStatus } = sessionData
 
       const sanitizedLocalName = sanitizeString(String(localName))
+      // Convert status string to boolean for API: 'ACTIVE' -> true, 'INACTIVE' -> false, undefined -> undefined
+      let active: boolean | undefined
+      if (locationStatus === 'ACTIVE') {
+        active = true
+      } else if (locationStatus === 'INACTIVE') {
+        active = false
+      }
       await locationsService.updateNonResidentialLocationDetails(
         systemToken,
         locationDetails.id,
         sanitizedLocalName,
         services,
-        locationStatus,
+        active,
       )
 
       next()

@@ -22,14 +22,14 @@ export default class LocationsService {
   async updateNonResidentialLocationDetails(
     token: string,
     locationId: string,
-    localName?: string,
-    servicesUsingLocation?: [],
-    status?: string,
+    localName: string,
+    servicesUsingLocation: string[],
+    active?: boolean,
   ) {
     return this.locationsApiClient.locations.updateNonResidentialLocation(
       token,
       { locationId },
-      { localName, servicesUsingLocation, status },
+      { localName, servicesUsingLocation, active },
     )
   }
 
@@ -39,6 +39,14 @@ export default class LocationsService {
     data: { localName: string; servicesUsingLocation: string[]; status: string },
   ) {
     return this.locationsApiClient.locations.addNonResidentialLocation(token, { prisonId }, data)
+  }
+
+  async archiveNonResidentialLocation(token: string, locationId: string) {
+    return this.locationsApiClient.locations.archiveNonResidentialLocation(
+      token,
+      { locationId },
+      { reason: 'Location archived' },
+    )
   }
 
   async getNonResidentialUsageTypes(token: string) {

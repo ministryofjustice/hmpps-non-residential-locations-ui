@@ -41,7 +41,7 @@ export default class Details extends FormInitialStep {
       fallbackUrl: `/prison/${prisonId}`,
     })
 
-    if (req.canAccess('edit_non_resi')) {
+    if (req.canAccess('edit_non_resi') && locationDetails.status !== 'ARCHIVED') {
       addAction({
         text: 'Archive',
         classes: 'govuk-button--warning',

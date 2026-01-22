@@ -29,7 +29,7 @@ export default class LocationsApiClient extends BaseApiClient {
     updateNonResidentialLocation: this.apiCall<
       Location,
       { locationId: string },
-      { localName: string; servicesUsingLocation: string[]; status: string }
+      { localName: string; servicesUsingLocation: string[]; active?: boolean }
     >({
       path: '/locations/non-residential/:locationId',
       requestType: 'put',
@@ -42,6 +42,11 @@ export default class LocationsApiClient extends BaseApiClient {
     >({
       path: '/locations/non-residential/:prisonId',
       requestType: 'post',
+    }),
+
+    archiveNonResidentialLocation: this.apiCall<Location, { locationId: string }, { reason: string }>({
+      path: '/locations/:locationId/deactivate/permanent',
+      requestType: 'put',
     }),
   }
 

@@ -108,7 +108,7 @@ export default {
       },
     }),
 
-  stubNonResidentialLocation: ({ prisonId }): SuperAgentRequest =>
+  stubNonResidentialLocation: ({ prisonId, includeArchived = false }): SuperAgentRequest =>
     stubFor({
       request: {
         method: 'GET',
@@ -145,6 +145,23 @@ export default {
                 level: 1,
                 parentId: '57718979-573c-433a-9e51-2d83f887c11c',
               },
+              ...(includeArchived
+                ? [
+                    {
+                      id: 'archived-location-id',
+                      prisonId: 'MDI',
+                      localName: 'Old Chapel',
+                      code: '002',
+                      pathHierarchy: 'A-1-002',
+                      locationType: 'ADJUDICATION_ROOM',
+                      permanentlyInactive: true,
+                      usedByGroupedServices: [],
+                      usedByServices: [],
+                      status: 'ARCHIVED',
+                      level: 1,
+                    },
+                  ]
+                : []),
             ],
             number: 0,
             first: true,
@@ -227,7 +244,36 @@ export default {
                 { key: 'TEST_TYPE', description: 'Test type', additionalInformation: 'Additional info for test type' },
               ],
             },
+            {
+              key: 'ACTIVITIES_APPOINTMENTS',
+              description: 'Activities and appointments',
+              values: [
+                { key: 'APPOINTMENT', description: 'Appointments', additionalInformation: '' },
+                { key: 'ACTIVITY', description: 'Activities', additionalInformation: '' },
+              ],
+            },
           ],
+        },
+      },
+    }),
+
+  stubArchiveNonResidentialLocation: ({ locationId }: { locationId: string }): SuperAgentRequest =>
+    stubFor({
+      request: {
+        method: 'PUT',
+        urlPath: `/locations-api/locations/${locationId}/deactivate/permanent`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          id: locationId,
+          prisonId: 'TST',
+          localName: 'Archived Location',
+          code: '001',
+          status: 'ARCHIVED',
         },
       },
     }),
