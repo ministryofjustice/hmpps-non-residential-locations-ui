@@ -4,8 +4,22 @@ import { Constant, CompoundConstant } from '../@types/locationsApi/locationsApiT
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
 
-  async getNonResidentialLocations(token: string, prisonId: string, page?: string) {
-    return this.locationsApiClient.locations.getNonResidentialSummary(token, { prisonId, page, size: '35' })
+  async getNonResidentialLocations(token: string, prisonId: string, page?: string, status?: string[]) {
+    return this.locationsApiClient.locations.getNonResidentialSummary(token, {
+      prisonId,
+      page,
+      size: '35',
+      status: status?.join(','),
+    })
+  }
+
+  async getNonResidentialLocationCount(token: string, prisonId: string, status: string[]): Promise<number> {
+    const result = await this.locationsApiClient.locations.getNonResidentialSummary(token, {
+      prisonId,
+      size: '1',
+      status: status.join(','),
+    })
+    return result.locations.totalElements
   }
 
   async getNonResidentialLocationByLocalName(token: string, prisonId: string, localName: string) {

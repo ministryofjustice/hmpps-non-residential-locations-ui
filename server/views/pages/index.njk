@@ -1,6 +1,7 @@
 {% extends "../partials/layout.njk" %}
 
 {% from "../macros/locationsTable.njk" import locationsTable %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% set mainClasses =
   "app-container govuk-body" ~ (" govuk-!-padding-top-0" if mojBanner else "")
@@ -14,6 +15,71 @@
       <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-6" href="/add-location" role="button" data-qa="add-location-button">Add a non-residential location</a>
     {% endif %}
 
-    {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes, canEdit) }}
+    <div class="status-filter" data-qa="status-filter-form">
+      <form method="get" id="status-filter-form">
+        <fieldset class="govuk-fieldset">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+            Filter by location status
+          </legend>
+          <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="status-ACTIVE" name="status" type="checkbox" value="ACTIVE" {{ "checked" if "ACTIVE" in selectedStatuses }}>
+              <label class="govuk-label govuk-checkboxes__label" for="status-ACTIVE">
+                Active ({{ statusCounts.ACTIVE }})
+              </label>
+            </div>
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="status-INACTIVE" name="status" type="checkbox" value="INACTIVE" {{ "checked" if "INACTIVE" in selectedStatuses }}>
+              <label class="govuk-label govuk-checkboxes__label" for="status-INACTIVE">
+                Inactive ({{ statusCounts.INACTIVE }})
+              </label>
+            </div>
+            <div class="govuk-checkboxes__item">
+              <input class="govuk-checkboxes__input" id="status-ARCHIVED" name="status" type="checkbox" value="ARCHIVED" {{ "checked" if "ARCHIVED" in selectedStatuses }}>
+              <label class="govuk-label govuk-checkboxes__label" for="status-ARCHIVED">
+                Archived ({{ statusCounts.ARCHIVED }})
+              </label>
+            </div>
+          </div>
+        </fieldset>
+        <div class="status-filter__actions">
+          <button type="submit" class="govuk-button govuk-!-margin-bottom-0" data-qa="apply-filter-button">Apply filters</button>
+          <a href="#" class="govuk-link" id="clear-filter" data-qa="clear-filter-link">Clear</a>
+        </div>
+      </form>
+    </div>
+    <script nonce="{{ cspNonce }}">
+      var form = document.getElementById('status-filter-form');
+
+      function addNoneStatus() {
+        var hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = 'status';
+        hidden.value = 'NONE';
+        form.appendChild(hidden);
+      }
+
+      form.addEventListener('submit', function() {
+        var checked = form.querySelectorAll('input[type="checkbox"]:checked');
+        if (checked.length === 0) {
+          addNoneStatus();
+        }
+      });
+
+      document.getElementById('clear-filter').addEventListener('click', function(e) {
+        e.preventDefault();
+        var checkboxes = form.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(function(cb) { cb.checked = false; });
+        addNoneStatus();
+        form.submit();
+      });
+    </script>
+
+    {% if locations.content | length > 0 %}
+      {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes, canEdit) }}
+    {% else %}
+      <p class="govuk-body-l govuk-!-font-weight-bold" data-qa="no-results-heading">There are no matching results.</p>
+      <p class="govuk-body" data-qa="no-results-message">Improve your results by applying or removing filters.</p>
+    {% endif %}
   </div>
 {% endblock %}
