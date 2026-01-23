@@ -26,4 +26,11 @@ export default class IndexPage extends Page {
   actionsColumn = (): PageElement => cy.get('[data-qa=locations-table] th').contains('Actions')
 
   changeLinks = (): PageElement => cy.get('[data-qa=locations-table] a').contains('Change')
+
+  statusFilterForm = (): PageElement => cy.get('[data-qa=status-filter-form]')
+
+  statusFilterCheckbox = (status: 'ACTIVE' | 'INACTIVE' | 'ARCHIVED'): PageElement =>
+    cy.get(`[data-qa=status-filter-form] input[value="${status}"]`)
+
+  statusFilterLegend = (): PageElement => cy.get('[data-qa=status-filter-form] legend')
 }

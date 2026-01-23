@@ -1,6 +1,125 @@
 import IndexPage from '../pages/index'
 
 context('Locations List', () => {
+  context('Status filter', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubNonResidentialLocationWithStatuses', {
+        prisonId: 'TST',
+        locations: [
+          { id: 'loc-1', localName: 'Active Gym', status: 'ACTIVE' },
+          { id: 'loc-2', localName: 'Inactive Chapel', status: 'INACTIVE' },
+          { id: 'loc-3', localName: 'Archived Library', status: 'ARCHIVED' },
+        ],
+      })
+      cy.task('stubLocationsConstantsNonResidentialUsageType')
+      cy.task('stubLocationsConstantsServiceTypes')
+      cy.task('stubLocationsConstantsServiceFamilyTypes')
+      cy.task('stubComponents')
+    })
+
+    it('should display the status filter with proper styling', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+      indexPage.statusFilterForm().should('exist')
+      indexPage.statusFilterForm().should('have.class', 'status-filter')
+    })
+
+    it('should display "Filter by location status" legend', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+      cy.get('[data-qa=status-filter-form] legend').should('contain.text', 'Filter by location status')
+    })
+
+    it('should have Active and Inactive checked by default, Archived unchecked', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+      indexPage.statusFilterCheckbox('ACTIVE').should('be.checked')
+      indexPage.statusFilterCheckbox('INACTIVE').should('be.checked')
+      indexPage.statusFilterCheckbox('ARCHIVED').should('not.be.checked')
+    })
+
+    it('should display checkboxes with counts', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+      indexPage.statusFilterForm().should('contain.text', 'Active (')
+      indexPage.statusFilterForm().should('contain.text', 'Inactive (')
+      indexPage.statusFilterForm().should('contain.text', 'Archived (')
+    })
+
+    it('should display Apply filters button and Clear link', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+      cy.get('[data-qa=apply-filter-button]').should('exist').and('contain.text', 'Apply filters')
+      cy.get('[data-qa=clear-filter-link]').should('exist').and('contain.text', 'Clear')
+    })
+
+    it('should submit filter when Apply filters button is clicked', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+
+      // Check Archived checkbox
+      cy.get('[data-qa=status-filter-form] input[value="ARCHIVED"]').click()
+
+      // Click Apply filters button
+      cy.get('[data-qa=apply-filter-button]').click()
+
+      // URL should contain all status parameters
+      cy.url().should('include', 'status=ACTIVE')
+      cy.url().should('include', 'status=INACTIVE')
+      cy.url().should('include', 'status=ARCHIVED')
+    })
+
+    it('should show empty state message when Clear is clicked', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+
+      // Click Clear link
+      cy.get('[data-qa=clear-filter-link]').click()
+
+      // URL should contain status=NONE
+      cy.url().should('include', 'status=NONE')
+
+      // No checkboxes should be checked
+      cy.get('[data-qa=status-filter-form] input[type="checkbox"]:checked').should('have.length', 0)
+
+      // Should display empty state message
+      cy.get('[data-qa=no-results-heading]').should('contain.text', 'There are no matching results.')
+      cy.get('[data-qa=no-results-message]').should(
+        'contain.text',
+        'Improve your results by applying or removing filters.',
+      )
+
+      // Locations table should not be present
+      cy.get('[data-qa=locations-table]').should('not.exist')
+    })
+
+    it('should show empty state message when all checkboxes are unchecked and Apply is clicked', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+
+      // Uncheck Active and Inactive
+      cy.get('[data-qa=status-filter-form] input[value="ACTIVE"]').uncheck()
+      cy.get('[data-qa=status-filter-form] input[value="INACTIVE"]').uncheck()
+
+      // Click Apply filters button
+      cy.get('[data-qa=apply-filter-button]').click()
+
+      // URL should contain status=NONE
+      cy.url().should('include', 'status=NONE')
+
+      // Should display empty state message
+      cy.get('[data-qa=no-results-heading]').should('contain.text', 'There are no matching results.')
+      cy.get('[data-qa=no-results-message]').should(
+        'contain.text',
+        'Improve your results by applying or removing filters.',
+      )
+    })
+  })
+
   context('View-only user (VIEW_INTERNAL_LOCATION role)', () => {
     beforeEach(() => {
       cy.task('reset')

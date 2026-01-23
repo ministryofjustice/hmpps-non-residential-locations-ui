@@ -53,6 +53,11 @@ const mockLocationsResponse: NonResidentialSummary = {
   },
 }
 
+beforeEach(() => {
+  // Default mock for location counts - can be overridden in specific tests
+  locationsService.getNonResidentialLocationCount.mockResolvedValue(10)
+})
+
 afterEach(() => {
   jest.resetAllMocks()
 })
@@ -107,8 +112,7 @@ describe('GET /prison/TST', () => {
         .get('/prison/TST')
         .expect(200)
         .expect(res => {
-          expect(res.text).toContain('<title>View non-residential locations')
-          expect(res.text).not.toContain('<title>Edit non-residential locations')
+          expect(res.text).toContain('<title>View non-residential locations - Non-residential locations</title>')
         })
     })
 
@@ -149,6 +153,122 @@ describe('GET /prison/TST', () => {
     })
   })
 
+  describe('status filter', () => {
+    beforeEach(() => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => user,
+        canAccess: () => false,
+      })
+    })
+
+    it('should call service with default statuses (ACTIVE, INACTIVE) when no status provided', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(undefined, 'TST', undefined, [
+            'ACTIVE',
+            'INACTIVE',
+          ])
+        })
+    })
+
+    it('should call service with specified statuses when filter provided', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?status=ARCHIVED')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(undefined, 'TST', undefined, [
+            'ARCHIVED',
+          ])
+        })
+    })
+
+    it('should call service with multiple statuses when multiple filters provided', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?status=ACTIVE&status=ARCHIVED')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(undefined, 'TST', undefined, [
+            'ACTIVE',
+            'ARCHIVED',
+          ])
+        })
+    })
+
+    it('should render status filter checkboxes with counts', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+      locationsService.getNonResidentialLocationCount.mockImplementation((token, prisonId, status) => {
+        if (status[0] === 'ACTIVE') return Promise.resolve(89)
+        if (status[0] === 'INACTIVE') return Promise.resolve(16)
+        if (status[0] === 'ARCHIVED') return Promise.resolve(10)
+        return Promise.resolve(0)
+      })
+
+      return request(app)
+        .get('/prison/TST')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toContain('Filter by location status')
+          expect(res.text).toContain('value="ACTIVE"')
+          expect(res.text).toContain('value="INACTIVE"')
+          expect(res.text).toContain('value="ARCHIVED"')
+          expect(res.text).toContain('Active (89)')
+          expect(res.text).toContain('Inactive (16)')
+          expect(res.text).toContain('Archived (10)')
+        })
+    })
+
+    it('should have ACTIVE and INACTIVE checked by default', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST')
+        .expect(200)
+        .expect(res => {
+          // Check ACTIVE checkbox is checked
+          expect(res.text).toMatch(/value="ACTIVE"[^>]*checked/)
+          // Check INACTIVE checkbox is checked
+          expect(res.text).toMatch(/value="INACTIVE"[^>]*checked/)
+          // Check ARCHIVED checkbox is NOT checked (no 'checked' attribute near ARCHIVED value)
+          expect(res.text).not.toMatch(/value="ARCHIVED"[^>]*checked/)
+        })
+    })
+
+    it('should preserve status filter in pagination links', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      const multiPageResponse = {
+        ...mockLocationsResponse,
+        locations: {
+          ...mockLocationsResponse.locations,
+          totalPages: 3,
+          totalElements: 100,
+        },
+      }
+      locationsService.getNonResidentialLocations.mockResolvedValue(multiPageResponse)
+
+      return request(app)
+        .get('/prison/TST?status=ACTIVE&status=ARCHIVED')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toContain('status=ACTIVE')
+          expect(res.text).toContain('status=ARCHIVED')
+        })
+    })
+  })
+
   describe('for edit user', () => {
     beforeEach(() => {
       app = appWithAllRoutes({
@@ -179,8 +299,7 @@ describe('GET /prison/TST', () => {
         .get('/prison/TST')
         .expect(200)
         .expect(res => {
-          expect(res.text).toContain('<title>Edit non-residential locations')
-          expect(res.text).not.toContain('<title>View non-residential locations')
+          expect(res.text).toContain('<title>Edit non-residential locations - Non-residential locations</title>')
         })
     })
 

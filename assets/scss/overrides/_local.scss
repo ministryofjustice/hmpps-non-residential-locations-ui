@@ -257,3 +257,30 @@ button.govuk-back-link {
   background: none;
   cursor: pointer;
 }
+
+.status-filter {
+  background-color: govuk-colour("light-grey");
+  padding: govuk-spacing(4);
+  margin-bottom: govuk-spacing(6);
+
+  .govuk-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: govuk-spacing(4);
+  }
+
+  .govuk-checkboxes__item {
+    margin-right: 0;
+  }
+
+  .govuk-checkboxes__label {
+    white-space: nowrap;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: govuk-spacing(4);
+    margin-top: govuk-spacing(4);
+  }
+}

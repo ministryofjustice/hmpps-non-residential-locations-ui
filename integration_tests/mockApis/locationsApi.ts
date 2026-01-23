@@ -190,6 +190,73 @@ export default {
       },
     }),
 
+  stubNonResidentialLocationWithStatuses: ({
+    prisonId,
+    locations,
+  }: {
+    prisonId: string
+    locations: Array<{
+      id: string
+      localName: string
+      status: 'ACTIVE' | 'INACTIVE' | 'ARCHIVED'
+    }>
+  }): SuperAgentRequest =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPath: `/locations-api/locations/non-residential/summary/${prisonId}`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          prisonId,
+          locations: {
+            totalElements: locations.length,
+            totalPages: 1,
+            size: locations.length,
+            content: locations.map(loc => ({
+              id: loc.id,
+              prisonId,
+              localName: loc.localName,
+              code: loc.id.substring(0, 3),
+              pathHierarchy: `A-1-${loc.id.substring(0, 3)}`,
+              locationType: 'ADJUDICATION_ROOM',
+              permanentlyInactive: loc.status === 'ARCHIVED',
+              usedByGroupedServices: ['ACTIVITIES_APPOINTMENTS'],
+              usedByServices: ['APPOINTMENT'],
+              status: loc.status,
+              level: 1,
+            })),
+            number: 0,
+            first: true,
+            last: true,
+            sort: {
+              empty: true,
+              sorted: true,
+              unsorted: true,
+            },
+            numberOfElements: locations.length,
+            pageable: {
+              offset: 0,
+              sort: {
+                empty: true,
+                sorted: true,
+                unsorted: true,
+              },
+              pageSize: 35,
+              paged: true,
+              pageNumber: 0,
+              unpaged: false,
+            },
+            empty: locations.length === 0,
+          },
+        },
+      },
+    }),
+
   stubLocationsConstantsNonResidentialUsageType: () =>
     stubFor({
       request: {

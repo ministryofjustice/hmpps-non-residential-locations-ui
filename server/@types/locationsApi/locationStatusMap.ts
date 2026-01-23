@@ -1,13 +1,15 @@
 const locationStatusMap: { [status: string]: { label: string; tagColour?: string } } = {
   ACTIVE: {
     label: 'Active',
+    tagColour: 'blue',
   },
   INACTIVE: {
     label: 'Inactive',
-    tagColour: 'grey',
+    tagColour: 'light-blue',
   },
   ARCHIVED: {
     label: 'Archived',
+    tagColour: 'grey',
   },
   DRAFT: {
     label: 'Draft',
