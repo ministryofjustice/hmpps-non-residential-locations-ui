@@ -15,7 +15,7 @@
       {% if canEdit %}
         {% set rows = (rows.push(
           [
-            { html: item.localName },
+            { html: item.localName | formatText },
             { html: locationStatusTag(item) },
             { html: usageTypes(item.usedByGroupedServices, usageTypesData) },
             { html: editLink(item) }
@@ -24,7 +24,7 @@
       {% else %}
         {% set rows = (rows.push(
           [
-            { html: item.localName },
+            { html: item.localName | formatText },
             { html: locationStatusTag(item) },
             { html: usageTypes(item.usedByGroupedServices, usageTypesData) }
           ]

@@ -221,13 +221,13 @@ context('Locations List', () => {
     it('should not display Archive link for archived locations', () => {
       cy.signIn()
       IndexPage.forEditUser()
-      cy.get('[data-qa=locations-table]').contains('tr', 'Old Chapel').find('a').should('not.contain.text', 'Archive')
+      cy.get('[data-qa=locations-table]').contains('tr', 'Old chapel').find('a').should('not.contain.text', 'Archive')
     })
 
     it('should still display Change link for archived locations', () => {
       cy.signIn()
       IndexPage.forEditUser()
-      cy.get('[data-qa=locations-table]').contains('tr', 'Old Chapel').should('contain.text', 'Change')
+      cy.get('[data-qa=locations-table]').contains('tr', 'Old chapel').should('contain.text', 'Change')
     })
   })
 })
