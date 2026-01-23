@@ -30,41 +30,76 @@
             {% endif %}
           {% endset %}
 
-          {{ govukRadios({
-            name: "archiveOrInactive",
-            id: "archiveOrInactive",
-            fieldset: {
-              legend: {
-                text: "Do you want to archive this location or make it inactive?",
-                classes: "govuk-fieldset__legend--m"
-              }
-            },
-            errorMessage: fields.archiveOrInactive.errorMessage if fields.archiveOrInactive.errorMessage,
-            items: [
-              {
-                value: "ARCHIVE",
-                text: "Archive this location",
-                hint: {
-                  text: "Permanently remove this location. Services currently using it will no longer have access to it."
-                },
-                conditional: {
-                  html: servicesConditionalHtml
-                },
-                checked: fields.archiveOrInactive.value == "ARCHIVE"
+          {% if isInactive %}
+            {{ govukRadios({
+              name: "archiveOrInactive",
+              id: "archiveOrInactive",
+              fieldset: {
+                legend: {
+                  text: "Do you want to archive this location or keep it inactive?",
+                  classes: "govuk-fieldset__legend--m"
+                }
               },
-              {
-                value: "INACTIVE",
-                text: "Make this location inactive",
-                hint: {
-                  text: "Keep the location in the list but temporarily remove access for services until you make it active again."
+              errorMessage: fields.archiveOrInactive.errorMessage if fields.archiveOrInactive.errorMessage,
+              items: [
+                {
+                  value: "ARCHIVE",
+                  text: "Archive this location",
+                  hint: {
+                    text: "Permanently remove this location. Services currently using it will no longer have access to it."
+                  },
+                  conditional: {
+                    html: servicesConditionalHtml
+                  },
+                  checked: fields.archiveOrInactive.value == "ARCHIVE"
                 },
-                conditional: {
-                  html: servicesConditionalHtml
+                {
+                  value: "KEEP_INACTIVE",
+                  text: "Keep this location inactive",
+                  hint: {
+                    text: "Keep the location in the list but do not allow services to use it until you make it active again."
+                  },
+                  checked: fields.archiveOrInactive.value == "KEEP_INACTIVE"
+                }
+              ]
+            }) }}
+          {% else %}
+            {{ govukRadios({
+              name: "archiveOrInactive",
+              id: "archiveOrInactive",
+              fieldset: {
+                legend: {
+                  text: "Do you want to archive this location or make it inactive?",
+                  classes: "govuk-fieldset__legend--m"
+                }
+              },
+              errorMessage: fields.archiveOrInactive.errorMessage if fields.archiveOrInactive.errorMessage,
+              items: [
+                {
+                  value: "ARCHIVE",
+                  text: "Archive this location",
+                  hint: {
+                    text: "Permanently remove this location. Services currently using it will no longer have access to it."
+                  },
+                  conditional: {
+                    html: servicesConditionalHtml
+                  },
+                  checked: fields.archiveOrInactive.value == "ARCHIVE"
                 },
-                checked: fields.archiveOrInactive.value == "INACTIVE"
-              }
-            ]
-          }) }}
+                {
+                  value: "INACTIVE",
+                  text: "Make this location inactive",
+                  hint: {
+                    text: "Keep the location in the list but temporarily remove access for services until you make it active again."
+                  },
+                  conditional: {
+                    html: servicesConditionalHtml
+                  },
+                  checked: fields.archiveOrInactive.value == "INACTIVE"
+                }
+              ]
+            }) }}
+          {% endif %}
 
           <div class="govuk-button-group">
             {{ govukButton({

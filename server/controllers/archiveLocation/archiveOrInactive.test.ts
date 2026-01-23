@@ -68,13 +68,35 @@ describe('ArchiveOrInactive controller', () => {
   })
 
   describe('locals()', () => {
-    it('returns correct page locals with capitalized location name', () => {
+    it('returns correct page locals with capitalized location name when active', () => {
+      res.locals!.locationDetails.status = 'ACTIVE'
       const locals = controller.locals(req as FormWizard.Request, res as Response)
 
       expect(locals.title).toBe('Archive Gymnasium or make it inactive')
       expect(locals.backLink).toBe('/prison/MDI')
       expect(locals.cancelLink).toBe('/prison/MDI/')
       expect(locals.buttonText).toBe('Continue')
+    })
+
+    it('returns correct title when location is inactive', () => {
+      res.locals!.locationDetails.status = 'INACTIVE'
+      const locals = controller.locals(req as FormWizard.Request, res as Response)
+
+      expect(locals.title).toBe('Archive Gymnasium')
+    })
+
+    it('sets isInactive to true on res.locals when location is inactive', () => {
+      res.locals!.locationDetails.status = 'INACTIVE'
+      controller.locals(req as FormWizard.Request, res as Response)
+
+      expect(res.locals!.isInactive).toBe(true)
+    })
+
+    it('sets isInactive to false on res.locals when location is active', () => {
+      res.locals!.locationDetails.status = 'ACTIVE'
+      controller.locals(req as FormWizard.Request, res as Response)
+
+      expect(res.locals!.isInactive).toBe(false)
     })
 
     it('sets servicesAffected on res.locals', () => {
