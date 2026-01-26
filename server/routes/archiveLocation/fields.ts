@@ -28,6 +28,13 @@ const fields = {
           text: 'Keep the location in the list but temporarily remove access for services until you make it active again.',
         },
       },
+      {
+        text: 'Keep this location inactive',
+        value: 'KEEP_INACTIVE',
+        hint: {
+          text: 'Keep the location in the list but do not allow services to use it until you make it active again.',
+        },
+      },
     ],
     attributes: { 'data-qa': 'archive-or-inactive' },
   },

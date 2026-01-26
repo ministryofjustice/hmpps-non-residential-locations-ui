@@ -1,8 +1,8 @@
 import Page, { PageElement } from '../page'
 
 export default class ArchiveOrInactivePage extends Page {
-  constructor(localName: string) {
-    super(`Archive ${localName} or make it inactive`)
+  constructor(localName: string, isInactive = false) {
+    super(isInactive ? `Archive ${localName}` : `Archive ${localName} or make it inactive`)
   }
 
   static goTo = (locationId: string) => cy.visit(`/location/${locationId}/archive`)
@@ -10,6 +10,8 @@ export default class ArchiveOrInactivePage extends Page {
   archiveRadio = (): PageElement => cy.get('input[name="archiveOrInactive"][value="ARCHIVE"]')
 
   inactiveRadio = (): PageElement => cy.get('input[name="archiveOrInactive"][value="INACTIVE"]')
+
+  keepInactiveRadio = (): PageElement => cy.get('input[name="archiveOrInactive"][value="KEEP_INACTIVE"]')
 
   continueButton = (): PageElement => cy.get('button[type="submit"]')
 

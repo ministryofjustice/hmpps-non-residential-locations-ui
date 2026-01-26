@@ -184,4 +184,58 @@ context('Archive Location Journey', () => {
       cy.get('.moj-alert--success').should('contain.text', 'Location made inactive')
     })
   })
+
+  describe('Archive or Inactive Page - Inactive Location Variant', () => {
+    beforeEach(() => {
+      cy.task('stubNonResidentialLocationById', {
+        locationId: TEST_LOCATION_ID,
+        localName: TEST_LOCATION_NAME,
+        prisonId: 'TST',
+        status: 'INACTIVE',
+      })
+    })
+
+    it('should display the correct H1 heading without "or make it inactive"', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+      cy.get('h1').should('contain.text', `Archive ${TEST_LOCATION_NAME}`)
+      cy.get('h1').should('not.contain.text', 'or make it inactive')
+    })
+
+    it('should show Keep inactive radio option instead of Make inactive', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+      const page = new ArchiveOrInactivePage(TEST_LOCATION_NAME, true)
+      page.keepInactiveRadio().should('exist')
+      page.inactiveRadio().should('not.exist')
+    })
+
+    it('should show error when no option is selected', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+      const page = new ArchiveOrInactivePage(TEST_LOCATION_NAME, true)
+      page.continueButton().click()
+      page.errorSummary().should('exist')
+    })
+
+    it('should navigate to archive confirm when Archive is selected', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+      const page = new ArchiveOrInactivePage(TEST_LOCATION_NAME, true)
+      page.archiveRadio().click()
+      page.continueButton().click()
+      cy.get('h1').should('contain.text', `Are you sure you want to archive ${TEST_LOCATION_NAME}?`)
+    })
+
+    it('should redirect to locations list with success message when Keep inactive is selected', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+      const page = new ArchiveOrInactivePage(TEST_LOCATION_NAME, true)
+      page.keepInactiveRadio().click()
+      page.continueButton().click()
+      cy.url().should('include', '/prison/TST')
+      cy.get('.moj-alert--success').should('exist')
+      cy.get('.moj-alert--success').should('contain.text', `${TEST_LOCATION_NAME} inactive`)
+    })
+  })
 })

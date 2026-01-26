@@ -2,6 +2,7 @@ import FormWizard from 'hmpo-form-wizard'
 import ArchiveOrInactive from '../../controllers/archiveLocation/archiveOrInactive'
 import Confirm from '../../controllers/archiveLocation/confirm'
 import InactiveConfirm from '../../controllers/archiveLocation/inactiveConfirm'
+import KeepInactive from '../../controllers/archiveLocation/keepInactive'
 
 const steps: FormWizard.Steps = {
   '/': {
@@ -18,6 +19,7 @@ const steps: FormWizard.Steps = {
     next: [
       { field: 'archiveOrInactive', value: 'ARCHIVE', next: 'confirm' },
       { field: 'archiveOrInactive', value: 'INACTIVE', next: 'inactive-confirm' },
+      { field: 'archiveOrInactive', value: 'KEEP_INACTIVE', next: 'keep-inactive' },
     ],
   },
   '/confirm': {
@@ -29,6 +31,9 @@ const steps: FormWizard.Steps = {
     controller: InactiveConfirm,
     template: '../editLocation/checkYourAnswers',
     pageTitle: 'Confirm changes to this location',
+  },
+  '/keep-inactive': {
+    controller: KeepInactive,
   },
 }
 

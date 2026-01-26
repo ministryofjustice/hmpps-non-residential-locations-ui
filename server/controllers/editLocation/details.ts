@@ -43,7 +43,7 @@ export default class Details extends FormInitialStep {
 
     if (req.canAccess('edit_non_resi') && locationDetails.status !== 'ARCHIVED') {
       addAction({
-        text: 'Archive',
+        text: 'Archive location',
         classes: 'govuk-button--warning',
         preventDoubleClick: true,
         href: `/location/${locationDetails.id}/archive`,

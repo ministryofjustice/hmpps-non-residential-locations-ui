@@ -23,27 +23,33 @@ export default class ArchiveOrInactive extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { locationDetails, serviceFamilyTypes } = res.locals
-    const { prisonId, localName } = locationDetails
+    const { prisonId, localName, status } = locationDetails
 
     const backLink = backUrl(req, {
       fallbackUrl: `/prison/${prisonId}`,
     })
 
     const locationNameSentenceCase = capFirst(localName)
+    const isInactive = status === 'INACTIVE'
 
-    res.locals.title = `Archive ${locationNameSentenceCase} or make it inactive`
+    const title = isInactive
+      ? `Archive ${locationNameSentenceCase}`
+      : `Archive ${locationNameSentenceCase} or make it inactive`
+
+    res.locals.title = title
 
     // Get the services that will be affected
     const servicesAffected = getServicesAffected(locationDetails.usedByGroupedServices, serviceFamilyTypes)
 
     // Set services affected on res.locals for the template
     res.locals.servicesAffected = servicesAffected
+    res.locals.isInactive = isInactive
 
     return {
       ...locals,
       backLink,
       cancelLink: `/prison/${prisonId}/`,
-      title: `Archive ${locationNameSentenceCase} or make it inactive`,
+      title,
       buttonText: 'Continue',
     }
   }
