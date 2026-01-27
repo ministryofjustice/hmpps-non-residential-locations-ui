@@ -9,6 +9,8 @@ export default class EditDetailsPage extends Page {
 
   locationNameInput = (): PageElement => cy.get('[data-qa="location-name"]')
 
+  characterCountInfo = (): PageElement => cy.get('#localName-info')
+
   serviceCheckbox = (value: string): PageElement => cy.get(`input[name="services"][value="${value}"]`)
 
   locationStatusRadios = (): PageElement => cy.get('[data-qa="location-status"]')

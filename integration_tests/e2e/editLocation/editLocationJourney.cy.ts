@@ -66,6 +66,20 @@ context('Edit Location Journey', () => {
       cy.get('.govuk-button--warning').should('exist')
       cy.get('.govuk-button--warning').should('contain.text', 'Archive')
     })
+
+    it('should display character count for location name field', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const page = new EditDetailsPage(TEST_LOCATION_NAME)
+      page.characterCountInfo().should('exist')
+      page.characterCountInfo().should('contain.text', 'characters')
+    })
+
+    it('should have character count configured with maxlength of 30', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      cy.get('.govuk-character-count').should('have.attr', 'data-maxlength', '30')
+    })
   })
 
   describe('Archive button visibility for archived locations', () => {
