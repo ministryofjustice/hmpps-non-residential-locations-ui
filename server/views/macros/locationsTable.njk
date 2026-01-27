@@ -70,5 +70,9 @@
 {% endmacro %}
 
 {% macro editLink(item) %}
-    <a href='/location/{{ item.id }}/edit'>Change</a>{% if item.status !== 'ARCHIVED' %} | <a href='/location/{{ item.id }}/archive'>Archive</a>{% endif %}
+    {% if item.status === 'ARCHIVED' %}
+        No available actions
+    {% else %}
+        <a href='/location/{{ item.id }}/edit'>Change</a> | <a href='/location/{{ item.id }}/archive'>Archive</a>
+    {% endif %}
 {% endmacro %}
