@@ -82,7 +82,7 @@ describe('ArchiveOrInactive controller', () => {
       res.locals!.locationDetails.status = 'INACTIVE'
       const locals = controller.locals(req as FormWizard.Request, res as Response)
 
-      expect(locals.title).toBe('Archive Gymnasium')
+      expect(locals.title).toBe('Archive Gymnasium or keep it inactive')
     })
 
     it('sets isInactive to true on res.locals when location is inactive', () => {

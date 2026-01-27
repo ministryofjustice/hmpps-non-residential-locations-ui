@@ -195,11 +195,10 @@ context('Archive Location Journey', () => {
       })
     })
 
-    it('should display the correct H1 heading without "or make it inactive"', () => {
+    it('should display the correct H1 heading with "or keep it inactive"', () => {
       cy.signIn()
       ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
-      cy.get('h1').should('contain.text', `Archive ${TEST_LOCATION_NAME}`)
-      cy.get('h1').should('not.contain.text', 'or make it inactive')
+      cy.get('h1').should('contain.text', `Archive ${TEST_LOCATION_NAME} or keep it inactive`)
     })
 
     it('should show Keep inactive radio option instead of Make inactive', () => {

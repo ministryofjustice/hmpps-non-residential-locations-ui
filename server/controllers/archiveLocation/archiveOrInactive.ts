@@ -33,7 +33,7 @@ export default class ArchiveOrInactive extends FormInitialStep {
     const isInactive = status === 'INACTIVE'
 
     const title = isInactive
-      ? `Archive ${locationNameSentenceCase}`
+      ? `Archive ${locationNameSentenceCase} or keep it inactive`
       : `Archive ${locationNameSentenceCase} or make it inactive`
 
     res.locals.title = title
