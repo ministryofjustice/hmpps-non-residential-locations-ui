@@ -218,16 +218,16 @@ context('Locations List', () => {
       cy.get('[data-qa=locations-table]').contains('tr', 'Gym').should('contain.text', 'Archive')
     })
 
-    it('should not display Archive link for archived locations', () => {
+    it('should display "No available actions" for archived locations', () => {
       cy.signIn()
       IndexPage.forEditUser()
-      cy.get('[data-qa=locations-table]').contains('tr', 'Old Chapel').find('a').should('not.contain.text', 'Archive')
+      cy.get('[data-qa=locations-table]').contains('tr', 'Old Chapel').should('contain.text', 'No available actions')
     })
 
-    it('should still display Change link for archived locations', () => {
+    it('should not display any action links for archived locations', () => {
       cy.signIn()
       IndexPage.forEditUser()
-      cy.get('[data-qa=locations-table]').contains('tr', 'Old Chapel').should('contain.text', 'Change')
+      cy.get('[data-qa=locations-table]').contains('tr', 'Old Chapel').find('a').should('not.exist')
     })
   })
 })
