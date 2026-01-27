@@ -59,6 +59,9 @@
                   hint: {
                     text: "Keep the location in the list but do not allow services to use it until you make it active again."
                   },
+                  conditional: {
+                    html: servicesConditionalHtml
+                  },
                   checked: fields.archiveOrInactive.value == "KEEP_INACTIVE"
                 }
               ]

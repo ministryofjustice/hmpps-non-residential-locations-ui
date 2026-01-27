@@ -2,7 +2,7 @@ import Page, { PageElement } from '../page'
 
 export default class ArchiveOrInactivePage extends Page {
   constructor(localName: string, isInactive = false) {
-    super(isInactive ? `Archive ${localName}` : `Archive ${localName} or make it inactive`)
+    super(isInactive ? `Archive ${localName} or keep it inactive` : `Archive ${localName} or make it inactive`)
   }
 
   static goTo = (locationId: string) => cy.visit(`/location/${locationId}/archive`)
