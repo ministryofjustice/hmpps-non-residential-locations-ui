@@ -4,7 +4,11 @@ const fields = {
   localName: {
     component: 'govukInput',
     validate: ['required', maxLength(30)],
-    errorMessages: { required: 'Enter a location name', taken: 'A location with this name already exists' },
+    errorMessages: {
+      required: 'Enter a location name',
+      taken: 'A location with this name already exists',
+      maxLength: 'Location name must be 30 characters or less',
+    },
     id: 'localName',
     name: 'localName',
     classes: 'govuk-!-width-full local-name-text-input',
