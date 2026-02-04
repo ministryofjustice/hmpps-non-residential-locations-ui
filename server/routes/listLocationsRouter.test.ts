@@ -170,10 +170,13 @@ describe('GET /prison/TST', () => {
         .get('/prison/TST')
         .expect(200)
         .expect(() => {
-          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(undefined, 'TST', undefined, [
-            'ACTIVE',
-            'INACTIVE',
-          ])
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'INACTIVE'],
+            'localName,asc',
+          )
         })
     })
 
@@ -185,9 +188,13 @@ describe('GET /prison/TST', () => {
         .get('/prison/TST?status=ARCHIVED')
         .expect(200)
         .expect(() => {
-          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(undefined, 'TST', undefined, [
-            'ARCHIVED',
-          ])
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ARCHIVED'],
+            'localName,asc',
+          )
         })
     })
 
@@ -199,10 +206,13 @@ describe('GET /prison/TST', () => {
         .get('/prison/TST?status=ACTIVE&status=ARCHIVED')
         .expect(200)
         .expect(() => {
-          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(undefined, 'TST', undefined, [
-            'ACTIVE',
-            'ARCHIVED',
-          ])
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'ARCHIVED'],
+            'localName,asc',
+          )
         })
     })
 
@@ -265,6 +275,169 @@ describe('GET /prison/TST', () => {
         .expect(res => {
           expect(res.text).toContain('status=ACTIVE')
           expect(res.text).toContain('status=ARCHIVED')
+        })
+    })
+  })
+
+  describe('sorting', () => {
+    beforeEach(() => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => user,
+        canAccess: () => false,
+      })
+    })
+
+    it('should use default sort (localName,asc) when no sort param provided', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'INACTIVE'],
+            'localName,asc',
+          )
+        })
+    })
+
+    it('should pass through valid sort param', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?sort=status,desc')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'INACTIVE'],
+            'status,desc',
+          )
+        })
+    })
+
+    it('should fall back to default sort key for invalid sort key', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?sort=invalidKey,asc')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'INACTIVE'],
+            'localName,asc',
+          )
+        })
+    })
+
+    it('should fall back to asc for invalid sort direction', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?sort=status,invalid')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'INACTIVE'],
+            'status,asc',
+          )
+        })
+    })
+
+    it('should preserve sort in pagination href template', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      const multiPageResponse = {
+        ...mockLocationsResponse,
+        locations: {
+          ...mockLocationsResponse.locations,
+          totalPages: 3,
+          totalElements: 100,
+        },
+      }
+      locationsService.getNonResidentialLocations.mockResolvedValue(multiPageResponse)
+
+      return request(app)
+        .get('/prison/TST?sort=status,desc')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toContain('sort=status,desc')
+        })
+    })
+
+    it('should include sortHrefTemplate in rendered page', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?status=ACTIVE')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toContain('data-sort-href-template')
+          expect(res.text).toContain('sort={sortKey},{sortDirection}')
+        })
+    })
+
+    it('should render table with moj-sortable-table data-module', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toContain('data-module="moj-sortable-table"')
+        })
+    })
+
+    it('should render Location column with aria-sort ascending when sorted by localName,asc', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?sort=localName,asc')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toMatch(/aria-sort="ascending" data-sort-key="localName"/)
+        })
+    })
+
+    it('should render Status column with aria-sort descending when sorted by status,desc', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?sort=status,desc')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toMatch(/aria-sort="descending" data-sort-key="status"/)
+        })
+    })
+
+    it('should render unsorted columns with aria-sort none', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?sort=localName,asc')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toMatch(/aria-sort="none" data-sort-key="status"/)
         })
     })
   })

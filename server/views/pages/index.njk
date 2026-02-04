@@ -76,7 +76,7 @@
     </script>
 
     {% if locations.content | length > 0 %}
-      {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes, canEdit) }}
+      {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes, canEdit, sort, sortHrefTemplate) }}
     {% else %}
       <p class="govuk-body-l govuk-!-font-weight-bold" data-qa="no-results-heading">There are no matching results.</p>
       <p class="govuk-body" data-qa="no-results-message">Improve your results by applying or removing filters.</p>

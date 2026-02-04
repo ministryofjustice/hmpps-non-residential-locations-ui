@@ -25,6 +25,18 @@ describe('LocationsService', () => {
       page: undefined,
       prisonId: 'MDI',
       size: '35',
+      sort: undefined,
+    })
+  })
+
+  it('should pass sort param to API when provided', async () => {
+    await locationsService.getNonResidentialLocations('some-token', 'MDI', '0', ['ACTIVE'], 'status,desc')
+    expect(locationsApiClient.locations.getNonResidentialSummary).toHaveBeenCalledWith('some-token', {
+      page: '0',
+      prisonId: 'MDI',
+      size: '35',
+      sort: 'status,desc',
+      status: 'ACTIVE',
     })
   })
 

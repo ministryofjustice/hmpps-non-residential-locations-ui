@@ -1,6 +1,90 @@
 import IndexPage from '../pages/index'
 
 context('Locations List', () => {
+  context('Sorting', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubNonResidentialLocationWithStatuses', {
+        prisonId: 'TST',
+        locations: [
+          { id: 'loc-1', localName: 'Alpha Gym', status: 'ACTIVE' },
+          { id: 'loc-2', localName: 'Beta Chapel', status: 'INACTIVE' },
+          { id: 'loc-3', localName: 'Gamma Library', status: 'ACTIVE' },
+        ],
+      })
+      cy.task('stubLocationsConstantsNonResidentialUsageType')
+      cy.task('stubLocationsConstantsServiceTypes')
+      cy.task('stubLocationsConstantsServiceFamilyTypes')
+      cy.task('stubComponents')
+    })
+
+    it('should render sortable column headers as buttons', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+      indexPage.sortableColumnButton('localName').should('exist')
+      indexPage.sortableColumnButton('status').should('exist')
+    })
+
+    it('should have aria-sort attribute on sortable columns', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+      indexPage.sortableColumnHeader('localName').should('have.attr', 'aria-sort')
+      indexPage.sortableColumnHeader('status').should('have.attr', 'aria-sort')
+    })
+
+    it('should default to sorting by localName ascending', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+      indexPage.sortableColumnHeader('localName').should('have.attr', 'aria-sort', 'ascending')
+      indexPage.sortableColumnHeader('status').should('have.attr', 'aria-sort', 'none')
+    })
+
+    it('should navigate to sorted URL when clicking sort button', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+
+      // Click the Location column (currently ascending) - should switch to descending
+      indexPage.sortableColumnButton('localName').click()
+      cy.url().should('include', 'sort=localName,desc')
+    })
+
+    it('should navigate to sort by status when clicking Status column', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+
+      // Click the Status column (currently none) - should sort ascending
+      indexPage.sortableColumnButton('status').click()
+      cy.url().should('include', 'sort=status,asc')
+    })
+
+    it('should show correct aria-sort after navigating to sorted URL', () => {
+      cy.signIn()
+      cy.visit('/prison/TST?sort=status,desc')
+      const indexPage = IndexPage.forViewUser()
+
+      indexPage.sortableColumnHeader('status').should('have.attr', 'aria-sort', 'descending')
+      indexPage.sortableColumnHeader('localName').should('have.attr', 'aria-sort', 'none')
+    })
+
+    it('should preserve sort in pagination links', () => {
+      cy.signIn()
+      cy.visit('/prison/TST?sort=status,desc')
+      IndexPage.forViewUser()
+
+      // Check that the table's sort href template contains the current sort
+      cy.get('[data-qa=locations-table]').should('have.attr', 'data-sort-href-template').and('include', 'sort=')
+    })
+
+    it('should have data-module attribute for MOJ sortable table', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+      cy.get('[data-qa=locations-table]').should('have.attr', 'data-module', 'moj-sortable-table')
+    })
+  })
+
   context('Status filter', () => {
     beforeEach(() => {
       cy.task('reset')

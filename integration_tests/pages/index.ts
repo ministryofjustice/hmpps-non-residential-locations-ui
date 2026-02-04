@@ -33,4 +33,10 @@ export default class IndexPage extends Page {
     cy.get(`[data-qa=status-filter-form] input[value="${status}"]`)
 
   statusFilterLegend = (): PageElement => cy.get('[data-qa=status-filter-form] legend')
+
+  sortableColumnHeader = (sortKey: string): PageElement =>
+    cy.get(`[data-qa=locations-table] th[data-sort-key="${sortKey}"]`)
+
+  sortableColumnButton = (sortKey: string): PageElement =>
+    cy.get(`[data-qa=locations-table] th[data-sort-key="${sortKey}"] button`)
 }
