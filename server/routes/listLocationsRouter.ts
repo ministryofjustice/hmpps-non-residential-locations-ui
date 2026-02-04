@@ -12,7 +12,7 @@ export default function routes({ locationsService }: Services): Router {
   router.get('/prison/:prisonId', async (req, res, next) => {
     const { systemToken } = req.session
     const { prisonId } = req.params
-    const { page, status } = req.query
+    const { page, status, sort } = req.query
 
     const canEdit = req.canAccess('edit_non_resi')
 
@@ -39,6 +39,14 @@ export default function routes({ locationsService }: Services): Router {
     }
 
     const pageNo = page && !Number.isNaN(Number(page)) ? Number(page) - 1 : null
+
+    const defaultSortKey = 'localName'
+    const allowedSortKeys = new Set(['localName', 'status'])
+    const rawSort = Array.isArray(sort) ? sort[0] : sort
+    const [requestedKey, requestedDirection] = typeof rawSort === 'string' ? rawSort.split(',') : []
+    const sortKey = allowedSortKeys.has(requestedKey) ? requestedKey : defaultSortKey
+    const sortDirection = requestedDirection === 'desc' ? 'desc' : 'asc'
+    const sortParam = `${sortKey},${sortDirection}`
 
     // Fetch counts for each status
     const [activeCount, inactiveCount, archivedCount] = await Promise.all([
@@ -71,7 +79,7 @@ export default function routes({ locationsService }: Services): Router {
         rowCount: 0,
         rowFrom: 0,
         rowTo: 0,
-        hrefTemplate: '?status=NONE&page={page}',
+        hrefTemplate: `?status=NONE&sort=${sortParam}&page={page}`,
       }
 
       return res.render('pages/index', {
@@ -80,6 +88,8 @@ export default function routes({ locationsService }: Services): Router {
         canEdit,
         selectedStatuses,
         statusCounts,
+        sort: sortParam,
+        sortHrefTemplate: `?status=NONE&sort={sortKey},{sortDirection}`,
       })
     }
 
@@ -89,6 +99,7 @@ export default function routes({ locationsService }: Services): Router {
       prisonId,
       pageNo ? `${pageNo}` : undefined,
       selectedStatuses,
+      sortParam,
     )
 
     const { locations } = locationsResult
@@ -97,9 +108,10 @@ export default function routes({ locationsService }: Services): Router {
     const rowFrom = pageable.pageSize * pageable.pageNumber + 1
     const rowTo = rowFrom + locations.numberOfElements - 1
 
-    // Build href template preserving status filter
-    const statusParams = selectedStatuses.map(s => `status=${s}`).join('&')
-    const hrefTemplate = statusParams ? `?${statusParams}&page={page}` : '?page={page}'
+    // Build href template preserving status filter and sort
+    const statusParams = selectedStatuses.map(s => `status=${s}`)
+    const hrefTemplate = `?${[...statusParams, `sort=${sortParam}`, 'page={page}'].join('&')}`
+    const sortHrefTemplate = `?${[...statusParams, 'sort={sortKey},{sortDirection}'].join('&')}`
 
     res.locals.paginationLocals = {
       totalPages: locations.totalPages,
@@ -112,7 +124,15 @@ export default function routes({ locationsService }: Services): Router {
       hrefTemplate,
     }
 
-    return res.render('pages/index', { ...res.locals, locations, canEdit, selectedStatuses, statusCounts })
+    return res.render('pages/index', {
+      ...res.locals,
+      locations,
+      canEdit,
+      selectedStatuses,
+      statusCounts,
+      sort: sortParam,
+      sortHrefTemplate,
+    })
   })
 
   return router

@@ -4,7 +4,7 @@
 {% from "./locationStatusTag.njk" import locationStatusTag %}
 {% from "../partials/simplePagination/macro.njk" import simplePagination %}
 
-{% macro locationsTable (locations, pagingData, usageTypesData, canEdit) %}
+{% macro locationsTable (locations, pagingData, usageTypesData, canEdit, sort, sortHrefTemplate) %}
 
 <h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
 
@@ -15,8 +15,8 @@
       {% if canEdit %}
         {% set rows = (rows.push(
           [
-            { html: item.localName },
-            { html: locationStatusTag(item) },
+            { html: item.localName, attributes: { "data-sort-value": item.localName } },
+            { html: locationStatusTag(item), attributes: { "data-sort-value": item.status } },
             { html: usageTypes(item.usedByGroupedServices, usageTypesData) },
             { html: editLink(item) }
           ]
@@ -24,8 +24,8 @@
       {% else %}
         {% set rows = (rows.push(
           [
-            { html: item.localName },
-            { html: locationStatusTag(item) },
+            { html: item.localName, attributes: { "data-sort-value": item.localName } },
+            { html: locationStatusTag(item), attributes: { "data-sort-value": item.status } },
             { html: usageTypes(item.usedByGroupedServices, usageTypesData) }
           ]
         ), rows) %}
@@ -33,9 +33,26 @@
     {% endfor %}
     {{ simplePagination(pagingData) }}
 
+    {% set sortParts = sort.split(',') if sort else [] %}
+    {% set activeSortKey = sortParts[0] if sortParts | length > 0 else '' %}
+    {% set activeSortDir = sortParts[1] if sortParts | length > 1 else '' %}
+
     {% set tableHead = [
-      { text: "Location", classes: "govuk-!-width-one-third" },
-      { text: "Status" },
+      {
+        text: "Location",
+        classes: "govuk-!-width-one-third",
+        attributes: {
+          "aria-sort": "ascending" if activeSortKey == "localName" and activeSortDir == "asc" else ("descending" if activeSortKey == "localName" and activeSortDir == "desc" else "none"),
+          "data-sort-key": "localName"
+        }
+      },
+      {
+        text: "Status",
+        attributes: {
+          "aria-sort": "ascending" if activeSortKey == "status" and activeSortDir == "asc" else ("descending" if activeSortKey == "status" and activeSortDir == "desc" else "none"),
+          "data-sort-key": "status"
+        }
+      },
       { text: "Services that use non-resi locations" }
     ] %}
     {% if canEdit %}
@@ -45,7 +62,9 @@
     {{ govukTable({
       attributes: {
         "data-qa": "locations-table",
-        "id": "locations-table"
+        "id": "locations-table",
+        "data-module": "moj-sortable-table",
+        "data-sort-href-template": sortHrefTemplate
       },
       firstCellIsHeader: false,
       head: tableHead,
