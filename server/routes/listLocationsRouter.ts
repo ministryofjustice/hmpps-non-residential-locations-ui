@@ -38,7 +38,7 @@ export default function routes({ locationsService }: Services): Router {
       selectedStatuses = [status as string]
     }
 
-    let selectedServiceType: string
+    let selectedServiceType: string = null
     if (serviceType !== undefined) {
       selectedServiceType = serviceType as string
     }

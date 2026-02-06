@@ -176,6 +176,8 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
+            null,
+            null,
           )
         })
     })
@@ -194,6 +196,8 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ARCHIVED'],
             'localName,asc',
+            null,
+            null,
           )
         })
     })
@@ -212,6 +216,8 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'ARCHIVED'],
             'localName,asc',
+            null,
+            null,
           )
         })
     })
@@ -302,6 +308,8 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
+            null,
+            null,
           )
         })
     })
@@ -320,6 +328,8 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'status,desc',
+            null,
+            null,
           )
         })
     })
@@ -338,6 +348,8 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
+            null,
+            null,
           )
         })
     })
@@ -356,6 +368,8 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'status,asc',
+            null,
+            null,
           )
         })
     })
