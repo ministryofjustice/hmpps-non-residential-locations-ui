@@ -12,7 +12,7 @@ export default function routes({ locationsService }: Services): Router {
   router.get('/prison/:prisonId', async (req, res, next) => {
     const { systemToken } = req.session
     const { prisonId } = req.params
-    const { page, status, sort } = req.query
+    const { page, status, sort, localName, serviceType } = req.query
 
     const canEdit = req.canAccess('edit_non_resi')
 
@@ -38,6 +38,15 @@ export default function routes({ locationsService }: Services): Router {
       selectedStatuses = [status as string]
     }
 
+    let selectedServiceType: string = null
+    if (serviceType !== undefined) {
+      selectedServiceType = serviceType as string
+    }
+
+    let wildcardName: string = null
+    if (localName !== undefined) {
+      wildcardName = localName as string
+    }
     const pageNo = page && !Number.isNaN(Number(page)) ? Number(page) - 1 : null
 
     const defaultSortKey = 'localName'
@@ -61,7 +70,7 @@ export default function routes({ locationsService }: Services): Router {
       ARCHIVED: archivedCount,
     }
 
-    // If no statuses selected, show empty result
+    // If no statuses selected, show an empty result
     if (selectedStatuses.length === 0) {
       const emptyLocations = {
         content: [] as never[],
@@ -100,6 +109,8 @@ export default function routes({ locationsService }: Services): Router {
       pageNo ? `${pageNo}` : undefined,
       selectedStatuses,
       sortParam,
+      selectedServiceType,
+      wildcardName,
     )
 
     const { locations } = locationsResult
