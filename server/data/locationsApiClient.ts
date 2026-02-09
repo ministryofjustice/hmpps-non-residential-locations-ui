@@ -17,7 +17,7 @@ export default class LocationsApiClient extends BaseApiClient {
         page?: string
         size?: string
         status?: string
-        sort?: string
+        sort?: string | string[]
         serviceType?: string
         localName?: string
       }
