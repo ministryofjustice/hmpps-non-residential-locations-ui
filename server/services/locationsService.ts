@@ -9,7 +9,7 @@ export default class LocationsService {
     prisonId: string,
     page?: string,
     status?: string[],
-    sort?: string,
+    sort?: string | string[],
     serviceType?: string,
     localName?: string,
   ) {

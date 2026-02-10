@@ -314,7 +314,7 @@ describe('GET /prison/TST', () => {
         })
     })
 
-    it('should pass through valid sort param', () => {
+    it('should pass through valid sort param with secondary sort by localName when sorting by status', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
@@ -327,7 +327,27 @@ describe('GET /prison/TST', () => {
             'TST',
             undefined,
             ['ACTIVE', 'INACTIVE'],
-            'status,desc',
+            ['status,desc', 'localName,asc'],
+            null,
+            null,
+          )
+        })
+    })
+
+    it('should add secondary sort by localName when sorting by status ascending', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?sort=status,asc')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'INACTIVE'],
+            ['status,asc', 'localName,asc'],
             null,
             null,
           )
@@ -367,7 +387,7 @@ describe('GET /prison/TST', () => {
             'TST',
             undefined,
             ['ACTIVE', 'INACTIVE'],
-            'status,asc',
+            ['status,asc', 'localName,asc'],
             null,
             null,
           )
@@ -390,6 +410,8 @@ describe('GET /prison/TST', () => {
         .get('/prison/TST?sort=status,desc')
         .expect(200)
         .expect(res => {
+          // The href template should contain the primary sort only (status,desc)
+          // The secondary sort is added programmatically by the API
           expect(res.text).toContain('sort=status,desc')
         })
     })

@@ -56,6 +56,9 @@ export default function routes({ locationsService }: Services): Router {
     const sortKey = allowedSortKeys.has(requestedKey) ? requestedKey : defaultSortKey
     const sortDirection = requestedDirection === 'desc' ? 'desc' : 'asc'
     const sortParam = `${sortKey},${sortDirection}`
+    // When sorting by status, add secondary sort by localName to maintain alphabetical order within each status
+    const sortParamForApi: string | string[] =
+      sortKey === 'status' ? [`${sortKey},${sortDirection}`, 'localName,asc'] : sortParam
 
     // Fetch counts for each status
     const [activeCount, inactiveCount, archivedCount] = await Promise.all([
@@ -108,7 +111,7 @@ export default function routes({ locationsService }: Services): Router {
       prisonId,
       pageNo ? `${pageNo}` : undefined,
       selectedStatuses,
-      sortParam,
+      sortParamForApi,
       selectedServiceType,
       wildcardName,
     )
