@@ -3,12 +3,12 @@ import maxLength from '../../validators/maxLength'
 const fields = {
   localName: {
     component: 'govukCharacterCount',
-    validate: ['required', maxLength(30)],
-    maxlength: 30,
+    validate: ['required', maxLength(40)],
+    maxlength: 40,
     errorMessages: {
       required: 'Enter a location name',
       taken: 'A location with this name already exists',
-      maxLength: 'Location name must be 30 characters or less',
+      maxLength: 'Location name must be 40 characters or less',
     },
     id: 'localName',
     name: 'localName',
