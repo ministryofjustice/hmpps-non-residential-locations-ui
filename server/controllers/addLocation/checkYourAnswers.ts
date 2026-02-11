@@ -56,7 +56,7 @@ export default class CheckYourAnswers extends FormInitialStep {
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('successMojFlash', {
-      title: 'Location added',
+      title: `${values.localName} added`,
       variant: 'success',
       dismissible: true,
     })
