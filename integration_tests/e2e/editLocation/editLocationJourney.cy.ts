@@ -75,10 +75,20 @@ context('Edit Location Journey', () => {
       page.characterCountInfo().should('contain.text', 'characters')
     })
 
-    it('should have character count configured with maxlength of 30', () => {
+    it('should have character count configured with maxlength of 40', () => {
       cy.signIn()
       EditDetailsPage.goTo(TEST_LOCATION_ID)
-      cy.get('.govuk-character-count').should('have.attr', 'data-maxlength', '30')
+      cy.get('.govuk-character-count').should('have.attr', 'data-maxlength', '40')
+    })
+
+    it('should display validation message if localName exceeds character limit', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const page = new EditDetailsPage(TEST_LOCATION_NAME)
+      page.locationNameInput().clear().type('A'.repeat(41))
+      page.continueButton().click()
+      page.errorSummary().should('exist')
+      page.errorSummaryList().should('contain.text', 'Location name must be 40 characters or less')
     })
   })
 
