@@ -86,7 +86,7 @@ context('Start journey', () => {
 
     // return to home page and check success banner
     cy.url().should('include', '/prison/TST')
-    cy.get('.moj-alert').should('exist')
-    cy.get('.moj-alert').should('exist').should('contain.text', 'Location added')
+    cy.get('.moj-alert__content').should('exist')
+    cy.get('.moj-alert__content').should('contain.text', 'Loc A added')
   })
 })

@@ -133,11 +133,11 @@ describe('CheckYourAnswers controller', () => {
       controller.successHandler(req as FormWizard.Request, res as Response, next)
       expect(logger.info).toHaveBeenCalledWith('Successfully created location Room A at MDI')
 
-      expect(req.journeyModel!.reset).toHaveBeenCalled()
-      expect(req.sessionModel!.reset).toHaveBeenCalled()
+      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(req.sessionModel.reset).toHaveBeenCalled()
 
       expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
-        title: 'Location added',
+        title: 'Room A added',
         variant: 'success',
         dismissible: true,
       })
