@@ -70,11 +70,11 @@ export default class InactiveConfirm extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { prisonId } = res.locals.locationDetails
+    const { prisonId, localName } = res.locals.locationDetails
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('successMojFlash', {
-      title: 'Location made inactive',
+      title: `${localName} inactive`,
       variant: 'success',
       dismissible: true,
     })
