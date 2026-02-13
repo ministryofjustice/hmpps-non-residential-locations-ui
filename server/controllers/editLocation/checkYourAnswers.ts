@@ -154,13 +154,13 @@ export default class CheckYourAnswers extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const { prisonId, localName: originalLocalName } = res.locals.locationDetails
+    const { prisonId } = res.locals.locationDetails
     const { localName: newLocalName } = req.sessionModel.toJSON() as SessionData
 
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('successMojFlash', {
-      title: `${originalLocalName} changed to ${newLocalName}`,
+      title: `${newLocalName} changed`,
       variant: 'success',
       dismissible: true,
     })

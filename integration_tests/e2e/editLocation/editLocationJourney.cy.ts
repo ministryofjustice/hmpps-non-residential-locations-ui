@@ -175,7 +175,7 @@ context('Edit Location Journey', () => {
       checkYourAnswersPage.confirmButton().click()
       cy.url().should('include', '/prison/TST')
       cy.get('.moj-alert__content').should('exist')
-      cy.get('.moj-alert__content').should('contain.text', 'Gym changed to New Location Name')
+      cy.get('.moj-alert__content').should('contain.text', 'New Location Name changed')
     })
   })
 })
