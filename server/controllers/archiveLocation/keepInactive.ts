@@ -13,7 +13,7 @@ export default class KeepInactive extends FormInitialStep {
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('successMojFlash', {
-      title: `${locationNameSentenceCase} inactive`,
+      title: `${locationNameSentenceCase} kept inactive`,
       variant: 'success',
       dismissible: true,
     })

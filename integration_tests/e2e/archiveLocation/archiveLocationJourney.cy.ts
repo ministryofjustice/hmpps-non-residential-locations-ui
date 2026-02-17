@@ -181,7 +181,7 @@ context('Archive Location Journey', () => {
       confirmPage.confirmButton().click()
       cy.url().should('include', '/prison/TST')
       cy.get('.moj-alert__content').should('exist')
-      cy.get('.moj-alert__content').should('contain.text', `${TEST_LOCATION_NAME} inactive`)
+      cy.get('.moj-alert__content').should('contain.text', `${TEST_LOCATION_NAME} made inactive`)
     })
   })
 
@@ -234,7 +234,7 @@ context('Archive Location Journey', () => {
       page.continueButton().click()
       cy.url().should('include', '/prison/TST')
       cy.get('.moj-alert__content').should('exist')
-      cy.get('.moj-alert__content').should('contain.text', `${TEST_LOCATION_NAME} inactive`)
+      cy.get('.moj-alert__content').should('contain.text', `${TEST_LOCATION_NAME} kept inactive`)
     })
   })
 })

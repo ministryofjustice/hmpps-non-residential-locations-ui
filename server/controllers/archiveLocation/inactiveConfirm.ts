@@ -74,7 +74,7 @@ export default class InactiveConfirm extends FormInitialStep {
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('successMojFlash', {
-      title: `${localName} inactive`,
+      title: `${localName} made inactive`,
       variant: 'success',
       dismissible: true,
     })
