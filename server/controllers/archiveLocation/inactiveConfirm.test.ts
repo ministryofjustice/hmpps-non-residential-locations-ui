@@ -127,7 +127,7 @@ describe('InactiveConfirm controller', () => {
       expect(req.sessionModel!.reset).toHaveBeenCalled()
 
       expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
-        title: 'Gymnasium inactive',
+        title: 'Gymnasium made inactive',
         variant: 'success',
         dismissible: true,
       })
