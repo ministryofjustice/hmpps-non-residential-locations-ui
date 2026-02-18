@@ -12,6 +12,7 @@ export default function routes({ locationsService }: Services): Router {
   router.get('/prison/:prisonId', async (req, res, next) => {
     const { systemToken } = req.session
     const { prisonId } = req.params
+    req.session.prisonId = prisonId
     const { page, status, sort, localName, serviceType } = req.query
 
     const canEdit = req.canAccess('edit_non_resi')

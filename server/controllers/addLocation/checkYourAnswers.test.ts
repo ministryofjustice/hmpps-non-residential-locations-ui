@@ -83,54 +83,17 @@ describe('CheckYourAnswers controller', () => {
     })
   })
 
-  describe('saveValues()', () => {
-    it('calls locationsService with mapped data and continues', async () => {
-      await controller.saveValues(req as FormWizard.Request, res as Response, next)
+  describe('successHandler()', () => {
+    it('successfully adds a new active location', async () => {
+      req.services.locationsService.addNonResidentialLocation = jest.fn().mockResolvedValue(undefined)
 
-      expect(addNonResidentialLocation).toHaveBeenCalledWith('token-123', 'MDI', {
+      await controller.successHandler(req as FormWizard.Request, res as Response, next)
+      expect(req.services.locationsService.addNonResidentialLocation).toHaveBeenCalledWith('token-123', 'MDI', {
         localName: 'Room A',
         servicesUsingLocation: ['EDU'],
         active: true,
       })
 
-      expect(next).toHaveBeenCalled()
-    })
-
-    it('calls locationsService with multiple services and continues', async () => {
-      req.sessionModel.toJSON = jest.fn().mockReturnValue({
-        localName: 'Room B',
-        services: ['EDU', 'GYM'],
-        locationStatus: 'ACTIVE',
-      })
-      req.sessionModel.get = jest.fn().mockImplementation(key => {
-        if (key === 'services') return ['EDU', 'GYM']
-        return undefined
-      })
-
-      await controller.saveValues(req as FormWizard.Request, res as Response, next)
-
-      expect(addNonResidentialLocation).toHaveBeenCalledWith('token-123', 'MDI', {
-        localName: 'Room B',
-        servicesUsingLocation: ['EDU', 'GYM'],
-        active: true,
-      })
-      expect(next).toHaveBeenCalled()
-    })
-
-    it('logs error and passes error to next on failure', async () => {
-      const error = new Error('API failure')
-      addNonResidentialLocation.mockRejectedValue(error)
-
-      await controller.saveValues(req as FormWizard.Request, res as Response, next)
-
-      expect(logger.error).toHaveBeenCalledWith('Failed to create location Room A at MDI', error)
-      expect(next).toHaveBeenCalledWith(error)
-    })
-  })
-
-  describe('successHandler()', () => {
-    it('resets models, flashes success message and redirects', () => {
-      controller.successHandler(req as FormWizard.Request, res as Response, next)
       expect(logger.info).toHaveBeenCalledWith('Successfully created location Room A at MDI')
 
       expect(req.journeyModel.reset).toHaveBeenCalled()
@@ -143,6 +106,83 @@ describe('CheckYourAnswers controller', () => {
       })
 
       expect(res.redirect).toHaveBeenCalledWith('/prison/MDI')
+    })
+
+    it('successfully adds a new active location using preferred prison rather than caseload', async () => {
+      req.services.locationsService.addNonResidentialLocation = jest.fn().mockResolvedValue(undefined)
+      req.session.prisonId = 'ABC'
+
+      await controller.successHandler(req as FormWizard.Request, res as Response, next)
+      expect(req.services.locationsService.addNonResidentialLocation).toHaveBeenCalledWith('token-123', 'ABC', {
+        localName: 'Room A',
+        servicesUsingLocation: ['EDU'],
+        active: true,
+      })
+
+      expect(logger.info).toHaveBeenCalledWith('Successfully created location Room A at ABC')
+
+      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(req.sessionModel.reset).toHaveBeenCalled()
+
+      expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
+        title: 'Room A added',
+        variant: 'success',
+        dismissible: true,
+      })
+
+      expect(res.redirect).toHaveBeenCalledWith('/prison/ABC')
+    })
+
+    it('handles inactive locationStatus', async () => {
+      req.sessionModel.toJSON = jest.fn().mockReturnValue({
+        localName: 'Room B',
+        services: ['GYM'],
+        locationStatus: 'INACTIVE',
+      })
+
+      await controller.successHandler(req as FormWizard.Request, res as Response, next)
+
+      expect(req.services.locationsService.addNonResidentialLocation).toHaveBeenCalledWith('token-123', 'MDI', {
+        localName: 'Room B',
+        servicesUsingLocation: ['GYM'],
+        active: false,
+      })
+      expect(logger.info).toHaveBeenCalledWith('Successfully created location Room B at MDI')
+      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(req.sessionModel.reset).toHaveBeenCalled()
+
+      expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
+        title: 'Room B added',
+        variant: 'success',
+        dismissible: true,
+      })
+      expect(res.redirect).toHaveBeenCalledWith('/prison/MDI')
+    })
+
+    it('logs error and calls next on failure', async () => {
+      const error = new Error('API failure')
+      req.sessionModel.toJSON = jest.fn().mockReturnValue({
+        localName: 'Room A',
+        services: ['EDU'],
+        locationStatus: 'ACTIVE',
+      })
+      req.services.locationsService.addNonResidentialLocation = jest.fn().mockRejectedValue(error)
+      req.form = { values: { services: ['EDU'] } } as any
+      res.locals.values = { services: ['EDU'] }
+
+      await controller.successHandler(req as FormWizard.Request, res as Response, next)
+
+      expect(req.services.locationsService.addNonResidentialLocation).toHaveBeenCalledWith('token-123', 'MDI', {
+        localName: 'Room A',
+        servicesUsingLocation: ['EDU'],
+        active: true,
+      })
+
+      expect(logger.error).toHaveBeenCalledWith('Failed to create location Room A at MDI', error)
+
+      expect(req.flash).not.toHaveBeenCalled()
+
+      expect(next).toHaveBeenCalledWith(error)
     })
   })
 })

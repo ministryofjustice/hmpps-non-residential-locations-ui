@@ -9,6 +9,7 @@ export declare module 'express-session' {
     referrerUrl: string
     returnTo: string
     systemToken: string
+    prisonId?: string
   }
 }
 

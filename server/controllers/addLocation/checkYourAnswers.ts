@@ -22,8 +22,8 @@ export default class CheckYourAnswers extends FormInitialStep {
     }
   }
 
-  override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const prisonId = res.locals.user.activeCaseload.id
+  override async successHandler(req: FormWizard.Request, res: Response, next: NextFunction) {
+    const prisonId = req.session.prisonId || res.locals.user.activeCaseload.id
     const values = req.sessionModel.toJSON() as {
       localName: string
       services: string[]
@@ -38,20 +38,13 @@ export default class CheckYourAnswers extends FormInitialStep {
     }
 
     try {
+      // currently the api doesn't validate the prisonId. May need to do that here against prison-register
       await req.services.locationsService.addNonResidentialLocation(req.session.systemToken, prisonId, locationData)
+      logger.info(`Successfully created location ${values.localName} at ${prisonId}`)
     } catch (error) {
       logger.error(`Failed to create location ${values.localName} at ${prisonId}`, error)
-      next(error)
+      return next(error)
     }
-    next()
-  }
-
-  override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const prisonId = res.locals.user.activeCaseload.id
-    const values = req.sessionModel.toJSON() as {
-      localName: string
-    }
-    logger.info(`Successfully created location ${values.localName} at ${prisonId}`)
 
     req.journeyModel.reset()
     req.sessionModel.reset()
@@ -60,6 +53,7 @@ export default class CheckYourAnswers extends FormInitialStep {
       variant: 'success',
       dismissible: true,
     })
-    res.redirect(`/prison/${prisonId}`)
+
+    return res.redirect(`/prison/${prisonId}`)
   }
 }
