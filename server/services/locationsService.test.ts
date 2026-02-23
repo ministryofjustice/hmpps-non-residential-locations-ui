@@ -15,6 +15,7 @@ describe('LocationsService', () => {
       updateNonResidentialLocation: Object.assign(jest.fn(), { clearCache: jest.fn() }),
       addNonResidentialLocation: Object.assign(jest.fn(), { clearCache: jest.fn() }),
       archiveNonResidentialLocation: Object.assign(jest.fn(), { clearCache: jest.fn() }),
+      prisonConfiguration: Object.assign(jest.fn(), { clearCache: jest.fn() }),
     }
     locationsService = new LocationsService(locationsApiClient)
   })

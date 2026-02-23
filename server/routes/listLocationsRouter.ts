@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import type { Services } from '../services'
+import logger from '../../logger'
 
 export default function routes({ locationsService }: Services): Router {
   const router = Router()
@@ -12,6 +13,17 @@ export default function routes({ locationsService }: Services): Router {
   router.get('/prison/:prisonId', async (req, res, next) => {
     const { systemToken } = req.session
     const { prisonId } = req.params
+
+    try {
+      logger.info(`Getting prison configuration for ${prisonId}`)
+      await locationsService.getPrisonConfiguration(systemToken, prisonId)
+    } catch (error) {
+      logger.error(`Error getting prison configuration for ${prisonId}. Prison may not exist.  ${error}`)
+      return next(error)
+    }
+
+    req.session.prisonId = prisonId
+
     const { page, status, sort, localName, serviceType } = req.query
 
     const canEdit = req.canAccess('edit_non_resi')
