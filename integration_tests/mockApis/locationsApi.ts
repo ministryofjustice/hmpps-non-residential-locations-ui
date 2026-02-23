@@ -291,6 +291,26 @@ export default {
       },
     }),
 
+  stubGetPrisonConfiguration: () =>
+    stubFor({
+      request: {
+        method: 'GET',
+        urlPattern: '/locations-api/prison-configuration/TST',
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          prisonId: 'TST',
+          nonResidentialLocationConfig: {
+            allowDuplicateLocalNames: false,
+          },
+        },
+      },
+    }),
+
   stubLocationsConstantsServiceFamilyTypes: () =>
     stubFor({
       request: {

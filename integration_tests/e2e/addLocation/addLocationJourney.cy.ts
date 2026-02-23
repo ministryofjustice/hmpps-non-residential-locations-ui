@@ -25,6 +25,7 @@ context('Start journey', () => {
     })
 
     cy.task('stubAddNonResidentialLocation', { prisonId: 'TST' })
+    cy.task('stubGetPrisonConfiguration')
   })
 
   it('Should display error messages correctly', () => {

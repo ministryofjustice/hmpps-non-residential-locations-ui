@@ -96,6 +96,19 @@ describe('CheckYourAnswers controller', () => {
       expect(next).toHaveBeenCalled()
     })
 
+    it('calls locationsService with preferred prison rather than user caseload', async () => {
+      req.session.prisonId = 'LEI'
+      await controller.saveValues(req as FormWizard.Request, res as Response, next)
+
+      expect(addNonResidentialLocation).toHaveBeenCalledWith('token-123', 'LEI', {
+        localName: 'Room A',
+        servicesUsingLocation: ['EDU'],
+        active: true,
+      })
+
+      expect(next).toHaveBeenCalled()
+    })
+
     it('calls locationsService with multiple services and continues', async () => {
       req.sessionModel.toJSON = jest.fn().mockReturnValue({
         localName: 'Room B',
