@@ -20,6 +20,7 @@ context('Edit Location Journey', () => {
     cy.task('stubLocationsConstantsServiceTypes')
     cy.task('stubLocationsConstantsServiceFamilyTypes')
     cy.task('stubComponents')
+    cy.task('stubGetPrisonConfiguration')
   })
 
   describe('Edit Details Page', () => {

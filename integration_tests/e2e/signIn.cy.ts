@@ -8,6 +8,7 @@ context('Sign In', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
+      cy.task('stubGetPrisonConfiguration')
     })
 
     it('Unauthenticated user directed to auth', () => {
@@ -37,6 +38,7 @@ context('Sign In', () => {
       cy.task('stubLocationsConstantsServiceTypes')
       cy.task('stubLocationsConstantsServiceFamilyTypes')
       cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
     })
 
     it('Unauthenticated user directed to auth', () => {
