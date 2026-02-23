@@ -1,12 +1,12 @@
 import type { Request, Response, NextFunction } from 'express'
-import type { HTTPError } from 'superagent'
+import type { HTTPError, ResponseError } from 'superagent'
 import logger from '../logger'
 
 export default function createErrorHandler(production: boolean) {
   return (error: HTTPError, req: Request, res: Response, next: NextFunction): void => {
     logger.error(`Error handling request for '${req.originalUrl}', user '${res.locals.user?.username}'`, error)
 
-    const errorStatus = error.status
+    const errorStatus = 'responseStatus' in error ? error.responseStatus : (error as ResponseError).status
 
     if (error.status === 401 || error.status === 403) {
       logger.info('Logging user out')
@@ -15,7 +15,7 @@ export default function createErrorHandler(production: boolean) {
 
     if (!production) {
       res.locals.message = error.message
-      res.locals.status = errorStatus
+      res.locals.status = errorStatus as number
       res.locals.stack = production ? null : error.stack
       res.locals.errorText = error.text
     }
