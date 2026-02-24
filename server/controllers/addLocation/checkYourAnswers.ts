@@ -47,7 +47,7 @@ export default class CheckYourAnswers extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const prisonId = res.locals.user.activeCaseload.id
+    const prisonId = req.session.prisonId || res.locals.user.activeCaseload.id
     const values = req.sessionModel.toJSON() as {
       localName: string
     }

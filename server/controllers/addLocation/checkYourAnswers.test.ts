@@ -157,5 +157,22 @@ describe('CheckYourAnswers controller', () => {
 
       expect(res.redirect).toHaveBeenCalledWith('/prison/MDI')
     })
+
+    it('redirects to prison held in session', () => {
+      req.session.prisonId = 'LEI'
+      controller.successHandler(req as FormWizard.Request, res as Response, next)
+      expect(logger.info).toHaveBeenCalledWith('Successfully created location Room A at LEI')
+
+      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(req.sessionModel.reset).toHaveBeenCalled()
+
+      expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
+        title: 'Room A added',
+        variant: 'success',
+        dismissible: true,
+      })
+
+      expect(res.redirect).toHaveBeenCalledWith('/prison/LEI')
+    })
   })
 })
