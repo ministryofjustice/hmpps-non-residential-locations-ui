@@ -1,6 +1,6 @@
 {% extends "../../partials/layout.njk" %}
 
-{% set title = applicationName + " - Error" %}
+{% set title = applicationName + " - Page not found" %}
 {% set mainClasses = "app-container govuk-body" %}
 {% set backLink = null %}
 
@@ -9,24 +9,18 @@
     <main class="govuk-main-wrapper">
       <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-          <h1 class="govuk-heading-l">Sorry, there is a problem with this service</h1>
-          <p>
-            Try again later.
+          <h1 class="govuk-heading-l">Page not found</h1>
+          <p class="govuk-body">
+            If you typed the web address, check it is correct.
           </p>
 
-          <p>
-            Any information you entered has not been saved. You will need to start again.
+          <p class="govuk-body">
+            If you pasted the web address, check you copied the entire address.
           </p>
 
-          <p>
-            <a href="/">Return to Residential locations</a>
+          <p class="govuk-body">
+            <a href="/">Return to Non-residential locations</a>
           </p>
-          {% if not production %} 
-            <h1>{{ message }}</h1>
-            <h2>{{ status }}</h2>
-            <pre>{{ errorText }}</pre>
-            <pre>{{ stack }}</pre>
-          {% endif %}
         </div>
       </div>
     </main>
