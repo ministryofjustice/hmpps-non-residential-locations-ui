@@ -10,7 +10,7 @@ export default class LocationsService {
     page?: string,
     status?: string[],
     sort?: string | string[],
-    serviceType?: string,
+    serviceFamilyType?: string,
     localName?: string,
   ) {
     return this.locationsApiClient.locations.getNonResidentialSummary(token, {
@@ -19,7 +19,7 @@ export default class LocationsService {
       size: '35',
       status: status?.join(','),
       localName,
-      serviceType,
+      serviceFamilyType,
       sort,
     })
   }
