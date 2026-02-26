@@ -24,7 +24,7 @@ export default function routes({ locationsService }: Services): Router {
 
     req.session.prisonId = prisonId
 
-    const { page, status, sort, localName, serviceType } = req.query
+    const { page, status, sort, localName, serviceFamilyType } = req.query
 
     const canEdit = req.canAccess('edit_non_resi')
 
@@ -50,9 +50,9 @@ export default function routes({ locationsService }: Services): Router {
       selectedStatuses = [status as string]
     }
 
-    let selectedServiceType: string = null
-    if (serviceType !== undefined) {
-      selectedServiceType = serviceType as string
+    let selectedServiceFamilyType: string = null
+    if (serviceFamilyType !== undefined) {
+      selectedServiceFamilyType = serviceFamilyType as string
     }
 
     let wildcardName: string = null
@@ -68,7 +68,7 @@ export default function routes({ locationsService }: Services): Router {
     const sortKey = allowedSortKeys.has(requestedKey) ? requestedKey : defaultSortKey
     const sortDirection = requestedDirection === 'desc' ? 'desc' : 'asc'
     const sortParam = `${sortKey},${sortDirection}`
-    // When sorting by status, add secondary sort by localName to maintain alphabetical order within each status
+    // When sorting by status, add a secondary sort by localName to maintain alphabetical order within each status
     const sortParamForApi: string | string[] =
       sortKey === 'status' ? [`${sortKey},${sortDirection}`, 'localName,asc'] : sortParam
 
@@ -124,7 +124,7 @@ export default function routes({ locationsService }: Services): Router {
       pageNo ? `${pageNo}` : undefined,
       selectedStatuses,
       sortParamForApi,
-      selectedServiceType,
+      selectedServiceFamilyType,
       wildcardName,
     )
 

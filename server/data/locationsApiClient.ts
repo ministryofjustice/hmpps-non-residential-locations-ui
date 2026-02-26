@@ -19,13 +19,13 @@ export default class LocationsApiClient extends BaseApiClient {
         size?: string
         status?: string
         sort?: string | string[]
-        serviceType?: string
+        serviceFamilyType?: string
         localName?: string
       }
     >({
       path: '/locations/non-residential/summary/:prisonId',
       requestType: 'get',
-      queryParams: ['page', 'size', 'status', 'sort', 'serviceType', 'localName'],
+      queryParams: ['page', 'size', 'status', 'sort', 'serviceFamilyType', 'localName'],
     }),
 
     getNonResidentialLocation: this.apiCall<Location, { locationId: string }>({
