@@ -1,0 +1,28 @@
+{% extends "../../partials/layout.njk" %}
+
+{% set title = applicationName + " - Page not found" %}
+{% set mainClasses = "app-container govuk-body" %}
+{% set backLink = null %}
+
+{% block content %}
+  <div class="govuk-width-container">
+    <main class="govuk-main-wrapper">
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          <h1 class="govuk-heading-l">Page not found</h1>
+          <p class="govuk-body">
+            If you typed the web address, check it is correct.
+          </p>
+
+          <p class="govuk-body">
+            If you pasted the web address, check you copied the entire address.
+          </p>
+
+          <p class="govuk-body">
+            <a href="/">Return to Non-residential locations</a>
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+{% endblock %}

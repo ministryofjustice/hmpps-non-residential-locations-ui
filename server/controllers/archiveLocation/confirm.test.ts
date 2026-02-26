@@ -149,7 +149,7 @@ describe('Confirm (Archive) controller', () => {
       expect(req.sessionModel!.reset).toHaveBeenCalled()
 
       expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
-        title: '<strong>Location archived</strong>',
+        title: 'gymnasium archived',
         variant: 'success',
         dismissible: true,
       })

@@ -3,6 +3,7 @@ import config from '../config'
 import BaseApiClient from './baseApiClient'
 import { RedisClient } from './redisClient'
 import { Location, NonResidentialSummary, Constant, CompoundConstant } from '../@types/locationsApi/locationsApiTypes'
+import { PrisonConfiguration } from './types/prisonConfiguration'
 
 export default class LocationsApiClient extends BaseApiClient {
   constructor(redisClient: RedisClient, authenticationClient: AuthenticationClient) {
@@ -58,6 +59,12 @@ export default class LocationsApiClient extends BaseApiClient {
     archiveNonResidentialLocation: this.apiCall<Location, { locationId: string }, { reason: string }>({
       path: '/locations/:locationId/deactivate/permanent',
       requestType: 'put',
+    }),
+
+    prisonConfiguration: this.apiCall<PrisonConfiguration, { prisonId: string }>({
+      path: '/prison-configuration/:prisonId',
+      requestType: 'get',
+      options: { cacheDuration: 3600 },
     }),
   }
 

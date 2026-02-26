@@ -44,7 +44,7 @@ describe('KeepInactive controller', () => {
       controller.get(req as FormWizard.Request, res as Response)
 
       expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
-        title: '<strong>Gymnasium inactive</strong>',
+        title: 'Gymnasium kept inactive',
         variant: 'success',
         dismissible: true,
       })
@@ -62,7 +62,7 @@ describe('KeepInactive controller', () => {
       controller.get(req as FormWizard.Request, res as Response)
 
       expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
-        title: '<strong>Chapel room inactive</strong>',
+        title: 'Chapel room kept inactive',
         variant: 'success',
         dismissible: true,
       })

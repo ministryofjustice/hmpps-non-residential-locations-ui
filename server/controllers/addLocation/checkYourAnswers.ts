@@ -6,7 +6,7 @@ import logger from '../../../logger'
 
 export default class CheckYourAnswers extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
-    const prisonId = res.locals.user.activeCaseload.id
+    const prisonId = req.session.prisonId || res.locals.user.activeCaseload.id
     const services = res.locals.values.services as string[]
     const { serviceTypes } = res.locals
     const serviceTypeDescriptions = serviceTypes
@@ -23,7 +23,7 @@ export default class CheckYourAnswers extends FormInitialStep {
   }
 
   override async saveValues(req: FormWizard.Request, res: Response, next: NextFunction) {
-    const prisonId = res.locals.user.activeCaseload.id
+    const prisonId = req.session.prisonId || res.locals.user.activeCaseload.id
     const values = req.sessionModel.toJSON() as {
       localName: string
       services: string[]
@@ -47,7 +47,7 @@ export default class CheckYourAnswers extends FormInitialStep {
   }
 
   override successHandler(req: FormWizard.Request, res: Response, _next: NextFunction) {
-    const prisonId = res.locals.user.activeCaseload.id
+    const prisonId = req.session.prisonId || res.locals.user.activeCaseload.id
     const values = req.sessionModel.toJSON() as {
       localName: string
     }
@@ -56,7 +56,7 @@ export default class CheckYourAnswers extends FormInitialStep {
     req.journeyModel.reset()
     req.sessionModel.reset()
     req.flash('successMojFlash', {
-      title: 'Location added',
+      title: `${values.localName} added`,
       variant: 'success',
       dismissible: true,
     })

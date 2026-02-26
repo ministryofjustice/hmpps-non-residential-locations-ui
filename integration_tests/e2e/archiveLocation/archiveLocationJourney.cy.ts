@@ -22,6 +22,7 @@ context('Archive Location Journey', () => {
     cy.task('stubLocationsConstantsServiceTypes')
     cy.task('stubLocationsConstantsServiceFamilyTypes')
     cy.task('stubComponents')
+    cy.task('stubGetPrisonConfiguration')
   })
 
   describe('Archive or Inactive Page', () => {
@@ -122,8 +123,8 @@ context('Archive Location Journey', () => {
       const confirmPage = new ArchiveConfirmPage(TEST_LOCATION_NAME)
       confirmPage.archiveButton().click()
       cy.url().should('include', '/prison/TST')
-      cy.get('.moj-alert--success').should('exist')
-      cy.get('.moj-alert--success').should('contain.text', 'Location archived')
+      cy.get('.moj-alert__content').should('exist')
+      cy.get('.moj-alert__content').should('contain.text', 'Gym archived')
     })
   })
 
@@ -180,8 +181,8 @@ context('Archive Location Journey', () => {
       const confirmPage = new InactiveConfirmPage()
       confirmPage.confirmButton().click()
       cy.url().should('include', '/prison/TST')
-      cy.get('.moj-alert--success').should('exist')
-      cy.get('.moj-alert--success').should('contain.text', 'Location made inactive')
+      cy.get('.moj-alert__content').should('exist')
+      cy.get('.moj-alert__content').should('contain.text', `${TEST_LOCATION_NAME} made inactive`)
     })
   })
 
@@ -233,8 +234,8 @@ context('Archive Location Journey', () => {
       page.keepInactiveRadio().click()
       page.continueButton().click()
       cy.url().should('include', '/prison/TST')
-      cy.get('.moj-alert--success').should('exist')
-      cy.get('.moj-alert--success').should('contain.text', `${TEST_LOCATION_NAME} inactive`)
+      cy.get('.moj-alert__content').should('exist')
+      cy.get('.moj-alert__content').should('contain.text', `${TEST_LOCATION_NAME} kept inactive`)
     })
   })
 })

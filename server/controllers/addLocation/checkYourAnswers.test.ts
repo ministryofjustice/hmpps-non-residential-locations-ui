@@ -96,6 +96,19 @@ describe('CheckYourAnswers controller', () => {
       expect(next).toHaveBeenCalled()
     })
 
+    it('calls locationsService with preferred prison rather than user caseload', async () => {
+      req.session.prisonId = 'LEI'
+      await controller.saveValues(req as FormWizard.Request, res as Response, next)
+
+      expect(addNonResidentialLocation).toHaveBeenCalledWith('token-123', 'LEI', {
+        localName: 'Room A',
+        servicesUsingLocation: ['EDU'],
+        active: true,
+      })
+
+      expect(next).toHaveBeenCalled()
+    })
+
     it('calls locationsService with multiple services and continues', async () => {
       req.sessionModel.toJSON = jest.fn().mockReturnValue({
         localName: 'Room B',
@@ -133,16 +146,33 @@ describe('CheckYourAnswers controller', () => {
       controller.successHandler(req as FormWizard.Request, res as Response, next)
       expect(logger.info).toHaveBeenCalledWith('Successfully created location Room A at MDI')
 
-      expect(req.journeyModel!.reset).toHaveBeenCalled()
-      expect(req.sessionModel!.reset).toHaveBeenCalled()
+      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(req.sessionModel.reset).toHaveBeenCalled()
 
       expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
-        title: 'Location added',
+        title: 'Room A added',
         variant: 'success',
         dismissible: true,
       })
 
       expect(res.redirect).toHaveBeenCalledWith('/prison/MDI')
+    })
+
+    it('redirects to prison held in session', () => {
+      req.session.prisonId = 'LEI'
+      controller.successHandler(req as FormWizard.Request, res as Response, next)
+      expect(logger.info).toHaveBeenCalledWith('Successfully created location Room A at LEI')
+
+      expect(req.journeyModel.reset).toHaveBeenCalled()
+      expect(req.sessionModel.reset).toHaveBeenCalled()
+
+      expect(req.flash).toHaveBeenCalledWith('successMojFlash', {
+        title: 'Room A added',
+        variant: 'success',
+        dismissible: true,
+      })
+
+      expect(res.redirect).toHaveBeenCalledWith('/prison/LEI')
     })
   })
 })

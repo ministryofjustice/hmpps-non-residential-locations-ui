@@ -19,16 +19,11 @@ export default function routes(services: Services): Router {
 
   // Convert flash messages to banner for templates
   router.use((req, res, next) => {
-    const successFlash = req.flash('success')
     const successMojFlash = req.flash('successMojFlash')
 
     if (successMojFlash?.length) {
       // eslint-disable-next-line prefer-destructuring
       res.locals.mojBanner = successMojFlash[0]
-    }
-
-    res.locals.banner = {
-      success: successFlash.length > 0 ? successFlash[0] : null,
     }
     next()
   })

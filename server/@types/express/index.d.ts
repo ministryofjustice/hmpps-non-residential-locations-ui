@@ -9,6 +9,7 @@ export declare module 'express-session' {
     referrerUrl: string
     returnTo: string
     systemToken: string
+    prisonId?: string
   }
 }
 
@@ -18,6 +19,7 @@ interface AllLocals {
   status?: number
   message?: string
   errorlist: FormWizard.Controller.Error[]
+  errorText?: string
   backLink: string
   cancelLink: string
   buttonText: string
@@ -39,6 +41,7 @@ interface AllLocals {
   values: FormWizard.Values
   fields: FormWizard.Fields
   nonResiUsageTypes?: ReferenceData[]
+  production: boolean
   serviceTypes?: ReferenceData[]
   serviceFamilyTypes?: ReferenceData[]
   servicesAffected?: string[]

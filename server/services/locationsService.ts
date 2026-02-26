@@ -74,6 +74,10 @@ export default class LocationsService {
     )
   }
 
+  async getPrisonConfiguration(token: string, prisonId: string) {
+    return this.locationsApiClient.locations.prisonConfiguration(token, { prisonId })
+  }
+
   async getNonResidentialUsageTypes(token: string) {
     return (await this.locationsApiClient.constants.getNonResidentialUsageTypes(token)).nonResidentialUsageTypes
   }

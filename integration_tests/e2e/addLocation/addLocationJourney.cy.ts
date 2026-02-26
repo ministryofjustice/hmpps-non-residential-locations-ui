@@ -25,6 +25,7 @@ context('Start journey', () => {
     })
 
     cy.task('stubAddNonResidentialLocation', { prisonId: 'TST' })
+    cy.task('stubGetPrisonConfiguration')
   })
 
   it('Should display error messages correctly', () => {
@@ -42,7 +43,12 @@ context('Start journey', () => {
       .eq(2)
       .should('contain.text', 'Select \u2018yes\u2019 if the location is already active')
 
-    indexPage.locationNameInput().type('Gym') // ensure existing location can't be added again
+    indexPage.locationNameInput().clear().type('A'.repeat(41))
+    indexPage.continueButton().click()
+    indexPage.errorSummaryList().should('have.length', 3)
+    indexPage.errorSummaryList().eq(0).should('contain.text', 'Location name must be 40 characters or less')
+
+    indexPage.locationNameInput().clear().type('Gym') // ensure existing location can't be added again
     indexPage.continueButton().click()
     indexPage.errorSummaryList().should('have.length', 3)
     indexPage.errorSummaryList().eq(0).should('contain.text', 'Location already exists. Enter a unique location name')
@@ -81,7 +87,7 @@ context('Start journey', () => {
 
     // return to home page and check success banner
     cy.url().should('include', '/prison/TST')
-    cy.get('.moj-alert').should('exist')
-    cy.get('.moj-alert').should('exist').should('contain.text', 'Location added')
+    cy.get('.moj-alert__content').should('exist')
+    cy.get('.moj-alert__content').should('contain.text', 'Loc A added')
   })
 })

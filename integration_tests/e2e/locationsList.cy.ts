@@ -19,6 +19,7 @@ context('Locations List', () => {
       cy.task('stubLocationsConstantsServiceTypes')
       cy.task('stubLocationsConstantsServiceFamilyTypes')
       cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
     })
 
     it('should render sortable column headers as buttons', () => {
@@ -103,6 +104,7 @@ context('Locations List', () => {
       cy.task('stubLocationsConstantsServiceTypes')
       cy.task('stubLocationsConstantsServiceFamilyTypes')
       cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
     })
 
     it('should display the status filter with proper styling', () => {
@@ -215,6 +217,7 @@ context('Locations List', () => {
       cy.task('stubLocationsConstantsServiceTypes')
       cy.task('stubLocationsConstantsServiceFamilyTypes')
       cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
     })
 
     it('should display "View non-residential locations" as the page heading', () => {
@@ -255,6 +258,7 @@ context('Locations List', () => {
       cy.task('stubLocationsConstantsServiceTypes')
       cy.task('stubLocationsConstantsServiceFamilyTypes')
       cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
     })
 
     it('should display "Edit non-residential locations" as the page heading', () => {
@@ -294,6 +298,7 @@ context('Locations List', () => {
       cy.task('stubLocationsConstantsServiceTypes')
       cy.task('stubLocationsConstantsServiceFamilyTypes')
       cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
     })
 
     it('should display Archive link for active locations', () => {
