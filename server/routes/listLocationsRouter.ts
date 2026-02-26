@@ -24,7 +24,7 @@ export default function routes({ locationsService }: Services): Router {
 
     req.session.prisonId = prisonId
 
-    const { page, status, sort, localName, serviceType } = req.query
+    const { page, status, sort, localName, serviceFamilyType } = req.query
 
     const canEdit = req.canAccess('edit_non_resi')
 
