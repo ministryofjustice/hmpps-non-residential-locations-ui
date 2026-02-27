@@ -53,6 +53,8 @@ export default function nunjucksSetup(app: express.Express): void {
   }
 
   njkEnv.addGlobal('callAsMacro', callAsMacro)
+  njkEnv.addGlobal('applicationInsightsConnectionString', process.env.APPLICATIONINSIGHTS_CONNECTION_STRING)
+  njkEnv.addGlobal('applicationInsightsRoleName', 'hmpps-non-residential-locations-ui')
 
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('assetMap', (url: string) => assetManifest[url] || url)

@@ -93,5 +93,13 @@
 {% endblock %}
 
 {% block bodyEnd %}
+  {% if applicationInsightsConnectionString %}
+    <script nonce="{{ cspNonce }}">
+      window.applicationInsightsConnectionString = '{{ applicationInsightsConnectionString }}'
+      window.applicationInsightsRoleName = '{{ applicationInsightsRoleName }}'
+      window.authenticatedUser = '{{ user.username }}'
+    </script>
+  {% endif %}
+
   <script type="module" src="{{ '/assets/js/index.js' | assetMap }}"></script>
 {% endblock %}
