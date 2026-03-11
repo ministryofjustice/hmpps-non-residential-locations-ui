@@ -12,11 +12,12 @@ export default class LocationsService {
     sort?: string | string[],
     serviceFamilyType?: string,
     localName?: string,
+    pageSize: number = 35,
   ) {
     return this.locationsApiClient.locations.getNonResidentialSummary(token, {
       prisonId,
       page,
-      size: '35',
+      size: pageSize.toString(),
       status: status?.join(','),
       localName,
       serviceFamilyType,
