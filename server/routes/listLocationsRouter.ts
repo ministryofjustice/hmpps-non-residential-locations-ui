@@ -24,7 +24,7 @@ export default function routes({ locationsService }: Services): Router {
 
     req.session.prisonId = prisonId
 
-    const { page, status, sort, localName, serviceFamilyType } = req.query
+    const { page, status, sort, localName, serviceFamilyType, size } = req.query
 
     const canEdit = req.canAccess('edit_non_resi')
 
@@ -50,7 +50,7 @@ export default function routes({ locationsService }: Services): Router {
       selectedStatuses = [status as string]
     }
 
-    let selectedServiceFamilyType: string = null
+    let selectedServiceFamilyType: string = 'ALL'
     if (serviceFamilyType !== undefined) {
       selectedServiceFamilyType = serviceFamilyType as string
     }
@@ -59,6 +59,8 @@ export default function routes({ locationsService }: Services): Router {
     if (localName !== undefined) {
       wildcardName = localName as string
     }
+    const pageSize = size ? Number(size) : 35
+
     const pageNo = page && !Number.isNaN(Number(page)) ? Number(page) - 1 : null
 
     const defaultSortKey = 'localName'
@@ -90,14 +92,14 @@ export default function routes({ locationsService }: Services): Router {
       const emptyLocations = {
         content: [] as never[],
         numberOfElements: 0,
-        pageable: { pageSize: 35, pageNumber: 0 },
+        pageable: { pageSize, pageNumber: 0 },
         totalElements: 0,
         totalPages: 0,
       }
 
       res.locals.paginationLocals = {
         totalPages: 0,
-        pageSize: 35,
+        pageSize,
         currentPage: 0,
         totalRows: 0,
         rowCount: 0,
@@ -124,8 +126,9 @@ export default function routes({ locationsService }: Services): Router {
       pageNo ? `${pageNo}` : undefined,
       selectedStatuses,
       sortParamForApi,
-      selectedServiceFamilyType,
+      selectedServiceFamilyType !== 'ALL' ? selectedServiceFamilyType : null,
       wildcardName,
+      pageSize,
     )
 
     const { locations } = locationsResult
@@ -136,8 +139,8 @@ export default function routes({ locationsService }: Services): Router {
 
     // Build href template preserving status filter and sort
     const statusParams = selectedStatuses.map(s => `status=${s}`)
-    const hrefTemplate = `?${[...statusParams, `sort=${sortParam}`, 'page={page}'].join('&')}`
-    const sortHrefTemplate = `?${[...statusParams, 'sort={sortKey},{sortDirection}'].join('&')}`
+    const hrefTemplate = `?${[...statusParams, `sort=${sortParam}`, 'page={page}', `size=${pageSize}`, `serviceFamilyType=${selectedServiceFamilyType}`, `localName=${wildcardName !== null ? wildcardName : ''}`].join('&')}`
+    const sortHrefTemplate = `?${[...statusParams, 'sort={sortKey},{sortDirection}', `size=${pageSize}`, `serviceFamilyType=${selectedServiceFamilyType}`, `localName=${wildcardName !== null ? wildcardName : ''}`].join('&')}`
 
     res.locals.paginationLocals = {
       totalPages: locations.totalPages,
