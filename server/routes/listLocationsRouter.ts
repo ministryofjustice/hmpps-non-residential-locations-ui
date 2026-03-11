@@ -59,7 +59,7 @@ export default function routes({ locationsService }: Services): Router {
     if (localName !== undefined) {
       wildcardName = localName as string
     }
-    let pageSize = size ? Number(size) : 35
+    const pageSize = size ? Number(size) : 35
 
     const pageNo = page && !Number.isNaN(Number(page)) ? Number(page) - 1 : null
 
@@ -92,14 +92,14 @@ export default function routes({ locationsService }: Services): Router {
       const emptyLocations = {
         content: [] as never[],
         numberOfElements: 0,
-        pageable: { pageSize: pageSize, pageNumber: 0 },
+        pageable: { pageSize, pageNumber: 0 },
         totalElements: 0,
         totalPages: 0,
       }
 
       res.locals.paginationLocals = {
         totalPages: 0,
-        pageSize: pageSize,
+        pageSize,
         currentPage: 0,
         totalRows: 0,
         rowCount: 0,
