@@ -576,6 +576,21 @@ describe('GET /prison/TST', () => {
     })
   })
 
+  describe('caseload validation', () => {
+    it('should return error when user does not have prison in caseloads', () => {
+      const userWithoutCaseload = {
+        ...user,
+        caseloads: [{ id: 'OTHER', name: 'Other Prison (HMP)' }],
+      }
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => userWithoutCaseload,
+      })
+
+      return request(app).get('/prison/TST').expect(500)
+    })
+  })
+
   it.skip('service errors are handled', () => {
     app = appWithAllRoutes({
       services: { auditService, locationsService },
