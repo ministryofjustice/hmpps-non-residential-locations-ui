@@ -14,14 +14,14 @@ services:
       - APPLICATION_AUTHENTICATION_UI_ALLOWLIST=0.0.0.0/0
 
   nomis-user-roles-api:
-    image: quay.io/hmpps/nomis-user-roles-api:latest
+    image: ghcr.io/ministryofjustice/nomis-user-roles-api:latest
     container_name: nomis-user-roles-api
     networks:
       - hmpps
     ports:
       - "8081:8080"
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health/ping" ]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ping"]
     environment:
       - SERVER_PORT=8080
       - SPRING_PROFILES_ACTIVE=dev
