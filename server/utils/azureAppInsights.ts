@@ -38,6 +38,7 @@ export function buildAppInsightsClient(
     defaultClient.addTelemetryProcessor(parameterisePaths)
     defaultClient.addTelemetryProcessor(ignoredRequestsProcessor)
     defaultClient.addTelemetryProcessor(ignoredDependenciesProcessor)
+    defaultClient.addTelemetryProcessor(addUserDataToRequests)
     return defaultClient
   }
   return null
@@ -71,6 +72,23 @@ export function ignoredDependenciesProcessor(envelope: EnvelopeTelemetry) {
     if (dependencyData instanceof Contracts.RemoteDependencyData && dependencyData.success) {
       const { target } = dependencyData
       return dependencyPrefixesToIgnore.every(prefix => !target.startsWith(prefix))
+    }
+  }
+  return true
+}
+
+export function addUserDataToRequests(envelope: EnvelopeTelemetry, contextObjects: ContextObject) {
+  const isRequest = envelope.data.baseType === 'RequestData'
+  if (isRequest) {
+    const { username, activeCaseload } = contextObjects?.['http.ServerRequest']?.res?.locals?.user || {}
+    if (username) {
+      const { properties } = envelope.data.baseData
+      // eslint-disable-next-line no-param-reassign
+      envelope.data.baseData.properties = {
+        username,
+        activeCaseLoadId: activeCaseload?.id,
+        ...properties,
+      }
     }
   }
   return true
