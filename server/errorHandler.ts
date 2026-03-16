@@ -13,6 +13,10 @@ export default function createErrorHandler(production: boolean) {
       return res.redirect('/sign-out')
     }
 
+    if (error.message === 'Caseload is not accessible by this user.') {
+      logger.info(error.message)
+    }
+
     if (!production) {
       res.locals.message = error.message
       res.locals.status = errorStatus as number
@@ -27,6 +31,6 @@ export default function createErrorHandler(production: boolean) {
 
     res.status(error.status || 500)
 
-    return res.render('pages/error')
+    return res.render('pages/errors/generic')
   }
 }
