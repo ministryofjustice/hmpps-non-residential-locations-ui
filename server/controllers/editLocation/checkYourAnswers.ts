@@ -63,6 +63,7 @@ export default class CheckYourAnswers extends FormInitialStep {
 
     // Check location name
     if (newName && newName !== originalName) {
+      req.sessionModel.set('localNameHasChanged', true)
       changedFields.push({
         question: 'What is the location name?',
         changedFrom: originalName,
@@ -139,10 +140,11 @@ export default class CheckYourAnswers extends FormInitialStep {
       } else if (locationStatus === 'INACTIVE') {
         active = false
       }
+      const newLocalName = req.sessionModel.get('localNameHasChanged') ? sanitizedLocalName : null
       await locationsService.updateNonResidentialLocationDetails(
         systemToken,
         locationDetails.id,
-        sanitizedLocalName,
+        newLocalName,
         services,
         active,
       )
