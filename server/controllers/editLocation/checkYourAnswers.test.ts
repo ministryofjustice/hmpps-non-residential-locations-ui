@@ -113,7 +113,8 @@ describe('EditLocation CheckYourAnswers controller', () => {
           changeLink: '/location/loc-123/edit/details',
         },
       ])
-      expect(req.sessionModel!.set).toHaveBeenCalledWith('localNameHasChanged', true)
+      expect(req.sessionModel!.set).toHaveBeenNthCalledWith(1, 'localNameHasChanged', false)
+      expect(req.sessionModel!.set).toHaveBeenNthCalledWith(2, 'localNameHasChanged', true)
       expect(res.locals!.title).toBe('Confirm changes to this location')
     })
   })
@@ -139,7 +140,7 @@ describe('EditLocation CheckYourAnswers controller', () => {
       expect(next).toHaveBeenCalledWith()
     })
 
-    it.each([null, undefined])(
+    it.each([false, null, undefined])(
       'passes null for localName when localNameHasChanged is %s',
       async localNameHasChanged => {
         sessionData = {

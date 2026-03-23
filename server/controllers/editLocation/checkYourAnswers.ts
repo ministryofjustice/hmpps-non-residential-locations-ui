@@ -60,6 +60,7 @@ export default class CheckYourAnswers extends FormInitialStep {
     const locationId = locationDetails.id
 
     const changedFields: ChangedField[] = []
+    req.sessionModel.set('localNameHasChanged', false)
 
     // Check location name
     if (newName && newName !== originalName) {
