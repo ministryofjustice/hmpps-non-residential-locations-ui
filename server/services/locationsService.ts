@@ -48,7 +48,7 @@ export default class LocationsService {
   async updateNonResidentialLocationDetails(
     token: string,
     locationId: string,
-    localName: string,
+    localName: string | null,
     servicesUsingLocation: string[],
     active?: boolean,
   ) {
