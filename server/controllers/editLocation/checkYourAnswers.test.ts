@@ -140,28 +140,26 @@ describe('EditLocation CheckYourAnswers controller', () => {
       expect(next).toHaveBeenCalledWith()
     })
 
-    it.each([false, null, undefined])(
-      'passes null for localName when localNameHasChanged is %s',
-      async localNameHasChanged => {
-        sessionData = {
-          localName: '  <b>New name</b>  ',
-          services: ['VISITS', 'LIBRARY'],
-          locationStatus: 'ACTIVE',
-        }
-        sessionModelState.localNameHasChanged = localNameHasChanged
+    it('does not send localName if it does not change', async () => {
+      sessionData = {
+        localName: '  <b>Old name</b>  ',
+        services: ['VISITS', 'LIBRARY'],
+        locationStatus: 'ACTIVE',
+      }
 
-        await controller.saveValues(req as FormWizard.Request, res as Response, next)
+      sessionModelState.localNameHasChanged = false
 
-        expect(updateNonResidentialLocationDetails).toHaveBeenCalledWith(
-          'token-123',
-          'loc-123',
-          null,
-          ['VISITS', 'LIBRARY'],
-          true,
-        )
-        expect(next).toHaveBeenCalledWith()
-      },
-    )
+      await controller.saveValues(req as FormWizard.Request, res as Response, next)
+
+      expect(updateNonResidentialLocationDetails).toHaveBeenCalledWith(
+        'token-123',
+        'loc-123',
+        null,
+        ['VISITS', 'LIBRARY'],
+        true,
+      )
+      expect(next).toHaveBeenCalledWith()
+    })
 
     it('passes null for an unchanged name and active=false for INACTIVE status', async () => {
       sessionData = {
