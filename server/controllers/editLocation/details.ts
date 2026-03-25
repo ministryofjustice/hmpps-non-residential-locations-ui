@@ -86,7 +86,7 @@ export default class Details extends FormInitialStep {
           sanitizedLocalName,
         )
         // display validation error if changing the localName to one that already exists
-        if (sanitizedLocalName !== localName && Array.isArray(location) && location.length > 0) {
+        if (sanitizedLocalName !== localName && location.length > 0) {
           validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
         }
       } catch (error) {

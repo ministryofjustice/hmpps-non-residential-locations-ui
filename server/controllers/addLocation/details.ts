@@ -58,7 +58,7 @@ export default class Details extends FormInitialStep {
             res.locals.user.activeCaseload.id,
             sanitizedLocalName,
           )
-          if (Array.isArray(location) && location.length > 0) {
+          if (location.length > 0) {
             validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
           }
         } catch (error) {
