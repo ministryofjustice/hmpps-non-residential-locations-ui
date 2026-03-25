@@ -68,7 +68,7 @@ export default class Details extends FormInitialStep {
     super.validateFields(req, res, async errors => {
       const { values } = req.form
       const { locationDetails } = res.locals
-      const { localName, usedByServices, status } = locationDetails
+      const { id: currentLocationId, localName, usedByServices, status } = locationDetails
 
       const sanitizedLocalName = sanitizeString(String(values.localName))
 
@@ -78,15 +78,20 @@ export default class Details extends FormInitialStep {
         return callback({ ...errors, ...validationErrors })
       }
 
-      let location
       try {
-        location = await locationsService.getNonResidentialLocationByLocalName(
+        const locationsByLocalName = await locationsService.getNonResidentialLocationByLocalName(
           req.session.systemToken,
           res.locals.user.activeCaseload.id,
           sanitizedLocalName,
         )
-        // display validation error if changing the localName to one that already exists
-        if (sanitizedLocalName !== localName && location.length > 0) {
+
+        const idsOfLocationsWithProposedLocalName = locationsByLocalName.map((loc: { id: string }) => loc.id)
+        // display validation error if locations with the proposed localName already exist
+        // and exclude the current location from this check to allow saving when localName is not changed
+        if (
+          idsOfLocationsWithProposedLocalName.length > 0 &&
+          !idsOfLocationsWithProposedLocalName.includes(currentLocationId)
+        ) {
           validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
         }
       } catch (error) {

@@ -157,6 +157,22 @@ describe('Edit Location - Details controller', () => {
       expect(callback).toHaveBeenCalledWith({})
     })
 
+    it('passes validation if only changing the case of local name, not the name', async () => {
+      deepReq.form!.values = {
+        localName: 'OLD NAME',
+        services: ['VISITS'],
+        locationStatus: 'ACTIVE',
+      }
+      mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+      locationsService.getNonResidentialLocationByLocalName = jest
+        .fn()
+        .mockResolvedValue([{ id: 'loc-123', localName: 'Old Name' }] as any)
+
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).toHaveBeenCalledWith({})
+    })
+
     it('passes validation if new local name is different to any existing local names', async () => {
       deepReq.form!.values = {
         localName: 'Quiet Room',
