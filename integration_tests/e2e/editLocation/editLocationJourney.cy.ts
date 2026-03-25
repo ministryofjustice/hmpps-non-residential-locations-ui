@@ -21,6 +21,12 @@ context('Edit Location Journey', () => {
     cy.task('stubLocationsConstantsServiceFamilyTypes')
     cy.task('stubComponents')
     cy.task('stubGetPrisonConfiguration')
+    cy.task('stubNonResidentialLocationByPrisonAndLocalName', {
+      prisonId: 'TST',
+      localName: TEST_LOCATION_NAME,
+      reponseStatus: 200,
+      responseBody: [{ id: TEST_LOCATION_ID, localName: TEST_LOCATION_NAME, prisonId: 'TST', status: 'ACTIVE' }],
+    })
   })
 
   describe('Edit Details Page', () => {
@@ -50,6 +56,23 @@ context('Edit Location Journey', () => {
       page.continueButton().click()
       page.errorSummary().should('exist')
       page.errorSummaryList().should('contain.text', 'You must change something')
+    })
+
+    it('should show error message if new localName already exists', () => {
+      cy.task('stubNonResidentialLocationByPrisonAndLocalName', {
+        prisonId: 'TST',
+        localName: 'Canteen',
+        reponseStatus: 200,
+        responseBody: [{ id: '999', localName: 'Canteen', prisonId: 'TST', status: 'ACTIVE' }],
+      })
+
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const page = new EditDetailsPage(TEST_LOCATION_NAME)
+      page.locationNameInput().clear().type('Canteen')
+      page.continueButton().click()
+      page.errorSummary().should('exist')
+      page.errorSummaryList().should('contain.text', 'Location already exists. Enter a unique location name')
     })
 
     it('should navigate to check your answers when changes are made', () => {

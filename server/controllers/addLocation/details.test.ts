@@ -114,10 +114,12 @@ describe('Add Location - Details controller', () => {
       deepReq.form.values.localName = 'Study room'
       mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
       const expectedError = controller.formError('localName', 'uniqueNameRequired')
-      locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue({
-        id: 'Loc 1',
-        localName: 'Study room',
-      })
+      locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue([
+        {
+          id: 'Loc 1',
+          localName: 'Study room',
+        },
+      ])
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(locationsService.getNonResidentialLocationByLocalName).toHaveBeenCalledWith(

@@ -21,7 +21,7 @@ context('Start journey', () => {
       prisonId: 'TST',
       localName: 'Gym',
       reponseStatus: 200,
-      responseBody: { id: 1 },
+      responseBody: [{ id: 1, localName: 'Gym', prisonId: 'TST' }],
     })
 
     cy.task('stubAddNonResidentialLocation', { prisonId: 'TST' })
