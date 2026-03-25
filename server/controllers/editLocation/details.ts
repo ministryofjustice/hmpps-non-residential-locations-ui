@@ -63,6 +63,8 @@ export default class Details extends FormInitialStep {
   }
 
   override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
+    const { locationsService } = req.services
+
     super.validateFields(req, res, async errors => {
       const { values } = req.form
       const { locationDetails } = res.locals
@@ -74,6 +76,24 @@ export default class Details extends FormInitialStep {
 
       if (!sanitizedLocalName) {
         return callback({ ...errors, ...validationErrors })
+      }
+
+      let location
+      try {
+        location = await locationsService.getNonResidentialLocationByLocalName(
+          req.session.systemToken,
+          res.locals.user.activeCaseload.id,
+          sanitizedLocalName,
+        )
+        // display validation error if changing the localName to one that already exists
+        if (sanitizedLocalName !== localName && Array.isArray(location) && location.length > 0) {
+          validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
+        }
+      } catch (error) {
+        if (error.responseStatus === 404) {
+          return callback(errors)
+        }
+        throw error
       }
 
       try {
