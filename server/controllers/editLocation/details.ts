@@ -8,6 +8,7 @@ import { sanitizeString } from '../../utils/utils'
 import { TypedLocals } from '../../@types/express'
 import capFirst from '../../formatters/capFirst'
 import addAction from '../../middleware/addAction'
+import logger from '../../../logger'
 
 export default class Details extends FormInitialStep {
   override middlewareSetup() {
@@ -107,7 +108,12 @@ export default class Details extends FormInitialStep {
           isEqual(sortBy(req.form.values.services as string[]), sortBy(usedByServices)) &&
           status === values.locationStatus
 
+        logger.info(
+          `check for no change: current localName=${localName}, proposed localName=${values.localName}, usedByServices=${usedByServices}, proposed services=${req.form.values.services}, status=${status}, proposed status=${values.locationStatus}`,
+        )
+
         if (noChange) {
+          logger.info('No changes detected for location details')
           validationErrors.localName = this.formError('', 'noChange')
           return callback({ ...errors, ...validationErrors })
         }
