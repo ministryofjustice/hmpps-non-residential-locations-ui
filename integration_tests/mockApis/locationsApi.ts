@@ -35,7 +35,7 @@ export default {
       },
     }),
 
-  stubAddNonResidentialLocation: ({ prisonId }): SuperAgentRequest =>
+  stubAddNonResidentialLocation: ({ prisonId }: { prisonId: string }): SuperAgentRequest =>
     stubFor({
       request: {
         method: 'POST',
@@ -108,7 +108,15 @@ export default {
       },
     }),
 
-  stubNonResidentialLocation: ({ prisonId, includeArchived = false }): SuperAgentRequest =>
+  stubNonResidentialLocation: ({
+    prisonId,
+    includeArchived = false,
+    isLeafLevel = true,
+  }: {
+    prisonId: string
+    includeArchived?: boolean
+    isLeafLevel?: boolean
+  }): SuperAgentRequest =>
     stubFor({
       request: {
         method: 'GET',
@@ -144,6 +152,7 @@ export default {
                 deactivatedBy: 'string',
                 level: 1,
                 parentId: '57718979-573c-433a-9e51-2d83f887c11c',
+                isLeafLevel,
               },
               ...(includeArchived
                 ? [
