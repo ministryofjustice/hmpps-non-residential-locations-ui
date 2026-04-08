@@ -91,7 +91,9 @@
 {% macro editLink(item) %}
     {% if item.status === 'ARCHIVED' %}
         No available actions
-    {% else %}
+    {% elif item.isLeafLevel %}
         <a href='/location/{{ item.id }}/edit'>Change</a> | <a href='/location/{{ item.id }}/archive'>Archive</a>
+    {% else %}
+        <a href='/location/{{ item.id }}/edit'>Change</a>
     {% endif %}
 {% endmacro %}
