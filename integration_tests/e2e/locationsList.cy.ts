@@ -301,10 +301,18 @@ context('Locations List', () => {
       cy.task('stubGetPrisonConfiguration')
     })
 
-    it('should display Archive link for active locations', () => {
+    it('should display Archive link for active child locations', () => {
       cy.signIn()
       IndexPage.forEditUser()
       cy.get('[data-qa=locations-table]').contains('tr', 'Gym').should('contain.text', 'Archive')
+    })
+
+    it('should not display Archive link for active parent locations', () => {
+      cy.task('stubNonResidentialLocation', { prisonId: 'TST', includeArchived: true, isLeafLevel: false })
+
+      cy.signIn()
+      IndexPage.forEditUser()
+      cy.get('[data-qa=locations-table]').contains('tr', 'Gym').should('not.contain.text', 'Archive')
     })
 
     it('should display "No available actions" for archived locations', () => {
