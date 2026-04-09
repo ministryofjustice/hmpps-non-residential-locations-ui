@@ -30,7 +30,7 @@ export default class Details extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { locationDetails } = res.locals
-    const { prisonId, localName } = locationDetails
+    const { prisonId, localName, isLeafLevel } = locationDetails
 
     const fields = { ...(locals.fields as FormWizard.Fields) }
     fields.services.items = res.locals.serviceFamilyTypes
@@ -42,7 +42,7 @@ export default class Details extends FormInitialStep {
       fallbackUrl: `/prison/${prisonId}`,
     })
 
-    if (req.canAccess('edit_non_resi') && locationDetails.status !== 'ARCHIVED') {
+    if (req.canAccess('edit_non_resi') && isLeafLevel && locationDetails.status !== 'ARCHIVED') {
       addAction({
         text: 'Archive location',
         classes: 'govuk-button--warning',

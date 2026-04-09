@@ -20,6 +20,11 @@ export default {
     localName,
     reponseStatus,
     responseBody,
+  }: {
+    localName?: string
+    prisonId?: string
+    reponseStatus?: number
+    responseBody?: Record<string, unknown>
   }): SuperAgentRequest =>
     stubFor({
       request: {
@@ -55,11 +60,13 @@ export default {
     localName = 'Gym',
     prisonId = 'TST',
     status = 'ACTIVE',
+    isLeafLevel = true,
   }: {
     locationId: string
     localName?: string
     prisonId?: string
     status?: string
+    isLeafLevel?: boolean
   }): SuperAgentRequest =>
     stubFor({
       request: {
@@ -83,6 +90,7 @@ export default {
           usedByServices: ['TEST_TYPE'],
           status,
           level: 1,
+          isLeafLevel,
         },
       },
     }),
