@@ -52,6 +52,10 @@ export default class Details extends FormInitialStep {
     }
 
     res.locals.title = `Change ${localName}`
+    // locationStatus (Is this location currently active?) component is only relevant for leaf level locations
+    if (!isLeafLevel) {
+      delete locals.fields.locationStatus
+    }
 
     return {
       ...locals,
@@ -65,10 +69,17 @@ export default class Details extends FormInitialStep {
 
   override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     const { locationsService } = req.services
+    const { locationDetails } = res.locals
+
+    // locationStatus (Is this location currently active?) component is only relevant for leaf level locations, so prevent validation for parent locations
+    if (!locationDetails.isLeafLevel) {
+      delete req.form.values.locationStatus
+      delete req.form.options.allFields.locationStatus
+      delete req.form.options.fields.locationStatus
+    }
 
     super.validateFields(req, res, async errors => {
       const { values } = req.form
-      const { locationDetails } = res.locals
       const { id: currentLocationId, localName, usedByServices, status } = locationDetails
 
       const sanitizedLocalName = sanitizeString(String(values.localName))

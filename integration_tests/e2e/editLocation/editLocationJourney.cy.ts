@@ -103,6 +103,30 @@ context('Edit Location Journey', () => {
       cy.get('.govuk-button--warning').should('not.exist')
     })
 
+    it('should not display location status radio button component for parent level (i.e. non-leafLevel) locations', () => {
+      cy.task('stubNonResidentialLocationById', {
+        locationId: TEST_LOCATION_ID,
+        localName: TEST_LOCATION_NAME,
+        prisonId: 'TST',
+        isLeafLevel: false,
+      })
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      cy.get('.govuk-radios').should('not.exist')
+    })
+
+    it('should display location status radio button component for leaf level locations', () => {
+      cy.task('stubNonResidentialLocationById', {
+        locationId: TEST_LOCATION_ID,
+        localName: TEST_LOCATION_NAME,
+        prisonId: 'TST',
+        isLeafLevel: true,
+      })
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      cy.get('.govuk-radios').should('exist')
+    })
+
     it('should display character count for location name field', () => {
       cy.signIn()
       EditDetailsPage.goTo(TEST_LOCATION_ID)

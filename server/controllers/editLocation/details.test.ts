@@ -78,6 +78,7 @@ describe('Edit Location - Details controller', () => {
           localName: 'Old Name',
           status: 'ACTIVE',
           usedByServices: ['APPOINTMENT', 'PROGRAMMES_AND_ACTIVITIES'],
+          isLeafLevel: true,
         },
       },
     }
@@ -116,6 +117,12 @@ describe('Edit Location - Details controller', () => {
       expect((locals.fields as FormWizard.Fields).localName.value).toEqual('New Name')
       expect((locals.fields as FormWizard.Fields).locationStatus.value).toEqual('ACTIVE')
       expect(deepReq.canAccess).toHaveBeenCalledWith('edit_non_resi')
+    })
+
+    it('should not include locationStatus component for non-leaf level locations', () => {
+      deepRes.locals.locationDetails.isLeafLevel = false
+      const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+      expect((locals.fields as FormWizard.Fields).locationStatus).toBeUndefined()
     })
 
     it('uses location details as defaults when form values are missing', () => {
@@ -243,6 +250,37 @@ describe('Edit Location - Details controller', () => {
 
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
+      expect(callback).toHaveBeenCalledWith({})
+    })
+
+    it('Should not validate location status for non leaf-level locations', async () => {
+      deepRes.locals.locationDetails.isLeafLevel = false
+      deepReq.form!.values = {
+        localName: 'New Name',
+        services: ['VISITS'],
+        locationStatus: 'INACTIVE',
+      }
+      mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+      locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue([] as any)
+
+      deepReq.form!.options = {
+        allFields: {
+          localName: {},
+          services: {},
+          locationStatus: {},
+        },
+        fields: {
+          localName: {},
+          services: {},
+          locationStatus: {},
+        },
+      } as any
+
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(deepReq.form!.values.locationStatus).toBeUndefined()
+      expect(deepReq.form!.options.allFields.locationStatus).toBeUndefined()
+      expect(deepReq.form!.options.fields.locationStatus).toBeUndefined()
       expect(callback).toHaveBeenCalledWith({})
     })
   })
