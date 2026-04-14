@@ -103,8 +103,38 @@ describe('Edit Location - Details controller', () => {
     })
   })
 
+  describe('getInitialValues', () => {
+    it('returns initial values from location details', () => {
+      const initialValues = controller.getInitialValues(deepReq as FormWizard.Request, deepRes as Response)
+
+      expect(initialValues).toEqual({
+        localName: 'Old Name',
+        services: ['APPOINTMENT', 'PROGRAMMES_AND_ACTIVITIES'],
+        locationStatus: 'ACTIVE',
+      })
+    })
+
+    it('returns undefined values when location details are missing', () => {
+      deepRes.locals.locationDetails = undefined
+
+      const initialValues = controller.getInitialValues(deepReq as FormWizard.Request, deepRes as Response)
+
+      expect(initialValues).toEqual({
+        localName: undefined,
+        services: undefined,
+        locationStatus: undefined,
+      })
+    })
+  })
+
   describe('locals', () => {
     it('returns edit page locals and injects field values from form', () => {
+      deepRes.locals.values = {
+        localName: 'New Name',
+        services: ['VISITS'],
+        locationStatus: 'ACTIVE',
+      }
+
       const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
       expect(locals.backLink).toEqual('/prison/TST')
@@ -113,20 +143,18 @@ describe('Edit Location - Details controller', () => {
       expect(locals.titleCaption).toEqual('Old Name')
       expect(locals.buttonText).toEqual('Continue')
       expect((locals.fields as FormWizard.Fields).services.items).toEqual(deepRes.locals!.serviceFamilyTypes)
-      expect((locals.fields as FormWizard.Fields).services.value).toEqual(['VISITS'])
-      expect((locals.fields as FormWizard.Fields).localName.value).toEqual('New Name')
-      expect((locals.fields as FormWizard.Fields).locationStatus.value).toEqual('ACTIVE')
       expect(deepReq.canAccess).toHaveBeenCalledWith('edit_non_resi')
     })
 
     it('should not include locationStatus component for non-leaf level locations', () => {
       deepRes.locals.locationDetails.isLeafLevel = false
       const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
-      expect((locals.fields as FormWizard.Fields).locationStatus).toBeUndefined()
+      expect((locals.fields as FormWizard.Fields).locationStatus).toBeDefined()
     })
 
     it('uses location details as defaults when form values are missing', () => {
       deepReq.form!.values = {}
+      deepRes.locals.values = controller.getInitialValues(deepReq as FormWizard.Request, deepRes as Response)
 
       const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
 
@@ -239,6 +267,38 @@ describe('Edit Location - Details controller', () => {
       )
     })
 
+    it('returns a noChange error when values are unchanged for a parent location', async () => {
+      deepRes.locals.locationDetails.isLeafLevel = false
+      deepReq.form!.values = {
+        localName: 'Old Name',
+        services: ['APPOINTMENT', 'PROGRAMMES_AND_ACTIVITIES'],
+      }
+      mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+      locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue([] as any)
+
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({
+          localName: controller.formError('', 'noChange'),
+        }),
+      )
+    })
+
+    it('returns no error when values have changed for a parent location', async () => {
+      deepRes.locals.locationDetails.isLeafLevel = false
+      deepReq.form!.values = {
+        localName: 'New Name',
+        services: ['APPOINTMENT', 'PROGRAMMES_AND_ACTIVITIES'],
+      }
+      mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+      locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue([] as any)
+
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(callback).toHaveBeenCalledWith({})
+    })
+
     it('returns empty errors for changed values and empty lookup result', async () => {
       deepReq.form!.values = {
         localName: 'Renamed room',
@@ -278,9 +338,9 @@ describe('Edit Location - Details controller', () => {
 
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
-      expect(deepReq.form!.values.locationStatus).toBeUndefined()
-      expect(deepReq.form!.options.allFields.locationStatus).toBeUndefined()
-      expect(deepReq.form!.options.fields.locationStatus).toBeUndefined()
+      expect(deepReq.form!.values.locationStatus).toEqual('INACTIVE')
+      expect(deepReq.form!.options.allFields.locationStatus).toBeDefined()
+      expect(deepReq.form!.options.fields.locationStatus).toBeDefined()
       expect(callback).toHaveBeenCalledWith({})
     })
   })
