@@ -27,22 +27,29 @@ export default class Details extends FormInitialStep {
     next()
   }
 
+  override getInitialValues(req: FormWizard.Request, res: Response) {
+    const { locationDetails } = res.locals
+
+    return {
+      localName: locationDetails?.localName,
+      services: locationDetails?.usedByServices,
+      locationStatus: locationDetails?.status,
+    }
+  }
+
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const { locationDetails } = res.locals
-    const { prisonId, localName } = locationDetails
+    const { prisonId, localName, isLeafLevel } = locationDetails
 
     const fields = { ...(locals.fields as FormWizard.Fields) }
     fields.services.items = res.locals.serviceFamilyTypes
-    fields.services.value = (req.form.values.services as string[]) || locationDetails.usedByServices
-    fields.localName.value = (req.form.values.localName as string) || locationDetails.localName
-    fields.locationStatus.value = (req.form.values.locationStatus as string) || locationDetails.status
 
     const backLink = backUrl(req, {
       fallbackUrl: `/prison/${prisonId}`,
     })
 
-    if (req.canAccess('edit_non_resi') && locationDetails.status !== 'ARCHIVED') {
+    if (req.canAccess('edit_non_resi') && isLeafLevel && locationDetails.status !== 'ARCHIVED') {
       addAction({
         text: 'Archive location',
         classes: 'govuk-button--warning',
@@ -52,7 +59,6 @@ export default class Details extends FormInitialStep {
     }
 
     res.locals.title = `Change ${localName}`
-
     return {
       ...locals,
       backLink,
@@ -65,10 +71,10 @@ export default class Details extends FormInitialStep {
 
   override async validateFields(req: FormWizard.Request, res: Response, callback: (errors: FormWizard.Errors) => void) {
     const { locationsService } = req.services
+    const { locationDetails } = res.locals
 
     super.validateFields(req, res, async errors => {
       const { values } = req.form
-      const { locationDetails } = res.locals
       const { id: currentLocationId, localName, usedByServices, status } = locationDetails
 
       const sanitizedLocalName = sanitizeString(String(values.localName))
@@ -103,10 +109,13 @@ export default class Details extends FormInitialStep {
       }
 
       try {
-        const noChange =
-          localName === values.localName &&
-          isEqual(sortBy(req.form.values.services as string[]), sortBy(usedByServices)) &&
-          status === values.locationStatus
+        const noChangeLocalName = localName === values.localName
+        const noChangeServices = isEqual(sortBy(req.form.values.services as string[]), sortBy(usedByServices))
+        const noChangeStatus = status === values.locationStatus
+
+        const noChange = locationDetails.isLeafLevel
+          ? noChangeLocalName && noChangeServices && noChangeStatus
+          : noChangeLocalName && noChangeServices
 
         logger.info(
           `check for no change: current localName=${localName}, proposed localName=${values.localName}, usedByServices=${usedByServices}, proposed services=${req.form.values.services}, status=${status}, proposed status=${values.locationStatus}`,

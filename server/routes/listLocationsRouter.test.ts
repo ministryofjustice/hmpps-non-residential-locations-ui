@@ -31,6 +31,7 @@ const mockLocationsResponse: NonResidentialSummary = {
         active: true,
         level: 1,
         permanentlyInactive: false,
+        isLeafLevel: true,
       },
       {
         id: '2',
@@ -45,6 +46,7 @@ const mockLocationsResponse: NonResidentialSummary = {
         active: true,
         level: 1,
         permanentlyInactive: false,
+        isLeafLevel: true,
       },
     ],
     pageable: { pageSize: 100, pageNumber: 0 },

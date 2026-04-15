@@ -5487,6 +5487,11 @@ export interface components {
        */
       localName: string
       /**
+       * @description Leaf level location
+       * @example true
+       */
+      isLeafLevel: boolean
+      /**
        * @description Location Code
        * @example 001
        */

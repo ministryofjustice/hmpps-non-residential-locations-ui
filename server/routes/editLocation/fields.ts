@@ -1,3 +1,4 @@
+import FormWizard from 'hmpo-form-wizard'
 import maxLength from '../../validators/maxLength'
 
 const fields = {
@@ -48,6 +49,8 @@ const fields = {
   locationStatus: {
     component: 'govukRadios',
     validate: ['required'],
+    remove: (_req, res) => !res.locals.locationDetails.isLeafLevel,
+    hideWhenRemoved: true,
     errorMessages: { required: 'Select ‘yes’ if the location is already active' },
     id: 'locationStatus',
     name: 'locationStatus',
@@ -63,6 +66,6 @@ const fields = {
     ],
     attributes: { 'data-qa': 'location-status' },
   },
-}
+} as FormWizard.Fields
 
 export default fields
