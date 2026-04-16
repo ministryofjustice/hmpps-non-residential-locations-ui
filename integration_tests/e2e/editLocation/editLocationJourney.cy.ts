@@ -150,6 +150,38 @@ context('Edit Location Journey', () => {
       page.errorSummary().should('exist')
       page.errorSummaryList().should('contain.text', 'Location name must be 40 characters or less')
     })
+
+    it('should display correct error message for parent location if continue button selected without making a change', () => {
+      cy.task('stubNonResidentialLocationById', {
+        locationId: TEST_LOCATION_ID,
+        localName: TEST_LOCATION_NAME,
+        prisonId: 'TST',
+        isLeafLevel: false,
+      })
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const page = new EditDetailsPage(TEST_LOCATION_NAME)
+      page.continueButton().click()
+      page.errorSummary().should('exist')
+      page.errorSummaryList().should('contain.text', 'You must change something or select ‘cancel’')
+    })
+
+    it('should display correct error message for leaf-level location if continue button selected without making a change', () => {
+      cy.task('stubNonResidentialLocationById', {
+        locationId: TEST_LOCATION_ID,
+        localName: TEST_LOCATION_NAME,
+        prisonId: 'TST',
+        isLeafLevel: true,
+      })
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      const page = new EditDetailsPage(TEST_LOCATION_NAME)
+      page.continueButton().click()
+      page.errorSummary().should('exist')
+      page
+        .errorSummaryList()
+        .should('contain.text', 'You must change something, archive the location or select ‘cancel’')
+    })
   })
 
   describe('Archive button visibility for archived locations', () => {

@@ -87,6 +87,7 @@ export default class FormInitialStep extends FormWizard.Controller {
     res: Response,
   ): { text: string; href: string } {
     const { fields } = res.locals.options
+    const isLeafLevel = res.locals.locationDetails?.isLeafLevel
     const field = fields[error.key]
     const fieldName: string = field?.nameForErrors || field?.label?.text
     const errorMessageOverrides = field?.errorMessages || {}
@@ -118,7 +119,9 @@ export default class FormInitialStep extends FormWizard.Controller {
       required: `Enter a ${unCapFirst(fieldName)}`,
       taken: `A location with this ${unCapFirst(fieldName)} already exists`,
       uniqueNameRequired: 'Location already exists. Enter a unique location name',
-      noChange: `You must change something, archive the location or select ‘cancel’`,
+      noChange: isLeafLevel
+        ? `You must change something, archive the location or select ‘cancel’`
+        : `You must change something or select ‘cancel’`,
     }
 
     const errorMessage =
