@@ -28,8 +28,7 @@ const fields = {
   services: {
     component: 'groupedCheckboxes',
     multiple: true,
-    validate: ['required'],
-    errorMessages: { required: 'Select at least one service' },
+    validate: [],
     id: 'services',
     name: 'services',
     hint: { text: 'Select all that apply.' },

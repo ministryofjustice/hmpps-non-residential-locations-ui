@@ -1,5 +1,6 @@
 import EditDetailsPage from '../../pages/editLocation/details'
 import CheckYourAnswersPage from '../../pages/editLocation/checkYourAnswers'
+import Page from '../../pages/page'
 
 const TEST_LOCATION_ID = '2475f250-434a-4257-afe7-b911f1773a4d'
 const TEST_LOCATION_NAME = 'Gym'
@@ -182,6 +183,29 @@ context('Edit Location Journey', () => {
         .errorSummaryList()
         .should('contain.text', 'You must change something, archive the location or select ‘cancel’')
     })
+
+    it('should successfully edit location even when all services checkboxes are deselected', () => {
+      cy.signIn()
+      EditDetailsPage.goTo(TEST_LOCATION_ID)
+      cy.task('stubUpdateNonResidentialLocation', { locationId: TEST_LOCATION_ID })
+      const page = new EditDetailsPage(TEST_LOCATION_NAME)
+      page.serviceCheckbox('TEST_TYPE').uncheck()
+      page.continueButton().click()
+
+      page.errorSummary().should('not.exist')
+      const checkYourAnswersPage = Page.verifyOnPage(CheckYourAnswersPage)
+      checkYourAnswersPage.changesTable().should('exist')
+      checkYourAnswersPage
+        .changesTableRowAndColumn(1, 0)
+        .should('contain.text', 'What services must be able to use this location?')
+      checkYourAnswersPage.changesTableRowAndColumn(1, 1).should('contain.text', 'Test type')
+      checkYourAnswersPage.changesTableRowAndColumn(1, 2).should('contain.text', '')
+      checkYourAnswersPage.changesTableRowAndColumn(1, 3).should('contain.text', 'Change')
+      checkYourAnswersPage.confirmButton().click()
+      cy.url().should('include', '/prison/TST')
+      cy.get('.moj-alert__content').should('exist')
+      cy.get('.moj-alert__content').should('contain.text', `${TEST_LOCATION_NAME} changed`)
+    })
   })
 
   describe('Archive button visibility for archived locations', () => {
@@ -227,9 +251,9 @@ context('Edit Location Journey', () => {
 
       const checkYourAnswersPage = new CheckYourAnswersPage()
       checkYourAnswersPage.changesTable().should('exist')
-      checkYourAnswersPage.changesTable().should('contain.text', 'What is the location name?')
-      checkYourAnswersPage.changesTable().should('contain.text', TEST_LOCATION_NAME)
-      checkYourAnswersPage.changesTable().should('contain.text', 'New Location Name')
+      checkYourAnswersPage.changesTableRowAndColumn(1, 0).should('contain.text', 'What is the location name?')
+      checkYourAnswersPage.changesTableRowAndColumn(1, 1).should('contain.text', TEST_LOCATION_NAME)
+      checkYourAnswersPage.changesTableRowAndColumn(1, 2).should('contain.text', 'New Location Name')
     })
 
     it('should return to details page when clicking Change link', () => {
