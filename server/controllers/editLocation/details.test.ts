@@ -249,7 +249,7 @@ describe('Edit Location - Details controller', () => {
       )
     })
 
-    it('returns noChange when all values are unchanged', async () => {
+    it('returns a noChange error when all values are unchanged', async () => {
       deepReq.form!.values = {
         localName: 'Old Name',
         services: ['APPOINTMENT', 'PROGRAMMES_AND_ACTIVITIES'],

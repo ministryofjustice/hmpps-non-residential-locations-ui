@@ -73,6 +73,12 @@ export default class Details extends FormInitialStep {
     const { locationsService } = req.services
     const { locationDetails } = res.locals
 
+    const { services } = req.form.values
+
+    if (Array.isArray(services)) {
+      req.form.values.services = services.filter(service => service !== '')
+    }
+
     super.validateFields(req, res, async errors => {
       const { values } = req.form
       const { id: currentLocationId, localName, usedByServices, status } = locationDetails
