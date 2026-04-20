@@ -45,6 +45,21 @@ export default class Details extends FormInitialStep {
     const fields = { ...(locals.fields as FormWizard.Fields) }
     fields.services.items = res.locals.serviceFamilyTypes
 
+    // If not a leaf-level location, only render services that have an editableInParent property of true.
+    if (!isLeafLevel) {
+      // Build a lookup of serviceFamilyTypes where editableInParent is true
+      const editableInParentServiceFamilyTypes = new Set(
+        res.locals.serviceTypes
+          .filter(type => type.attributes.editableInParent)
+          .map(type => type.attributes.serviceFamilyType),
+      )
+
+      // Keep only the services whose serviceFamilyType is present in lookup
+      locals.fields.services.items = locals.fields.services.items.filter((item: { key: string }) =>
+        editableInParentServiceFamilyTypes.has(item.key),
+      )
+    }
+
     const backLink = backUrl(req, {
       fallbackUrl: `/prison/${prisonId}`,
     })

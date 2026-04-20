@@ -148,8 +148,159 @@ describe('Edit Location - Details controller', () => {
 
     it('should not include locationStatus component for non-leaf level locations', () => {
       deepRes.locals.locationDetails.isLeafLevel = false
+      deepRes.locals.serviceTypes = [
+        {
+          attributes: {
+            editableInParent: true,
+            serviceFamilyType: 'VISITS',
+          },
+        },
+      ] as any
       const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       expect((locals.fields as FormWizard.Fields).locationStatus).toBeDefined()
+    })
+
+    it('only renders services whose serviceFamilyType has editableInParent=true for non-leaf locations', () => {
+      deepRes.locals.locationDetails.isLeafLevel = false
+      deepRes.locals.serviceTypes = [
+        {
+          key: 'SERVICE_A',
+          attributes: {
+            serviceFamilyType: 'ACTIVITIES_APPOINTMENTS',
+            editableInParent: true,
+          },
+        },
+        {
+          key: 'SERVICE_B',
+          attributes: {
+            serviceFamilyType: 'ACTIVITIES_APPOINTMENTS',
+            editableInParent: true,
+          },
+        },
+        {
+          key: 'SERVICE_C',
+          attributes: {
+            serviceFamilyType: 'VIDEO_LINK_APPOINTMENTS',
+            editableInParent: true,
+          },
+        },
+        {
+          key: 'SERVICE_D',
+          attributes: {
+            serviceFamilyType: 'USE_OF_FORCE',
+            editableInParent: false,
+          },
+        },
+      ] as any
+
+      deepRes.locals.serviceFamilyTypes = [
+        {
+          key: 'ACTIVITIES_APPOINTMENTS',
+          values: [
+            {
+              key: 'SERVICE_A',
+            },
+            {
+              key: 'SERVICE_B',
+            },
+          ],
+        },
+        {
+          key: 'VIDEO_LINK_APPOINTMENTS',
+          values: [
+            {
+              key: 'SERVICE_C',
+            },
+          ],
+        },
+        {
+          key: 'USE_OF_FORCE',
+          values: [
+            {
+              key: 'SERVICE_D',
+            },
+          ],
+        },
+      ] as any
+
+      const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+
+      expect((locals.fields as FormWizard.Fields).services.items).toEqual([
+        { key: 'ACTIVITIES_APPOINTMENTS', values: [{ key: 'SERVICE_A' }, { key: 'SERVICE_B' }] },
+        { key: 'VIDEO_LINK_APPOINTMENTS', values: [{ key: 'SERVICE_C' }] },
+      ])
+    })
+
+    it('renders all services when location`s isLeafLevel property is true', () => {
+      deepRes.locals.locationDetails.isLeafLevel = true
+      deepRes.locals.serviceTypes = [
+        {
+          key: 'SERVICE_A',
+          attributes: {
+            serviceFamilyType: 'ACTIVITIES_APPOINTMENTS',
+            editableInParent: true,
+          },
+        },
+        {
+          key: 'SERVICE_B',
+          attributes: {
+            serviceFamilyType: 'ACTIVITIES_APPOINTMENTS',
+            editableInParent: true,
+          },
+        },
+        {
+          key: 'SERVICE_C',
+          attributes: {
+            serviceFamilyType: 'VIDEO_LINK_APPOINTMENTS',
+            editableInParent: true,
+          },
+        },
+        {
+          key: 'SERVICE_D',
+          attributes: {
+            serviceFamilyType: 'USE_OF_FORCE',
+            editableInParent: false,
+          },
+        },
+      ] as any
+
+      deepRes.locals.serviceFamilyTypes = [
+        {
+          key: 'ACTIVITIES_APPOINTMENTS',
+          values: [
+            {
+              key: 'SERVICE_A',
+            },
+            {
+              key: 'SERVICE_B',
+            },
+          ],
+        },
+        {
+          key: 'VIDEO_LINK_APPOINTMENTS',
+          values: [
+            {
+              key: 'SERVICE_C',
+            },
+          ],
+        },
+        {
+          key: 'USE_OF_FORCE',
+          values: [
+            {
+              key: 'SERVICE_D',
+            },
+          ],
+        },
+      ] as any
+
+      const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+
+      expect((locals.fields as FormWizard.Fields).services.items).toEqual([
+        { key: 'ACTIVITIES_APPOINTMENTS', values: [{ key: 'SERVICE_A' }, { key: 'SERVICE_B' }] },
+        { key: 'VIDEO_LINK_APPOINTMENTS', values: [{ key: 'SERVICE_C' }] },
+        { key: 'USE_OF_FORCE', values: [{ key: 'SERVICE_D' }] },
+      ])
     })
 
     it('uses location details as defaults when form values are missing', () => {
