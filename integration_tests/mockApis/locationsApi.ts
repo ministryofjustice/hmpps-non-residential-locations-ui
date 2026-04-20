@@ -291,7 +291,7 @@ export default {
       },
     }),
 
-  stubLocationsConstantsServiceTypes: () =>
+  stubLocationsConstantsServiceTypes: (attributes = { serviceFamilyType: 'TEST_TYPE', editableInParent: true }) =>
     stubFor({
       request: {
         method: 'GET',
@@ -303,7 +303,7 @@ export default {
           'Content-Type': 'application/json;charset=UTF-8',
         },
         jsonBody: {
-          nonResidentialServiceTypes: [{ key: 'TEST_TYPE', description: 'Test type' }],
+          nonResidentialServiceTypes: [{ key: 'TEST_TYPE', description: 'Test type', attributes }],
         },
       },
     }),
