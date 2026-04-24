@@ -51,7 +51,7 @@
     "hmpo-form-wizard": "^13.0.2",
     "http-errors": "^2.0.1",
     "jwt-decode": "^4.0.0",
-    "lodash": "4.17.23",
+    "lodash": "4.18.1",
     "nocache": "^4.0.0",
     "nunjucks": "^3.2.4",
     "passport": "^0.7.0",
