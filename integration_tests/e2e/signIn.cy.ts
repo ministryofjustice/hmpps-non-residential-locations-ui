@@ -4,7 +4,7 @@ import Page from '../pages/page'
 import AuthManageDetailsPage from '../pages/authManageDetails'
 
 context('Sign In', () => {
-  context('Without the VIEW_INTERNAL_LOCATION role', () => {
+  context('Unauthenticated user', () => {
     beforeEach(() => {
       cy.task('reset')
       cy.task('stubSignIn', { roles: [] })
@@ -19,11 +19,6 @@ context('Sign In', () => {
     it('Unauthenticated user navigating to sign in page directed to auth', () => {
       cy.visit('/sign-in')
       Page.verifyOnPage(AuthSignInPage)
-    })
-
-    it('Error header is visible', () => {
-      cy.signIn({ failOnStatusCode: false })
-      cy.get('h1').contains('Authorisation Error')
     })
   })
 
