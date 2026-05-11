@@ -104,7 +104,7 @@
     "nock": "14.0.14",
     "openapi-typescript": "^7.13.0",
     "prettier": "^3.8.3",
-    "prettier-plugin-jinja-template": "2.2.0",
+    "prettier-plugin-jinja-template": "^2.2.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.9",
     "typescript": "^5.9.3"
