@@ -101,6 +101,33 @@ describe('Edit Location - Details controller', () => {
       ])
       expect(next).toHaveBeenCalled()
     })
+
+    it('omits BVL service types when the user does not have edit_bvl', async () => {
+      ;(deepReq.canAccess as jest.Mock).mockImplementation(p => p !== 'edit_bvl')
+      locationsService.getServiceTypes = jest.fn().mockResolvedValue([
+        { key: 'A', description: 'Alpha', attributes: { serviceFamilyType: 'ACTIVITIES_APPOINTMENTS' } },
+        { key: 'B', description: 'Bravo', attributes: { serviceFamilyType: 'VIDEO_LINK_APPOINTMENTS' } },
+      ])
+
+      await controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.form!.options!.fields!.services.items).toEqual([{ text: 'Alpha', value: 'A' }])
+    })
+
+    it('includes BVL service types when the user has edit_bvl', async () => {
+      ;(deepReq.canAccess as jest.Mock).mockReturnValue(true)
+      locationsService.getServiceTypes = jest.fn().mockResolvedValue([
+        { key: 'A', description: 'Alpha', attributes: { serviceFamilyType: 'ACTIVITIES_APPOINTMENTS' } },
+        { key: 'B', description: 'Bravo', attributes: { serviceFamilyType: 'VIDEO_LINK_APPOINTMENTS' } },
+      ])
+
+      await controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.form!.options!.fields!.services.items).toEqual([
+        { text: 'Alpha', value: 'A' },
+        { text: 'Bravo', value: 'B' },
+      ])
+    })
   })
 
   describe('getInitialValues', () => {
@@ -313,6 +340,22 @@ describe('Edit Location - Details controller', () => {
       expect((locals.fields as FormWizard.Fields).localName.value).toEqual('Old Name')
       expect((locals.fields as FormWizard.Fields).locationStatus.value).toEqual('ACTIVE')
     })
+
+    it('filters out the BVL service family when the user does not have edit_bvl', () => {
+      ;(deepReq.canAccess as jest.Mock).mockImplementation(p => p !== 'edit_bvl')
+      deepRes.locals.serviceFamilyTypes = [
+        { key: 'ACTIVITIES_APPOINTMENTS', description: 'Activities', values: [] },
+        { key: 'VIDEO_LINK_APPOINTMENTS', description: 'Book a video link', values: [] },
+        { key: 'USE_OF_FORCE', description: 'Use of force', values: [] },
+      ] as any
+
+      const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+
+      expect((locals.fields as FormWizard.Fields).services.items).toEqual([
+        { key: 'ACTIVITIES_APPOINTMENTS', description: 'Activities', values: [] },
+        { key: 'USE_OF_FORCE', description: 'Use of force', values: [] },
+      ])
+    })
   })
 
   describe('validateFields', () => {
@@ -462,6 +505,85 @@ describe('Edit Location - Details controller', () => {
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
       expect(callback).toHaveBeenCalledWith({})
+    })
+
+    describe('BVL preservation for users without edit_bvl', () => {
+      beforeEach(() => {
+        deepRes.locals.serviceTypes = [
+          { key: 'APPOINTMENT', attributes: { serviceFamilyType: 'ACTIVITIES_APPOINTMENTS' } },
+          { key: 'PROGRAMMES_AND_ACTIVITIES', attributes: { serviceFamilyType: 'ACTIVITIES_APPOINTMENTS' } },
+          { key: 'VIDEO_LINK_BOOKING', attributes: { serviceFamilyType: 'VIDEO_LINK_APPOINTMENTS' } },
+        ] as any
+      })
+
+      it('re-adds existing BVL services to the submitted services so they are not stripped on save', async () => {
+        ;(deepReq.canAccess as jest.Mock).mockImplementation(p => p !== 'edit_bvl')
+        deepRes.locals.locationDetails.usedByServices = ['APPOINTMENT', 'VIDEO_LINK_BOOKING'] as any
+        deepReq.form!.values = {
+          localName: 'Renamed room',
+          services: ['APPOINTMENT'],
+          locationStatus: 'ACTIVE',
+        }
+        mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+        locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue([])
+
+        await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+        expect((deepReq.form!.values.services as string[]).sort()).toEqual(['APPOINTMENT', 'VIDEO_LINK_BOOKING'])
+        expect(callback).toHaveBeenCalledWith({})
+      })
+
+      it('does not duplicate a BVL service that is already in the submission', async () => {
+        ;(deepReq.canAccess as jest.Mock).mockImplementation(p => p !== 'edit_bvl')
+        deepRes.locals.locationDetails.usedByServices = ['VIDEO_LINK_BOOKING'] as any
+        deepReq.form!.values = {
+          localName: 'Renamed room',
+          services: ['VIDEO_LINK_BOOKING'],
+          locationStatus: 'ACTIVE',
+        }
+        mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+        locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue([])
+
+        await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+        expect(deepReq.form!.values.services).toEqual(['VIDEO_LINK_BOOKING'])
+      })
+
+      it('reports noChange when the only original service was BVL and no other fields changed', async () => {
+        ;(deepReq.canAccess as jest.Mock).mockImplementation(p => p !== 'edit_bvl')
+        deepRes.locals.locationDetails.usedByServices = ['VIDEO_LINK_BOOKING'] as any
+        deepReq.form!.values = {
+          localName: 'Old Name',
+          services: [],
+          locationStatus: 'ACTIVE',
+        }
+        mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+        locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue([])
+
+        await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+        expect(callback).toHaveBeenCalledWith(
+          expect.objectContaining({
+            localName: controller.formError('', 'noChange'),
+          }),
+        )
+      })
+
+      it('does not preserve BVL services for users with edit_bvl (they may intentionally untick)', async () => {
+        ;(deepReq.canAccess as jest.Mock).mockReturnValue(true)
+        deepRes.locals.locationDetails.usedByServices = ['APPOINTMENT', 'VIDEO_LINK_BOOKING'] as any
+        deepReq.form!.values = {
+          localName: 'Old Name',
+          services: ['APPOINTMENT'],
+          locationStatus: 'ACTIVE',
+        }
+        mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+        locationsService.getNonResidentialLocationByLocalName = jest.fn().mockResolvedValue([])
+
+        await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+        expect(deepReq.form!.values.services).toEqual(['APPOINTMENT'])
+      })
     })
 
     it('Should not validate location status for non leaf-level locations', async () => {

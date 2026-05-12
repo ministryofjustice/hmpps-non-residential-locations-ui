@@ -5,6 +5,8 @@ import backUrl from '../../utils/backUrl'
 import { TypedLocals } from '../../@types/express'
 import { sanitizeString } from '../../utils/utils'
 
+const BVL_SERVICE_FAMILY_TYPE = 'VIDEO_LINK_APPOINTMENTS'
+
 export default class Details extends FormInitialStep {
   override middlewareSetup() {
     this.use(this.setOptions)
@@ -13,8 +15,14 @@ export default class Details extends FormInitialStep {
 
   async setOptions(req: FormWizard.Request, res: Response, next: NextFunction) {
     const serviceTypes = await req.services.locationsService.getServiceTypes(req.session.systemToken)
+    const visibleServiceTypes = req.canAccess('edit_bvl')
+      ? Object.values(serviceTypes)
+      : Object.values(serviceTypes).filter(
+          (st: { attributes?: { serviceFamilyType?: string } }) =>
+            st.attributes?.serviceFamilyType !== BVL_SERVICE_FAMILY_TYPE,
+        )
 
-    req.form.options.fields.services.items = Object.values(serviceTypes).map(
+    req.form.options.fields.services.items = visibleServiceTypes.map(
       (serviceType: { key: string; description: string }) => ({
         text: serviceType.description,
         value: serviceType.key,
@@ -27,7 +35,11 @@ export default class Details extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): TypedLocals {
     const locals = super.locals(req, res)
     const fields = { ...(locals.fields as FormWizard.Fields) }
-    fields.services.items = res.locals.serviceFamilyTypes
+    fields.services.items = req.canAccess('edit_bvl')
+      ? res.locals.serviceFamilyTypes
+      : (res.locals.serviceFamilyTypes || []).filter(
+          (family: { key: string }) => family.key !== BVL_SERVICE_FAMILY_TYPE,
+        )
     const backLink = backUrl(req, {
       fallbackUrl: `/`,
     })

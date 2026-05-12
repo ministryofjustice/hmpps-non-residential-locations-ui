@@ -10,6 +10,8 @@ import capFirst from '../../formatters/capFirst'
 import addAction from '../../middleware/addAction'
 import logger from '../../../logger'
 
+const BVL_SERVICE_FAMILY_TYPE = 'VIDEO_LINK_APPOINTMENTS'
+
 export default class Details extends FormInitialStep {
   override middlewareSetup() {
     this.use(this.setOptions)
@@ -18,8 +20,14 @@ export default class Details extends FormInitialStep {
 
   async setOptions(req: FormWizard.Request, res: Response, next: NextFunction) {
     const serviceTypes = await req.services.locationsService.getServiceTypes(req.session.systemToken)
+    const visibleServiceTypes = req.canAccess('edit_bvl')
+      ? Object.values(serviceTypes)
+      : Object.values(serviceTypes).filter(
+          (st: { attributes?: { serviceFamilyType?: string } }) =>
+            st.attributes?.serviceFamilyType !== BVL_SERVICE_FAMILY_TYPE,
+        )
 
-    req.form.options.fields.services.items = Object.values(serviceTypes).map(({ key, description }) => ({
+    req.form.options.fields.services.items = visibleServiceTypes.map(({ key, description }) => ({
       text: description,
       value: key,
     }))
@@ -43,7 +51,11 @@ export default class Details extends FormInitialStep {
     const { prisonId, localName, isLeafLevel } = locationDetails
 
     const fields = { ...(locals.fields as FormWizard.Fields) }
-    fields.services.items = res.locals.serviceFamilyTypes
+    fields.services.items = req.canAccess('edit_bvl')
+      ? res.locals.serviceFamilyTypes
+      : (res.locals.serviceFamilyTypes || []).filter(
+          (family: { key: string }) => family.key !== BVL_SERVICE_FAMILY_TYPE,
+        )
 
     // If not a leaf-level location, only render services that have an editableInParent property of true.
     if (!isLeafLevel) {
@@ -95,6 +107,26 @@ export default class Details extends FormInitialStep {
     }
 
     super.validateFields(req, res, async errors => {
+      // Re-add any BVL services from the original location for users without edit_bvl,
+      // so unrelated edits do not silently strip Book a video link from the location.
+      if (!req.canAccess('edit_bvl')) {
+        const bvlServiceKeys = new Set(
+          (res.locals.serviceTypes || [])
+            .filter(
+              (st: { attributes?: { serviceFamilyType?: string } }) =>
+                st.attributes?.serviceFamilyType === BVL_SERVICE_FAMILY_TYPE,
+            )
+            .map((st: { key: string }) => st.key),
+        )
+        const originalBvlServices = (locationDetails.usedByServices || []).filter((key: string) =>
+          bvlServiceKeys.has(key),
+        )
+        if (originalBvlServices.length > 0) {
+          const submitted = (req.form.values.services as string[]) || []
+          req.form.values.services = Array.from(new Set([...submitted, ...originalBvlServices]))
+        }
+      }
+
       const { values } = req.form
       const { id: currentLocationId, localName, usedByServices, status } = locationDetails
 
