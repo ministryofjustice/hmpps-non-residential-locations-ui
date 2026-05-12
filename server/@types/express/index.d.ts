@@ -63,6 +63,8 @@ interface PaginationLocals {
   currentPage: number
   totalRows: number
   rowCount: number
+  rowFrom: number
+  rowTo: number
   hrefTemplate: string
 }
 
