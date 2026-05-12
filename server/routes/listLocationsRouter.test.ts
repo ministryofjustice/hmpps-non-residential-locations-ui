@@ -593,20 +593,50 @@ describe('GET /prison/TST', () => {
     })
   })
 
-  it.skip('service errors are handled', () => {
-    app = appWithAllRoutes({
-      services: { auditService, locationsService },
-      userSupplier: () => user,
-    })
-    auditService.logPageView.mockResolvedValue(null)
-    locationsService.getNonResidentialLocations.mockRejectedValue(new Error('Some problem calling external api!'))
-
-    return request(app)
-      .get('/prison/TST')
-      .expect('Content-Type', /html/)
-      .expect(500)
-      .expect(res => {
-        expect(res.text).toContain('Some problem calling external api!')
+  describe('error handling', () => {
+    beforeEach(() => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => user,
       })
+      auditService.logPageView.mockResolvedValue(null)
+    })
+
+    it('renders the generic error page when getNonResidentialLocations rejects', () => {
+      locationsService.getNonResidentialLocations.mockRejectedValue(new Error('Some problem calling external api!'))
+
+      return request(app)
+        .get('/prison/TST')
+        .expect('Content-Type', /html/)
+        .expect(500)
+        .expect(res => {
+          expect(res.text).toContain('Sorry, there is a problem with this service')
+          expect(res.text).toContain('Return to Locations')
+        })
+    })
+
+    it('renders the generic error page when serviceFamilyType filter triggers an API error', () => {
+      locationsService.getNonResidentialLocations.mockRejectedValue(new Error('Bad request'))
+
+      return request(app)
+        .get('/prison/TST?serviceFamilyType=xxx')
+        .expect('Content-Type', /html/)
+        .expect(500)
+        .expect(res => {
+          expect(res.text).toContain('Sorry, there is a problem with this service')
+        })
+    })
+
+    it('renders the generic error page when getNonResidentialLocationCount rejects', () => {
+      locationsService.getNonResidentialLocationCount.mockRejectedValue(new Error('Counts API failure'))
+
+      return request(app)
+        .get('/prison/TST')
+        .expect('Content-Type', /html/)
+        .expect(500)
+        .expect(res => {
+          expect(res.text).toContain('Sorry, there is a problem with this service')
+        })
+    })
   })
 })

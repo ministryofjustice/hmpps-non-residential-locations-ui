@@ -3,6 +3,7 @@ import { Router } from 'express'
 import type { Services } from '../services'
 import logger from '../../logger'
 import validateCaseload from '../middleware/validateCaseload'
+import asyncMiddleware from '../middleware/asyncMiddleware'
 
 export default function routes({ locationsService }: Services): Router {
   const router = Router()
@@ -18,7 +19,7 @@ export default function routes({ locationsService }: Services): Router {
       next()
     },
     validateCaseload(),
-    async (req, res, next) => {
+    asyncMiddleware(async (req, res, next) => {
       const { systemToken } = req.session
       const { prisonId } = res.locals
 
@@ -170,7 +171,7 @@ export default function routes({ locationsService }: Services): Router {
         sort: sortParam,
         sortHrefTemplate,
       })
-    },
+    }),
   )
 
   return router
