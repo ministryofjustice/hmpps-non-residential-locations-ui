@@ -26,6 +26,7 @@ describe('Add Location - Details controller', () => {
       services: {
         locationsService,
       },
+      canAccess: jest.fn().mockReturnValue(true),
       form: {
         options: {
           fields: {
@@ -73,6 +74,33 @@ describe('Add Location - Details controller', () => {
 
       expect(next).toHaveBeenCalled()
     })
+
+    it('omits BVL service types when the user does not have edit_bvl', async () => {
+      ;(deepReq.canAccess as jest.Mock).mockImplementation(p => p !== 'edit_bvl')
+      locationsService.getServiceTypes = jest.fn().mockResolvedValue([
+        { key: 'A', description: 'Alpha', attributes: { serviceFamilyType: 'ACTIVITIES_APPOINTMENTS' } },
+        { key: 'B', description: 'Bravo', attributes: { serviceFamilyType: 'VIDEO_LINK_APPOINTMENTS' } },
+      ])
+
+      await controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.form!.options!.fields!.services.items).toEqual([{ text: 'Alpha', value: 'A' }])
+    })
+
+    it('includes BVL service types when the user has edit_bvl', async () => {
+      ;(deepReq.canAccess as jest.Mock).mockReturnValue(true)
+      locationsService.getServiceTypes = jest.fn().mockResolvedValue([
+        { key: 'A', description: 'Alpha', attributes: { serviceFamilyType: 'ACTIVITIES_APPOINTMENTS' } },
+        { key: 'B', description: 'Bravo', attributes: { serviceFamilyType: 'VIDEO_LINK_APPOINTMENTS' } },
+      ])
+
+      await controller.setOptions(deepReq as FormWizard.Request, deepRes as Response, next)
+
+      expect(deepReq.form!.options!.fields!.services.items).toEqual([
+        { text: 'Alpha', value: 'A' },
+        { text: 'Bravo', value: 'B' },
+      ])
+    })
   })
 
   describe('locals', () => {
@@ -94,6 +122,34 @@ describe('Add Location - Details controller', () => {
     it('injects service family types into services field items', () => {
       const response = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
       // Expect the returned locals to include a services field; items should reflect serviceFamilyTypes
+      expect((response.fields as FormWizard.Fields).services.items).toEqual(deepRes.locals!.serviceFamilyTypes)
+    })
+
+    it('filters out the BVL service family when the user does not have edit_bvl', () => {
+      ;(deepReq.canAccess as jest.Mock).mockImplementation(p => p !== 'edit_bvl')
+      deepRes.locals!.serviceFamilyTypes = [
+        { key: 'ACTIVITIES_APPOINTMENTS', description: 'Activities', values: [] },
+        { key: 'VIDEO_LINK_APPOINTMENTS', description: 'Book a video link', values: [] },
+        { key: 'USE_OF_FORCE', description: 'Use of force', values: [] },
+      ] as any
+
+      const response = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+
+      expect((response.fields as FormWizard.Fields).services.items).toEqual([
+        { key: 'ACTIVITIES_APPOINTMENTS', description: 'Activities', values: [] },
+        { key: 'USE_OF_FORCE', description: 'Use of force', values: [] },
+      ])
+    })
+
+    it('keeps the BVL service family when the user has edit_bvl', () => {
+      ;(deepReq.canAccess as jest.Mock).mockReturnValue(true)
+      deepRes.locals!.serviceFamilyTypes = [
+        { key: 'ACTIVITIES_APPOINTMENTS', description: 'Activities', values: [] },
+        { key: 'VIDEO_LINK_APPOINTMENTS', description: 'Book a video link', values: [] },
+      ] as any
+
+      const response = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+
       expect((response.fields as FormWizard.Fields).services.items).toEqual(deepRes.locals!.serviceFamilyTypes)
     })
   })
