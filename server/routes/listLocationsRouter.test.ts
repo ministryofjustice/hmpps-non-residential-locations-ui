@@ -611,7 +611,7 @@ describe('GET /prison/TST', () => {
         .expect(500)
         .expect(res => {
           expect(res.text).toContain('Sorry, there is a problem with this service')
-          expect(res.text).toContain('Return to Locations')
+          expect(res.text).toContain('Return to Non-residential locations')
         })
     })
 
