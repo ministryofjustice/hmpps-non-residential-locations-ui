@@ -9,7 +9,7 @@ const editBvlLocationsPermissions: string[] = [...editLocationsPermissions, 'edi
 const permissionsByRole: { [key: string]: string[] } = {
   VIEW_INTERNAL_LOCATION: viewLocationsPermissions,
   NONRESI__MAINTAIN_LOCATION: editLocationsPermissions,
-  NONRESI__MAINTAIN_BVL_LOCATIONS: editBvlLocationsPermissions,
+  NONRESI__MAINTAIN_BVL_LOCS: editBvlLocationsPermissions,
 }
 
 const rolesToPermissions = (roles: string[], mapping = permissionsByRole) =>
