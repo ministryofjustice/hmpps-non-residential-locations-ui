@@ -377,12 +377,11 @@ describe('Edit Location - Details controller', () => {
         locationStatus: 'ACTIVE',
       }
       mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
-      locationsService.getNonResidentialLocationByLocalName = jest
-        .fn()
-        .mockResolvedValue([{ id: 'loc-123', localName: 'Old Name' }] as any)
+      locationsService.getNonResidentialLocationByLocalName = jest.fn()
 
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
+      expect(locationsService.getNonResidentialLocationByLocalName).not.toHaveBeenCalled()
       expect(callback).toHaveBeenCalledWith({})
     })
 
@@ -393,12 +392,29 @@ describe('Edit Location - Details controller', () => {
         locationStatus: 'ACTIVE',
       }
       mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
-      locationsService.getNonResidentialLocationByLocalName = jest
-        .fn()
-        .mockResolvedValue([{ id: 'loc-123', localName: 'Old Name' }] as any)
+      locationsService.getNonResidentialLocationByLocalName = jest.fn()
 
       await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
 
+      expect(locationsService.getNonResidentialLocationByLocalName).not.toHaveBeenCalled()
+      expect(callback).toHaveBeenCalledWith({})
+    })
+
+    it('passes validation for a parent location when local name is unchanged and the lookup would not return the parent itself', async () => {
+      // Parents without a stored local name have their pathHierarchy substituted by the API,
+      // so a local-name lookup against the displayed value would not return the parent and
+      // could not be used to identify the current location.
+      deepRes.locals.locationDetails.isLeafLevel = false
+      deepReq.form!.values = {
+        localName: 'Old Name',
+        services: ['VISITS'],
+      }
+      mockSuperValidateFields.mockImplementation((_req, _res, cb) => cb({}))
+      locationsService.getNonResidentialLocationByLocalName = jest.fn()
+
+      await controller.validateFields(deepReq as FormWizard.Request, deepRes as Response, callback)
+
+      expect(locationsService.getNonResidentialLocationByLocalName).not.toHaveBeenCalled()
       expect(callback).toHaveBeenCalledWith({})
     })
 
