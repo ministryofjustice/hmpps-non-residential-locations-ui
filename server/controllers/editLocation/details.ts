@@ -138,27 +138,34 @@ export default class Details extends FormInitialStep {
         return callback({ ...errors, ...validationErrors })
       }
 
-      try {
-        const locationsByLocalName = await locationsService.getNonResidentialLocationByLocalName(
-          req.session.systemToken,
-          res.locals.user.activeCaseload.id,
-          sanitizedLocalName,
-        )
+      // Only check uniqueness when the local name is actually changing. Some non-residential
+      // parent locations have no stored local name, in which case the API substitutes the path
+      // hierarchy when reading and does not return the location when searching by local name —
+      // so the existing exclude-self-by-id check cannot identify the current location and
+      // misreports the unchanged name as a duplicate.
+      const localNameChanged = sanitizedLocalName.toLowerCase() !== (localName ?? '').toLowerCase()
 
-        const idsOfLocationsWithProposedLocalName = locationsByLocalName.map((loc: { id: string }) => loc.id)
-        // display validation error if locations with the proposed localName already exist
-        // and exclude the current location from this check to allow saving when localName is not changed
-        if (
-          idsOfLocationsWithProposedLocalName.length > 0 &&
-          !idsOfLocationsWithProposedLocalName.includes(currentLocationId)
-        ) {
-          validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
+      if (localNameChanged) {
+        try {
+          const locationsByLocalName = await locationsService.getNonResidentialLocationByLocalName(
+            req.session.systemToken,
+            res.locals.user.activeCaseload.id,
+            sanitizedLocalName,
+          )
+
+          const idsOfLocationsWithProposedLocalName = locationsByLocalName.map((loc: { id: string }) => loc.id)
+          if (
+            idsOfLocationsWithProposedLocalName.length > 0 &&
+            !idsOfLocationsWithProposedLocalName.includes(currentLocationId)
+          ) {
+            validationErrors.localName = this.formError('localName', 'uniqueNameRequired')
+          }
+        } catch (error) {
+          if (error.responseStatus === 404) {
+            return callback(errors)
+          }
+          throw error
         }
-      } catch (error) {
-        if (error.responseStatus === 404) {
-          return callback(errors)
-        }
-        throw error
       }
 
       try {
