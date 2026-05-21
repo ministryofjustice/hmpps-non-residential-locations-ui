@@ -274,6 +274,10 @@ button.govuk-back-link {
   }
 }
 
+.locations-table__actions {
+  white-space: nowrap;
+}
+
 .locations-table-column {
   @include govuk-media-query($from: desktop) {
     width: 70%;
