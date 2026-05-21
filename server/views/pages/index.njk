@@ -19,7 +19,7 @@
     {{ simplePagination(paginationLocals) }}
 
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-quarter">
+      <div class="govuk-grid-column-one-quarter locations-filter-column">
         <div class="locations-filter" data-qa="locations-filter">
           <form method="get" id="locations-filter-form" data-qa="status-filter-form" class="status-filter">
             {% if hasSelectedFilters %}
@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <div class="govuk-grid-column-three-quarters">
+      <div class="govuk-grid-column-three-quarters locations-table-column">
         {% if locations.content | length > 0 %}
           {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes, canEdit, sort, sortHrefTemplate) }}
         {% else %}
