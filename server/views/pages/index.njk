@@ -1,6 +1,7 @@
 {% extends "../partials/layout.njk" %}
 
 {% from "../macros/locationsTable.njk" import locationsTable %}
+{% from "../partials/simplePagination/macro.njk" import simplePagination %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
 {% set mainClasses =
@@ -15,8 +16,10 @@
       <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-6" href="/add-location" role="button" data-qa="add-location-button">Add a non-residential location</a>
     {% endif %}
 
+    {{ simplePagination(paginationLocals) }}
+
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-third">
+      <div class="govuk-grid-column-one-quarter">
         <div class="locations-filter" data-qa="locations-filter">
           <form method="get" id="locations-filter-form" data-qa="status-filter-form" class="status-filter">
             {% if hasSelectedFilters %}
@@ -107,7 +110,7 @@
         </div>
       </div>
 
-      <div class="govuk-grid-column-two-thirds">
+      <div class="govuk-grid-column-three-quarters">
         {% if locations.content | length > 0 %}
           {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes, canEdit, sort, sortHrefTemplate) }}
         {% else %}

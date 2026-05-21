@@ -2,7 +2,6 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% from "./locationStatusTag.njk" import locationStatusTag %}
-{% from "../partials/simplePagination/macro.njk" import simplePagination %}
 
 {% macro locationsTable (locations, pagingData, usageTypesData, canEdit, sort, sortHrefTemplate) %}
 
@@ -31,7 +30,6 @@
         ), rows) %}
       {% endif %}
     {% endfor %}
-    {{ simplePagination(pagingData) }}
 
     {% set sortParts = sort.split(',') if sort else [] %}
     {% set activeSortKey = sortParts[0] if sortParts | length > 0 else '' %}
@@ -71,7 +69,6 @@
       rows: rows
     }) }}
   {% endif %}
-  {{ simplePagination(pagingData) }}
 {% endmacro %}
 
 {% macro usageTypes(items, usageTypesData) %}
