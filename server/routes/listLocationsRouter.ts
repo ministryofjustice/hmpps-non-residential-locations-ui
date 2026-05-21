@@ -5,6 +5,38 @@ import logger from '../../logger'
 import validateCaseload from '../middleware/validateCaseload'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 
+const ALL_STATUSES = ['ACTIVE', 'INACTIVE', 'ARCHIVED']
+
+type FilterState = {
+  statuses: string[]
+  serviceFamilyTypes: string[]
+  sort: string
+  size: number
+  localName: string | null
+}
+
+function buildQueryString(state: FilterState, overrides: Partial<{ page: number | null }> = {}): string {
+  const parts: string[] = []
+
+  if (state.statuses.length === 0) {
+    parts.push('status=NONE')
+  } else {
+    state.statuses.forEach(s => parts.push(`status=${encodeURIComponent(s)}`))
+  }
+
+  state.serviceFamilyTypes.forEach(s => parts.push(`serviceFamilyType=${encodeURIComponent(s)}`))
+
+  if (state.sort) parts.push(`sort=${state.sort}`)
+  if (state.size) parts.push(`size=${state.size}`)
+  if (state.localName) parts.push(`localName=${encodeURIComponent(state.localName)}`)
+
+  if (overrides.page !== null && overrides.page !== undefined) {
+    parts.push(`page=${overrides.page}`)
+  }
+
+  return `?${parts.join('&')}`
+}
+
 export default function routes({ locationsService }: Services): Router {
   const router = Router()
 
@@ -59,9 +91,16 @@ export default function routes({ locationsService }: Services): Router {
         selectedStatuses = [status as string]
       }
 
-      let selectedServiceFamilyType: string = 'ALL'
-      if (serviceFamilyType !== undefined) {
-        selectedServiceFamilyType = serviceFamilyType as string
+      // Parse service family type filter - empty means no filter (show all services)
+      let selectedServiceFamilyTypes: string[]
+      if (serviceFamilyType === undefined) {
+        selectedServiceFamilyTypes = []
+      } else if (Array.isArray(serviceFamilyType)) {
+        selectedServiceFamilyTypes = (serviceFamilyType as string[]).filter(s => s && s !== 'ALL')
+      } else if (serviceFamilyType === '' || serviceFamilyType === 'ALL') {
+        selectedServiceFamilyTypes = []
+      } else {
+        selectedServiceFamilyTypes = [serviceFamilyType as string]
       }
 
       let wildcardName: string = null
@@ -83,18 +122,67 @@ export default function routes({ locationsService }: Services): Router {
       const sortParamForApi: string | string[] =
         sortKey === 'status' ? [`${sortKey},${sortDirection}`, 'localName,asc'] : sortParam
 
-      // Fetch counts for each status
-      const [activeCount, inactiveCount, archivedCount] = await Promise.all([
-        locationsService.getNonResidentialLocationCount(systemToken, prisonId, ['ACTIVE']),
-        locationsService.getNonResidentialLocationCount(systemToken, prisonId, ['INACTIVE']),
-        locationsService.getNonResidentialLocationCount(systemToken, prisonId, ['ARCHIVED']),
+      // Fetch service family types for the service filter
+      const serviceFamilyTypes = await locationsService.getServiceFamilyTypes(systemToken)
+
+      // Fetch counts for each status and each service family type in parallel
+      const statusCountPromises = ALL_STATUSES.map(s =>
+        locationsService.getNonResidentialLocationCount(systemToken, prisonId, [s]),
+      )
+      const serviceCountPromises = serviceFamilyTypes.map(family =>
+        locationsService.getNonResidentialLocationCount(systemToken, prisonId, ALL_STATUSES, [family.key]),
+      )
+
+      const [statusCountValues, serviceCountValues] = await Promise.all([
+        Promise.all(statusCountPromises),
+        Promise.all(serviceCountPromises),
       ])
 
       const statusCounts = {
-        ACTIVE: activeCount,
-        INACTIVE: inactiveCount,
-        ARCHIVED: archivedCount,
+        ACTIVE: statusCountValues[0],
+        INACTIVE: statusCountValues[1],
+        ARCHIVED: statusCountValues[2],
       }
+
+      const serviceFamilyOptions = serviceFamilyTypes.map((family, index) => ({
+        key: family.key,
+        description: family.description,
+        count: serviceCountValues[index],
+        checked: selectedServiceFamilyTypes.includes(family.key),
+      }))
+
+      const filterState: FilterState = {
+        statuses: selectedStatuses,
+        serviceFamilyTypes: selectedServiceFamilyTypes,
+        sort: sortParam,
+        size: pageSize,
+        localName: wildcardName,
+      }
+
+      const statusLabels: Record<string, string> = {
+        ACTIVE: 'Active',
+        INACTIVE: 'Inactive',
+        ARCHIVED: 'Archived',
+      }
+
+      const statusChips = selectedStatuses.map(s => ({
+        label: statusLabels[s] || s,
+        removeHref: buildQueryString({ ...filterState, statuses: selectedStatuses.filter(x => x !== s) }),
+      }))
+
+      const serviceChips = selectedServiceFamilyTypes.map(key => {
+        const family = serviceFamilyTypes.find(f => f.key === key)
+        return {
+          label: family ? family.description : key,
+          removeHref: buildQueryString({
+            ...filterState,
+            serviceFamilyTypes: selectedServiceFamilyTypes.filter(x => x !== key),
+          }),
+        }
+      })
+
+      const hasSelectedFilters = statusChips.length > 0 || serviceChips.length > 0
+      const clearAllHref = buildQueryString({ ...filterState, statuses: [], serviceFamilyTypes: [] })
 
       // If no statuses selected, show an empty result
       if (selectedStatuses.length === 0) {
@@ -114,7 +202,7 @@ export default function routes({ locationsService }: Services): Router {
           rowCount: 0,
           rowFrom: 0,
           rowTo: 0,
-          hrefTemplate: `?status=NONE&sort=${sortParam}&page={page}`,
+          hrefTemplate: `${buildQueryString(filterState)}&page={page}`,
         }
 
         return res.render('pages/index', {
@@ -122,9 +210,15 @@ export default function routes({ locationsService }: Services): Router {
           locations: emptyLocations,
           canEdit,
           selectedStatuses,
+          selectedServiceFamilyTypes,
           statusCounts,
+          serviceFamilyOptions,
+          statusChips,
+          serviceChips,
+          hasSelectedFilters,
+          clearAllHref,
           sort: sortParam,
-          sortHrefTemplate: `?status=NONE&sort={sortKey},{sortDirection}`,
+          sortHrefTemplate: `${buildQueryString({ ...filterState, sort: '{sortKey},{sortDirection}' })}`,
         })
       }
 
@@ -135,7 +229,7 @@ export default function routes({ locationsService }: Services): Router {
         pageNo ? `${pageNo}` : undefined,
         selectedStatuses,
         sortParamForApi,
-        selectedServiceFamilyType !== 'ALL' ? selectedServiceFamilyType : null,
+        selectedServiceFamilyTypes,
         wildcardName,
         pageSize,
       )
@@ -146,10 +240,9 @@ export default function routes({ locationsService }: Services): Router {
       const rowFrom = pageable.pageSize * pageable.pageNumber + 1
       const rowTo = rowFrom + locations.numberOfElements - 1
 
-      // Build href template preserving status filter and sort
-      const statusParams = selectedStatuses.map(s => `status=${s}`)
-      const hrefTemplate = `?${[...statusParams, `sort=${sortParam}`, 'page={page}', `size=${pageSize}`, `serviceFamilyType=${selectedServiceFamilyType}`, `localName=${wildcardName !== null ? wildcardName : ''}`].join('&')}`
-      const sortHrefTemplate = `?${[...statusParams, 'sort={sortKey},{sortDirection}', `size=${pageSize}`, `serviceFamilyType=${selectedServiceFamilyType}`, `localName=${wildcardName !== null ? wildcardName : ''}`].join('&')}`
+      // Build href template preserving status filter, service filter, and sort
+      const hrefTemplate = `${buildQueryString(filterState)}&page={page}`
+      const sortHrefTemplate = `${buildQueryString({ ...filterState, sort: '{sortKey},{sortDirection}' })}`
 
       res.locals.paginationLocals = {
         totalPages: locations.totalPages,
@@ -167,7 +260,13 @@ export default function routes({ locationsService }: Services): Router {
         locations,
         canEdit,
         selectedStatuses,
+        selectedServiceFamilyTypes,
         statusCounts,
+        serviceFamilyOptions,
+        statusChips,
+        serviceChips,
+        hasSelectedFilters,
+        clearAllHref,
         sort: sortParam,
         sortHrefTemplate,
       })

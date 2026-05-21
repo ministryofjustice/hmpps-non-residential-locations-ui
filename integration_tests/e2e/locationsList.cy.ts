@@ -114,10 +114,10 @@ context('Locations List', () => {
       indexPage.statusFilterForm().should('have.class', 'status-filter')
     })
 
-    it('should display "Filter by location status" legend', () => {
+    it('should display "Location status" legend', () => {
       cy.signIn()
       IndexPage.forViewUser()
-      cy.get('[data-qa=status-filter-form] legend').should('contain.text', 'Filter by location status')
+      cy.get('[data-qa=status-filter-form] legend').should('contain.text', 'Location status')
     })
 
     it('should have Active and Inactive checked by default, Archived unchecked', () => {
@@ -136,11 +136,11 @@ context('Locations List', () => {
       indexPage.statusFilterForm().should('contain.text', 'Archived (')
     })
 
-    it('should display Apply filters button and Clear link', () => {
+    it('should display Apply filters button and Clear filters link', () => {
       cy.signIn()
       IndexPage.forViewUser()
       cy.get('[data-qa=apply-filter-button]').should('exist').and('contain.text', 'Apply filters')
-      cy.get('[data-qa=clear-filter-link]').should('exist').and('contain.text', 'Clear')
+      cy.get('[data-qa=clear-filters-link]').should('exist').and('contain.text', 'Clear filters')
     })
 
     it('should submit filter when Apply filters button is clicked', () => {
@@ -159,18 +159,18 @@ context('Locations List', () => {
       cy.url().should('include', 'status=ARCHIVED')
     })
 
-    it('should show empty state message when Clear is clicked', () => {
+    it('should show empty state message when Clear filters is clicked', () => {
       cy.signIn()
       IndexPage.forViewUser()
 
-      // Click Clear link
-      cy.get('[data-qa=clear-filter-link]').click()
+      // Click Clear filters link
+      cy.get('[data-qa=clear-filters-link]').click()
 
       // URL should contain status=NONE
       cy.url().should('include', 'status=NONE')
 
-      // No checkboxes should be checked
-      cy.get('[data-qa=status-filter-form] input[type="checkbox"]:checked').should('have.length', 0)
+      // No status checkboxes should be checked
+      cy.get('[data-qa=status-filter-form] input[name="status"]:checked').should('have.length', 0)
 
       // Should display empty state message
       cy.get('[data-qa=no-results-heading]').should('contain.text', 'There are no matching results.')

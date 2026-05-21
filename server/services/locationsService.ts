@@ -10,7 +10,7 @@ export default class LocationsService {
     page?: string,
     status?: string[],
     sort?: string | string[],
-    serviceFamilyType?: string,
+    serviceFamilyTypes?: string[],
     localName?: string,
     pageSize: number = 35,
   ) {
@@ -18,18 +18,24 @@ export default class LocationsService {
       prisonId,
       page,
       size: pageSize.toString(),
-      status: status?.join(','),
+      status: status?.length ? status.join(',') : undefined,
       localName,
-      serviceFamilyType,
+      serviceFamilyType: serviceFamilyTypes?.length ? serviceFamilyTypes.join(',') : undefined,
       sort,
     })
   }
 
-  async getNonResidentialLocationCount(token: string, prisonId: string, status: string[]): Promise<number> {
+  async getNonResidentialLocationCount(
+    token: string,
+    prisonId: string,
+    status: string[],
+    serviceFamilyTypes?: string[],
+  ): Promise<number> {
     const result = await this.locationsApiClient.locations.getNonResidentialSummary(token, {
       prisonId,
       size: '1',
       status: status.join(','),
+      serviceFamilyType: serviceFamilyTypes?.length ? serviceFamilyTypes.join(',') : undefined,
     })
     return result.locations.totalElements
   }
