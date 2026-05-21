@@ -55,9 +55,23 @@ const mockLocationsResponse: NonResidentialSummary = {
   },
 }
 
+const mockServiceFamilyTypes: Array<{ key: string; description: string; values: never[] }> = [
+  {
+    key: 'ACTIVITIES_APPOINTMENTS',
+    description: 'Activities and appointments',
+    values: [],
+  },
+  {
+    key: 'ADJUDICATIONS',
+    description: 'Adjudications',
+    values: [],
+  },
+]
+
 beforeEach(() => {
   // Default mock for location counts - can be overridden in specific tests
   locationsService.getNonResidentialLocationCount.mockResolvedValue(10)
+  locationsService.getServiceFamilyTypes.mockResolvedValue(mockServiceFamilyTypes)
 })
 
 afterEach(() => {
@@ -178,7 +192,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
-            null,
+            [],
             null,
             35,
           )
@@ -199,7 +213,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ARCHIVED'],
             'localName,asc',
-            null,
+            [],
             null,
             35,
           )
@@ -220,7 +234,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'ARCHIVED'],
             'localName,asc',
-            null,
+            [],
             null,
             35,
           )
@@ -241,7 +255,7 @@ describe('GET /prison/TST', () => {
         .get('/prison/TST')
         .expect(200)
         .expect(res => {
-          expect(res.text).toContain('Filter by location status')
+          expect(res.text).toContain('Location status')
           expect(res.text).toContain('value="ACTIVE"')
           expect(res.text).toContain('value="INACTIVE"')
           expect(res.text).toContain('value="ARCHIVED"')
@@ -290,6 +304,188 @@ describe('GET /prison/TST', () => {
     })
   })
 
+  describe('service family filter', () => {
+    beforeEach(() => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => user,
+        canAccess: () => false,
+      })
+    })
+
+    it('should pass no service family filter to API when not provided', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'INACTIVE'],
+            'localName,asc',
+            [],
+            null,
+            35,
+          )
+        })
+    })
+
+    it('should pass single service family type when one provided', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?serviceFamilyType=ACTIVITIES_APPOINTMENTS')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'INACTIVE'],
+            'localName,asc',
+            ['ACTIVITIES_APPOINTMENTS'],
+            null,
+            35,
+          )
+        })
+    })
+
+    it('should pass multiple service family types when more than one provided', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?serviceFamilyType=ACTIVITIES_APPOINTMENTS&serviceFamilyType=ADJUDICATIONS')
+        .expect(200)
+        .expect(() => {
+          expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
+            undefined,
+            'TST',
+            undefined,
+            ['ACTIVE', 'INACTIVE'],
+            'localName,asc',
+            ['ACTIVITIES_APPOINTMENTS', 'ADJUDICATIONS'],
+            null,
+            35,
+          )
+        })
+    })
+
+    it('should render service family checkboxes with counts', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+      locationsService.getNonResidentialLocationCount.mockImplementation((token, prisonId, status, families) => {
+        if (families && families[0] === 'ACTIVITIES_APPOINTMENTS') return Promise.resolve(15)
+        if (families && families[0] === 'ADJUDICATIONS') return Promise.resolve(42)
+        return Promise.resolve(0)
+      })
+
+      return request(app)
+        .get('/prison/TST')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toContain('Services that use non-residential locations')
+          expect(res.text).toContain('value="ACTIVITIES_APPOINTMENTS"')
+          expect(res.text).toContain('value="ADJUDICATIONS"')
+          expect(res.text).toContain('Activities and appointments (15)')
+          expect(res.text).toContain('Adjudications (42)')
+        })
+    })
+
+    it('should mark the selected service family checkboxes as checked', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?serviceFamilyType=ADJUDICATIONS')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toMatch(/value="ADJUDICATIONS"[^>]*checked/)
+          expect(res.text).not.toMatch(/value="ACTIVITIES_APPOINTMENTS"[^>]*checked/)
+        })
+    })
+
+    it('should preserve service family filter in pagination links', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      const multiPageResponse = {
+        ...mockLocationsResponse,
+        locations: {
+          ...mockLocationsResponse.locations,
+          totalPages: 3,
+          totalElements: 100,
+        },
+      }
+      locationsService.getNonResidentialLocations.mockResolvedValue(multiPageResponse)
+
+      return request(app)
+        .get('/prison/TST?serviceFamilyType=ACTIVITIES_APPOINTMENTS')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toContain('serviceFamilyType=ACTIVITIES_APPOINTMENTS')
+        })
+    })
+  })
+
+  describe('selected filter chips', () => {
+    beforeEach(() => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => user,
+        canAccess: () => false,
+      })
+    })
+
+    it('should render selected filter chips for selected statuses and services', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?status=ACTIVE&serviceFamilyType=ACTIVITIES_APPOINTMENTS')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toContain('Selected filters')
+          expect(res.text).toContain('data-qa="selected-status-chips"')
+          expect(res.text).toContain('data-qa="selected-service-chips"')
+          expect(res.text).toContain('Active')
+          expect(res.text).toContain('Activities and appointments')
+          expect(res.text).toContain('data-qa="clear-filters-link"')
+        })
+    })
+
+    it('should not render the selected filters panel when no filters are applied', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?status=NONE')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).not.toContain('Selected filters')
+        })
+    })
+
+    it('clear filters link should remove all status and service filters', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST?status=ACTIVE&serviceFamilyType=ADJUDICATIONS')
+        .expect(200)
+        .expect(res => {
+          // Clear all should produce status=NONE and no serviceFamilyType
+          const match = res.text.match(/href="([^"]+)"[^>]*data-qa="clear-filters-link"/)
+          expect(match).toBeTruthy()
+          expect(match[1]).toContain('status=NONE')
+          expect(match[1]).not.toContain('serviceFamilyType=')
+        })
+    })
+  })
+
   describe('sorting', () => {
     beforeEach(() => {
       app = appWithAllRoutes({
@@ -313,7 +509,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
-            null,
+            [],
             null,
             35,
           )
@@ -334,7 +530,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             ['status,desc', 'localName,asc'],
-            null,
+            [],
             null,
             35,
           )
@@ -355,7 +551,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             ['status,asc', 'localName,asc'],
-            null,
+            [],
             null,
             35,
           )
@@ -376,7 +572,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
-            null,
+            [],
             null,
             35,
           )
@@ -397,7 +593,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             ['status,asc', 'localName,asc'],
-            null,
+            [],
             null,
             35,
           )

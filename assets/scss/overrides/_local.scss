@@ -263,24 +263,59 @@ button.govuk-back-link {
   padding: govuk-spacing(4);
   margin-bottom: govuk-spacing(6);
 
-  .govuk-checkboxes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: govuk-spacing(4);
-  }
-
   .govuk-checkboxes__item {
     margin-right: 0;
   }
+}
 
-  .govuk-checkboxes__label {
-    white-space: nowrap;
-  }
+.locations-filter {
+  margin-bottom: govuk-spacing(6);
 
   &__actions {
     display: flex;
     align-items: center;
     gap: govuk-spacing(4);
     margin-top: govuk-spacing(4);
+  }
+
+  &__selected {
+    background-color: govuk-colour("light-grey");
+    padding: govuk-spacing(3);
+    margin-bottom: govuk-spacing(4);
+  }
+
+  &__selected-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: govuk-spacing(2);
+  }
+
+  &__chip-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: govuk-spacing(2);
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: govuk-spacing(1);
+    padding: govuk-spacing(1) govuk-spacing(2);
+    background-color: govuk-colour("white");
+    border: 1px solid $govuk-border-colour;
+    text-decoration: none;
+    color: $govuk-text-colour;
+
+    &:hover {
+      background-color: govuk-colour("light-grey");
+    }
+
+    &:focus {
+      @include govuk-focused-text;
+    }
   }
 }
