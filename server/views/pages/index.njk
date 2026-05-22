@@ -91,17 +91,11 @@
               <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                 Services that use non-residential locations
               </legend>
-              <div class="govuk-radios govuk-radios--small" data-module="govuk-radios" data-qa="service-filter-radios">
-                <div class="govuk-radios__item">
-                  <input class="govuk-radios__input" id="serviceFamilyType-ALL" name="serviceFamilyType" type="radio" value="" {{ "checked" if not selectedServiceFamilyType }}>
-                  <label class="govuk-label govuk-radios__label" for="serviceFamilyType-ALL">
-                    All services
-                  </label>
-                </div>
+              <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes" data-qa="service-filter-checkboxes">
                 {% for option in serviceFamilyOptions %}
-                  <div class="govuk-radios__item">
-                    <input class="govuk-radios__input" id="serviceFamilyType-{{ option.key }}" name="serviceFamilyType" type="radio" value="{{ option.key }}" {{ "checked" if option.checked }}>
-                    <label class="govuk-label govuk-radios__label" for="serviceFamilyType-{{ option.key }}">
+                  <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input" id="serviceFamilyType-{{ option.key }}" name="serviceFamilyType" type="checkbox" value="{{ option.key }}" {{ "checked" if option.checked }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="serviceFamilyType-{{ option.key }}">
                       {{ option.description }} ({{ option.count }})
                     </label>
                   </div>

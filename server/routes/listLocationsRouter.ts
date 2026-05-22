@@ -9,7 +9,7 @@ const ALL_STATUSES = ['ACTIVE', 'INACTIVE', 'ARCHIVED']
 
 type FilterState = {
   statuses: string[]
-  serviceFamilyType: string | null
+  serviceFamilyTypes: string[]
   sort: string
   size: number
   localName: string | null
@@ -24,9 +24,7 @@ function buildQueryString(state: FilterState, overrides: Partial<{ page: number 
     state.statuses.forEach(s => parts.push(`status=${encodeURIComponent(s)}`))
   }
 
-  if (state.serviceFamilyType) {
-    parts.push(`serviceFamilyType=${encodeURIComponent(state.serviceFamilyType)}`)
-  }
+  state.serviceFamilyTypes.forEach(s => parts.push(`serviceFamilyType=${encodeURIComponent(s)}`))
 
   if (state.sort) parts.push(`sort=${state.sort}`)
   if (state.size) parts.push(`size=${state.size}`)
@@ -93,14 +91,16 @@ export default function routes({ locationsService }: Services): Router {
         selectedStatuses = [status as string]
       }
 
-      // Parse service family type filter - the Locations API only supports filtering by a
-      // single service family, so this is a single-select filter. No value means show all
-      // services. If a URL somehow carries more than one value, use the first valid one.
-      let selectedServiceFamilyType: string | null = null
-      if (Array.isArray(serviceFamilyType)) {
-        selectedServiceFamilyType = (serviceFamilyType as string[]).find(s => s && s !== 'ALL') ?? null
-      } else if (typeof serviceFamilyType === 'string' && serviceFamilyType !== '' && serviceFamilyType !== 'ALL') {
-        selectedServiceFamilyType = serviceFamilyType
+      // Parse service family type filter - empty means no filter (show all services)
+      let selectedServiceFamilyTypes: string[]
+      if (serviceFamilyType === undefined) {
+        selectedServiceFamilyTypes = []
+      } else if (Array.isArray(serviceFamilyType)) {
+        selectedServiceFamilyTypes = (serviceFamilyType as string[]).filter(s => s && s !== 'ALL')
+      } else if (serviceFamilyType === '' || serviceFamilyType === 'ALL') {
+        selectedServiceFamilyTypes = []
+      } else {
+        selectedServiceFamilyTypes = [serviceFamilyType as string]
       }
 
       let wildcardName: string = null
@@ -130,7 +130,7 @@ export default function routes({ locationsService }: Services): Router {
         locationsService.getNonResidentialLocationCount(systemToken, prisonId, [s]),
       )
       const serviceCountPromises = serviceFamilyTypes.map(family =>
-        locationsService.getNonResidentialLocationCount(systemToken, prisonId, ALL_STATUSES, family.key),
+        locationsService.getNonResidentialLocationCount(systemToken, prisonId, ALL_STATUSES, [family.key]),
       )
 
       const [statusCountValues, serviceCountValues] = await Promise.all([
@@ -148,12 +148,12 @@ export default function routes({ locationsService }: Services): Router {
         key: family.key,
         description: family.description,
         count: serviceCountValues[index],
-        checked: family.key === selectedServiceFamilyType,
+        checked: selectedServiceFamilyTypes.includes(family.key),
       }))
 
       const filterState: FilterState = {
         statuses: selectedStatuses,
-        serviceFamilyType: selectedServiceFamilyType,
+        serviceFamilyTypes: selectedServiceFamilyTypes,
         sort: sortParam,
         size: pageSize,
         localName: wildcardName,
@@ -170,19 +170,19 @@ export default function routes({ locationsService }: Services): Router {
         removeHref: buildQueryString({ ...filterState, statuses: selectedStatuses.filter(x => x !== s) }),
       }))
 
-      const serviceChips = selectedServiceFamilyType
-        ? [
-            {
-              label:
-                serviceFamilyTypes.find(f => f.key === selectedServiceFamilyType)?.description ??
-                selectedServiceFamilyType,
-              removeHref: buildQueryString({ ...filterState, serviceFamilyType: null }),
-            },
-          ]
-        : []
+      const serviceChips = selectedServiceFamilyTypes.map(key => {
+        const family = serviceFamilyTypes.find(f => f.key === key)
+        return {
+          label: family ? family.description : key,
+          removeHref: buildQueryString({
+            ...filterState,
+            serviceFamilyTypes: selectedServiceFamilyTypes.filter(x => x !== key),
+          }),
+        }
+      })
 
       const hasSelectedFilters = statusChips.length > 0 || serviceChips.length > 0
-      const clearAllHref = buildQueryString({ ...filterState, statuses: [], serviceFamilyType: null })
+      const clearAllHref = buildQueryString({ ...filterState, statuses: [], serviceFamilyTypes: [] })
 
       // If no statuses selected, show an empty result
       if (selectedStatuses.length === 0) {
@@ -210,7 +210,7 @@ export default function routes({ locationsService }: Services): Router {
           locations: emptyLocations,
           canEdit,
           selectedStatuses,
-          selectedServiceFamilyType,
+          selectedServiceFamilyTypes,
           statusCounts,
           serviceFamilyOptions,
           statusChips,
@@ -229,7 +229,7 @@ export default function routes({ locationsService }: Services): Router {
         pageNo ? `${pageNo}` : undefined,
         selectedStatuses,
         sortParamForApi,
-        selectedServiceFamilyType ?? undefined,
+        selectedServiceFamilyTypes,
         wildcardName,
         pageSize,
       )
@@ -260,7 +260,7 @@ export default function routes({ locationsService }: Services): Router {
         locations,
         canEdit,
         selectedStatuses,
-        selectedServiceFamilyType,
+        selectedServiceFamilyTypes,
         statusCounts,
         serviceFamilyOptions,
         statusChips,

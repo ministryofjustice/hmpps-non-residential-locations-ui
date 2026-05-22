@@ -192,7 +192,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
-            undefined,
+            [],
             null,
             35,
           )
@@ -213,7 +213,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ARCHIVED'],
             'localName,asc',
-            undefined,
+            [],
             null,
             35,
           )
@@ -234,7 +234,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'ARCHIVED'],
             'localName,asc',
-            undefined,
+            [],
             null,
             35,
           )
@@ -327,7 +327,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
-            undefined,
+            [],
             null,
             35,
           )
@@ -348,14 +348,14 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
-            'ACTIVITIES_APPOINTMENTS',
+            ['ACTIVITIES_APPOINTMENTS'],
             null,
             35,
           )
         })
     })
 
-    it('should pass only the first service family type when more than one provided in the URL', () => {
+    it('should pass multiple service family types when more than one provided', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
@@ -369,19 +369,19 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
-            'ACTIVITIES_APPOINTMENTS',
+            ['ACTIVITIES_APPOINTMENTS', 'ADJUDICATIONS'],
             null,
             35,
           )
         })
     })
 
-    it('should render service family radios with counts', () => {
+    it('should render service family checkboxes with counts', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
-      locationsService.getNonResidentialLocationCount.mockImplementation((token, prisonId, status, family) => {
-        if (family === 'ACTIVITIES_APPOINTMENTS') return Promise.resolve(15)
-        if (family === 'ADJUDICATIONS') return Promise.resolve(42)
+      locationsService.getNonResidentialLocationCount.mockImplementation((token, prisonId, status, families) => {
+        if (families && families[0] === 'ACTIVITIES_APPOINTMENTS') return Promise.resolve(15)
+        if (families && families[0] === 'ADJUDICATIONS') return Promise.resolve(42)
         return Promise.resolve(0)
       })
 
@@ -390,9 +390,6 @@ describe('GET /prison/TST', () => {
         .expect(200)
         .expect(res => {
           expect(res.text).toContain('Services that use non-residential locations')
-          expect(res.text).toContain('data-qa="service-filter-radios"')
-          expect(res.text).toContain('type="radio"')
-          expect(res.text).toContain('All services')
           expect(res.text).toContain('value="ACTIVITIES_APPOINTMENTS"')
           expect(res.text).toContain('value="ADJUDICATIONS"')
           expect(res.text).toContain('Activities and appointments (15)')
@@ -400,7 +397,7 @@ describe('GET /prison/TST', () => {
         })
     })
 
-    it('should mark the selected service family radio as checked', () => {
+    it('should mark the selected service family checkboxes as checked', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
@@ -410,18 +407,6 @@ describe('GET /prison/TST', () => {
         .expect(res => {
           expect(res.text).toMatch(/value="ADJUDICATIONS"[^>]*checked/)
           expect(res.text).not.toMatch(/value="ACTIVITIES_APPOINTMENTS"[^>]*checked/)
-        })
-    })
-
-    it('should check the "All services" radio when no service family is selected', () => {
-      auditService.logPageView.mockResolvedValue(null)
-      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
-
-      return request(app)
-        .get('/prison/TST')
-        .expect(200)
-        .expect(res => {
-          expect(res.text).toMatch(/id="serviceFamilyType-ALL"[^>]*checked/)
         })
     })
 
@@ -524,7 +509,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
-            undefined,
+            [],
             null,
             35,
           )
@@ -545,7 +530,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             ['status,desc', 'localName,asc'],
-            undefined,
+            [],
             null,
             35,
           )
@@ -566,7 +551,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             ['status,asc', 'localName,asc'],
-            undefined,
+            [],
             null,
             35,
           )
@@ -587,7 +572,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             'localName,asc',
-            undefined,
+            [],
             null,
             35,
           )
@@ -608,7 +593,7 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE', 'INACTIVE'],
             ['status,asc', 'localName,asc'],
-            undefined,
+            [],
             null,
             35,
           )

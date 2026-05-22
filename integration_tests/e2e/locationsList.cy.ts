@@ -206,63 +206,6 @@ context('Locations List', () => {
     })
   })
 
-  context('Service filter', () => {
-    beforeEach(() => {
-      cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
-      cy.task('stubManageUsersMe')
-      cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubNonResidentialLocationWithStatuses', {
-        prisonId: 'TST',
-        locations: [
-          { id: 'loc-1', localName: 'Active Gym', status: 'ACTIVE' },
-          { id: 'loc-2', localName: 'Inactive Chapel', status: 'INACTIVE' },
-        ],
-      })
-      cy.task('stubLocationsConstantsNonResidentialUsageType')
-      cy.task('stubLocationsConstantsServiceTypes')
-      cy.task('stubLocationsConstantsServiceFamilyTypes')
-      cy.task('stubComponents')
-      cy.task('stubGetPrisonConfiguration')
-    })
-
-    it('should render the service filter as single-select radio buttons', () => {
-      cy.signIn()
-      IndexPage.forViewUser()
-      cy.get('[data-qa=service-filter-radios]').should('exist')
-      cy.get('[data-qa=service-filter-radios] input[type=radio]').should('have.length.greaterThan', 1)
-      cy.get('[data-qa=service-filter-radios] input[type=checkbox]').should('not.exist')
-    })
-
-    it('should select "All services" by default', () => {
-      cy.signIn()
-      IndexPage.forViewUser()
-      cy.get('#serviceFamilyType-ALL').should('be.checked')
-    })
-
-    it('should apply a single service filter and reflect it in the URL', () => {
-      cy.signIn()
-      IndexPage.forViewUser()
-
-      cy.get('[data-qa=service-filter-radios] input[value="ACTIVITIES_APPOINTMENTS"]').check()
-      cy.get('[data-qa=apply-filter-button]').click()
-
-      cy.url().should('include', 'serviceFamilyType=ACTIVITIES_APPOINTMENTS')
-      cy.get('#serviceFamilyType-ACTIVITIES_APPOINTMENTS').should('be.checked')
-    })
-
-    it('should not error when the URL carries more than one service family type', () => {
-      cy.signIn()
-      cy.visit('/prison/TST?serviceFamilyType=ACTIVITIES_APPOINTMENTS&serviceFamilyType=TEST_TYPE')
-
-      // The page renders normally rather than showing the generic error page
-      cy.get('h1').should('contain.text', 'View non-residential locations')
-      cy.get('[data-qa=locations-table]').should('exist')
-      // Only the first service family type is applied
-      cy.get('#serviceFamilyType-ACTIVITIES_APPOINTMENTS').should('be.checked')
-    })
-  })
-
   context('View-only user (VIEW_INTERNAL_LOCATION role)', () => {
     beforeEach(() => {
       cy.task('reset')
