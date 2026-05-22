@@ -41,6 +41,25 @@ describe('LocationsService', () => {
     })
   })
 
+  it('should pass a single serviceFamilyType to the API', async () => {
+    await locationsService.getNonResidentialLocations(
+      'some-token',
+      'MDI',
+      '0',
+      ['ACTIVE'],
+      'localName,asc',
+      'ADJUDICATIONS',
+    )
+    expect(locationsApiClient.locations.getNonResidentialSummary).toHaveBeenCalledWith('some-token', {
+      page: '0',
+      prisonId: 'MDI',
+      size: '35',
+      sort: 'localName,asc',
+      status: 'ACTIVE',
+      serviceFamilyType: 'ADJUDICATIONS',
+    })
+  })
+
   it('should get non-residential location by local name', async () => {
     await locationsService.getNonResidentialLocationByLocalName('some-token', 'MDI', 'GYM')
     expect(locationsApiClient.locations.getNonResidentialLocationByLocalName).toHaveBeenCalledWith('some-token', {
