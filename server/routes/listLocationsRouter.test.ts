@@ -684,6 +684,96 @@ describe('GET /prison/TST', () => {
     })
   })
 
+  describe('"View all results" link', () => {
+    beforeEach(() => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => user,
+        canAccess: () => false,
+      })
+    })
+
+    it('should render the link with size=<totalElements> when there is more than one page', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      const multiPageResponse = {
+        ...mockLocationsResponse,
+        locations: {
+          ...mockLocationsResponse.locations,
+          totalPages: 2,
+          totalElements: 70,
+        },
+      }
+      locationsService.getNonResidentialLocations.mockResolvedValue(multiPageResponse)
+
+      return request(app)
+        .get('/prison/TST')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).toMatch(/href="[^"]*size=70[^"]*"[^>]*data-qa="view-all-results-link"/)
+          expect(res.text).toContain('View all results')
+        })
+    })
+
+    it('should not render the link when only one page of results', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+
+      return request(app)
+        .get('/prison/TST')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).not.toContain('data-qa="view-all-results-link"')
+        })
+    })
+
+    it('should not render the link when viewing all results on a single page (size matches total)', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      const singlePageAllResponse = {
+        ...mockLocationsResponse,
+        locations: {
+          ...mockLocationsResponse.locations,
+          pageable: { pageSize: 70, pageNumber: 0 },
+          totalPages: 1,
+          totalElements: 70,
+        },
+      }
+      locationsService.getNonResidentialLocations.mockResolvedValue(singlePageAllResponse)
+
+      return request(app)
+        .get('/prison/TST?size=70')
+        .expect(200)
+        .expect(res => {
+          expect(res.text).not.toContain('data-qa="view-all-results-link"')
+        })
+    })
+
+    it('should preserve filters and sort in the view-all link', () => {
+      auditService.logPageView.mockResolvedValue(null)
+      const multiPageResponse = {
+        ...mockLocationsResponse,
+        locations: {
+          ...mockLocationsResponse.locations,
+          totalPages: 2,
+          totalElements: 70,
+        },
+      }
+      locationsService.getNonResidentialLocations.mockResolvedValue(multiPageResponse)
+
+      return request(app)
+        .get('/prison/TST?status=ACTIVE&serviceFamilyType=ADJUDICATIONS&sort=status,desc')
+        .expect(200)
+        .expect(res => {
+          const match = res.text.match(/href="([^"]+)"[^>]*data-qa="view-all-results-link"/)
+          expect(match).toBeTruthy()
+          expect(match[1]).toContain('status=ACTIVE')
+          expect(match[1]).toContain('serviceFamilyType=ADJUDICATIONS')
+          expect(match[1]).toContain('sort=status,desc')
+          expect(match[1]).toContain('size=70')
+          expect(match[1]).not.toContain('page=')
+        })
+    })
+  })
+
   describe('for edit user', () => {
     beforeEach(() => {
       app = appWithAllRoutes({

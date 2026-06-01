@@ -219,6 +219,7 @@ export default function routes({ locationsService }: Services): Router {
           clearAllHref,
           sort: sortParam,
           sortHrefTemplate: `${buildQueryString({ ...filterState, sort: '{sortKey},{sortDirection}' })}`,
+          viewAllHref: null as string | null,
         })
       }
 
@@ -243,6 +244,7 @@ export default function routes({ locationsService }: Services): Router {
       // Build href template preserving status filter, service filter, and sort
       const hrefTemplate = `${buildQueryString(filterState)}&page={page}`
       const sortHrefTemplate = `${buildQueryString({ ...filterState, sort: '{sortKey},{sortDirection}' })}`
+      const viewAllHref = buildQueryString({ ...filterState, size: locations.totalElements })
 
       res.locals.paginationLocals = {
         totalPages: locations.totalPages,
@@ -269,6 +271,7 @@ export default function routes({ locationsService }: Services): Router {
         clearAllHref,
         sort: sortParam,
         sortHrefTemplate,
+        viewAllHref,
       })
     }),
   )

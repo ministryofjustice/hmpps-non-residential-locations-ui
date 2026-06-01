@@ -274,6 +274,85 @@ export default {
       },
     }),
 
+  stubNonResidentialLocationMultiPage: ({
+    prisonId,
+    totalElements,
+    defaultPageSize = 35,
+  }: {
+    prisonId: string
+    totalElements: number
+    defaultPageSize?: number
+  }): SuperAgentRequest[] => {
+    const buildLocation = (i: number) => ({
+      id: `loc-${i}`,
+      prisonId,
+      localName: `Location ${i}`,
+      code: `0${i}`,
+      pathHierarchy: `A-1-0${i}`,
+      locationType: 'ADJUDICATION_ROOM',
+      permanentlyInactive: false,
+      usedByGroupedServices: ['ACTIVITIES_APPOINTMENTS'],
+      usedByServices: ['APPOINTMENT'],
+      status: 'ACTIVE',
+      level: 1,
+      isLeafLevel: true,
+    })
+
+    const buildPage = (pageSize: number, pageNumber: number, count: number, totalPages: number) => ({
+      prisonId,
+      locations: {
+        totalElements,
+        totalPages,
+        size: pageSize,
+        content: Array.from({ length: count }, (_, i) => buildLocation(pageNumber * pageSize + i + 1)),
+        number: pageNumber,
+        first: pageNumber === 0,
+        last: pageNumber === totalPages - 1,
+        sort: { empty: true, sorted: true, unsorted: true },
+        numberOfElements: count,
+        pageable: {
+          offset: pageNumber * pageSize,
+          sort: { empty: true, sorted: true, unsorted: true },
+          pageSize,
+          paged: true,
+          pageNumber,
+          unpaged: false,
+        },
+        empty: count === 0,
+      },
+    })
+
+    const totalPages = Math.ceil(totalElements / defaultPageSize)
+
+    return [
+      stubFor({
+        priority: 1,
+        request: {
+          method: 'GET',
+          urlPath: `/locations-api/locations/non-residential/summary/${prisonId}`,
+          queryParameters: { size: { equalTo: String(totalElements) } },
+        },
+        response: {
+          status: 200,
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+          jsonBody: buildPage(totalElements, 0, totalElements, 1),
+        },
+      }),
+      stubFor({
+        priority: 5,
+        request: {
+          method: 'GET',
+          urlPath: `/locations-api/locations/non-residential/summary/${prisonId}`,
+        },
+        response: {
+          status: 200,
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+          jsonBody: buildPage(defaultPageSize, 0, defaultPageSize, totalPages),
+        },
+      }),
+    ]
+  },
+
   stubLocationsConstantsNonResidentialUsageType: () =>
     stubFor({
       request: {
