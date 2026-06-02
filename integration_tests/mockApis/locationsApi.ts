@@ -1,4 +1,4 @@
-import { SuperAgentRequest } from 'superagent'
+import { SuperAgentRequest, Response } from 'superagent'
 import { stubFor } from './wiremock'
 
 export default {
@@ -282,7 +282,7 @@ export default {
     prisonId: string
     totalElements: number
     defaultPageSize?: number
-  }): SuperAgentRequest[] => {
+  }): Promise<Response[]> => {
     const buildLocation = (i: number) => ({
       id: `loc-${i}`,
       prisonId,
@@ -324,7 +324,7 @@ export default {
 
     const totalPages = Math.ceil(totalElements / defaultPageSize)
 
-    return [
+    return Promise.all([
       stubFor({
         priority: 1,
         request: {
@@ -350,7 +350,7 @@ export default {
           jsonBody: buildPage(defaultPageSize, 0, defaultPageSize, totalPages),
         },
       }),
-    ]
+    ])
   },
 
   stubLocationsConstantsNonResidentialUsageType: () =>
