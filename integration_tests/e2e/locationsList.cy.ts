@@ -287,6 +287,45 @@ context('Locations List', () => {
     })
   })
 
+  context('View all results link', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubNonResidentialLocationMultiPage', { prisonId: 'TST', totalElements: 70 })
+      cy.task('stubLocationsConstantsNonResidentialUsageType')
+      cy.task('stubLocationsConstantsServiceTypes')
+      cy.task('stubLocationsConstantsServiceFamilyTypes')
+      cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
+    })
+
+    it('should display the link when there is more than one page', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+      cy.get('[data-qa=view-all-results-link]').should('exist').and('contain.text', 'View all results')
+      cy.get('[data-qa=view-all-results-link]').should('have.attr', 'href').and('include', 'size=70')
+    })
+
+    it('should hide pagination and the link after navigating to view all', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+      cy.get('[data-qa=view-all-results-link]').click()
+      cy.url().should('include', 'size=70')
+      cy.get('[data-qa=view-all-results-link]').should('not.exist')
+      cy.get('.moj-pagination__list').should('not.exist')
+    })
+
+    it('should restore pagination and the link when returning to the default page', () => {
+      cy.signIn()
+      cy.visit('/prison/TST?size=70')
+      cy.get('[data-qa=view-all-results-link]').should('not.exist')
+      cy.visit('/prison/TST')
+      cy.get('[data-qa=view-all-results-link]').should('exist')
+    })
+  })
+
   context('Archive link visibility', () => {
     beforeEach(() => {
       cy.task('reset')

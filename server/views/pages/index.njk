@@ -18,6 +18,12 @@
 
     {{ simplePagination(paginationLocals) }}
 
+    {% if paginationLocals.totalPages > 1 %}
+      <p class="govuk-body">
+        <a href="{{ viewAllHref }}" class="govuk-link" data-qa="view-all-results-link">View all results</a>
+      </p>
+    {% endif %}
+
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-quarter locations-filter-column">
         <div class="locations-filter" data-qa="locations-filter">
