@@ -4,6 +4,8 @@ import type { Services } from '../services'
 import logger from '../../logger'
 import validateCaseload from '../middleware/validateCaseload'
 import asyncMiddleware from '../middleware/asyncMiddleware'
+import logPageView from '../middleware/logPageView'
+import { Page } from '../services/auditService'
 
 const ALL_STATUSES = ['ACTIVE', 'INACTIVE', 'ARCHIVED']
 
@@ -37,7 +39,7 @@ function buildQueryString(state: FilterState, overrides: Partial<{ page: number 
   return `?${parts.join('&')}`
 }
 
-export default function routes({ locationsService }: Services): Router {
+export default function routes({ locationsService, auditService }: Services): Router {
   const router = Router()
 
   router.get('/', (req, res) => {
@@ -51,6 +53,7 @@ export default function routes({ locationsService }: Services): Router {
       next()
     },
     validateCaseload(),
+    logPageView(auditService, Page.LIST_NON_RESIDENTIAL_LOCATIONS),
     asyncMiddleware(async (req, res, next) => {
       const { systemToken } = req.session
       const { prisonId } = res.locals

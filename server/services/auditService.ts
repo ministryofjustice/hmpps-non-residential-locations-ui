@@ -1,7 +1,7 @@
 import HmppsAuditClient, { AuditEvent } from '../data/hmppsAuditClient'
 
 export enum Page {
-  EXAMPLE_PAGE = 'EXAMPLE_PAGE',
+  LIST_NON_RESIDENTIAL_LOCATIONS = 'LIST_NON_RESIDENTIAL_LOCATIONS',
 }
 
 export interface PageViewEventDetails {
