@@ -88,7 +88,7 @@
     "cypress": "^15.15.0",
     "cypress-multi-reporters": "^2.0.5",
     "cypress-split": "^1.24.31",
-    "esbuild": "^0.28.0",
+    "esbuild": "^0.28.1",
     "esbuild-plugin-clean": "^1.0.1",
     "esbuild-plugin-copy": "^2.1.1",
     "esbuild-plugin-manifest": "^1.0.5",
@@ -116,8 +116,15 @@
     "nunjucks": {
       "chokidar": "$chokidar"
     },
+    "@opentelemetry/core": "2.8.0",
+    "@opentelemetry/resources": "2.8.0",
+    "@opentelemetry/sdk-trace-base": "2.8.0",
+    "@opentelemetry/sdk-trace-web": "2.8.0",
+    "js-yaml": "4.2.0",
+    "form-data": "4.0.6",
+    "diff": "8.0.3",
     "qs": "6.15.2",
-    "tar": "7.5.15",
+    "tar": "7.5.16",
     "serialize-javascript": "7.0.5",
     "tmp": "0.2.7"
   }
