@@ -19,7 +19,6 @@ generic-service:
     SERVICE_RESIDENTIAL_LOCATIONS_URL: "https://locations-inside-prison-preprod.hmpps.service.justice.gov.uk"
     ENVIRONMENT_NAME: PRE-PRODUCTION
     AUDIT_ENABLED: "false"
-    GOOGLE_ANALYTICS_MEASUREMENT_ID: "G-L22V4RLXBV"
 
 generic-prometheus-alerts:
   alertSeverity: move-a-prisoner-alerts-nonprod
