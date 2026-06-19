@@ -110,5 +110,8 @@ export default {
     locationsLanding: get('SERVICE_LOCATIONS_LANDING_URL', 'http://localhost:3000', requiredInProduction),
     residentialLocations: get('SERVICE_RESIDENTIAL_LOCATIONS_URL', 'http://localhost:3000', requiredInProduction),
   },
+  googleAnalytics: {
+    measurementId: get('GOOGLE_ANALYTICS_MEASUREMENT_ID', ''),
+  },
   environmentName: get('ENVIRONMENT_NAME', ''),
 }
