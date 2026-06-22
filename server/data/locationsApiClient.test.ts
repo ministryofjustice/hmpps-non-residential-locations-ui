@@ -1,7 +1,7 @@
 import nock from 'nock'
-import { createClient } from 'redis'
 import config from '../config'
 import LocationsApiClient from './locationsApiClient'
+import { RedisClient } from './redisClient'
 
 describe('LocationsApiClient', () => {
   const token = { access_token: 'token-1', expires_in: 300 }
@@ -25,7 +25,7 @@ describe('LocationsApiClient', () => {
 
   beforeEach(() => {
     fakeApi = nock(config.apis.locationsApi.url)
-    locationsApiClient = new LocationsApiClient(redisClient as unknown as ReturnType<typeof createClient>, null)
+    locationsApiClient = new LocationsApiClient(redisClient as unknown as RedisClient, null)
     redisClient.cache = {}
   })
 
