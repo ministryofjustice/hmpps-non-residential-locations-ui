@@ -1,0 +1,43 @@
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+
+{#
+  Renders the "Location" cell for the non-residential locations table.
+
+  Because parents and their children can share the same local name (e.g. a
+  parent "Gym" and a child "Gym"), this adds minimal context so users can tell
+  them apart:
+    - a "Parent" tag on non-leaf locations, and
+    - an expandable reveal on child locations showing the immediate parent and
+      the full readable hierarchy path.
+
+  parentLocalName and localNamePath are supplied by the locations API summary
+  response (NonResidentialLocationDTO).
+#}
+{% macro locationName(item) %}
+  <div class="locations-table__location">
+    {{ item.localName }}
+
+    {% if item.isLeafLevel === false %}
+      {{ govukTag({
+        text: "Parent",
+        classes: "govuk-tag--grey govuk-!-font-weight-regular locations-table__parent-tag",
+        attributes: { "data-qa": "parent-tag" }
+      }) }}
+    {% endif %}
+
+    {% if item.parentId and item.parentLocalName %}
+      {% set hierarchyHtml %}
+        <p class="govuk-body-s govuk-!-margin-bottom-1">Part of <span class="govuk-!-font-weight-bold">{{ item.parentLocalName }}</span></p>
+        {% if item.localNamePath %}
+          <p class="govuk-hint govuk-body-s govuk-!-margin-bottom-0" data-qa="location-path">{{ item.localNamePath }}</p>
+        {% endif %}
+      {% endset %}
+      {{ govukDetails({
+        summaryHtml: 'Show location details<span class="govuk-visually-hidden"> for ' ~ item.localName ~ '</span>',
+        html: hierarchyHtml,
+        attributes: { "data-qa": "location-hierarchy" }
+      }) }}
+    {% endif %}
+  </div>
+{% endmacro %}

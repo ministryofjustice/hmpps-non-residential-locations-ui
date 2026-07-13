@@ -278,6 +278,28 @@ button.govuk-back-link {
   white-space: nowrap;
 }
 
+.locations-table__location {
+  .locations-table__parent-tag {
+    margin-left: govuk-spacing(1);
+  }
+
+  // Override the global negative margin on details (used in form contexts) so
+  // the reveal sits neatly beneath the location name inside the table cell.
+  .govuk-details {
+    margin-top: govuk-spacing(1);
+    margin-bottom: 0;
+  }
+
+  .govuk-details__summary {
+    @include govuk-font($size: 16);
+  }
+
+  .govuk-details__text {
+    padding-top: govuk-spacing(1);
+    padding-bottom: 0;
+  }
+}
+
 .locations-table-column {
   @include govuk-media-query($from: desktop) {
     width: 70%;
