@@ -39,4 +39,10 @@ export default class IndexPage extends Page {
 
   sortableColumnButton = (sortKey: string): PageElement =>
     cy.get(`[data-qa=locations-table] th[data-sort-key="${sortKey}"] button`)
+
+  locationHierarchy = (): PageElement => cy.get('[data-qa=location-hierarchy]')
+
+  locationPath = (): PageElement => cy.get('[data-qa=location-path]')
+
+  parentTag = (): PageElement => cy.get('[data-qa=parent-tag]')
 }

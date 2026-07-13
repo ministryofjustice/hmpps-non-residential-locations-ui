@@ -326,6 +326,51 @@ context('Locations List', () => {
     })
   })
 
+  context('Parent and hierarchy display', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
+      cy.task('stubLocationsConstantsNonResidentialUsageType')
+      cy.task('stubLocationsConstantsServiceTypes')
+      cy.task('stubLocationsConstantsServiceFamilyTypes')
+      cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
+    })
+
+    it('shows an expandable reveal with the parent hierarchy for child locations', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+      indexPage.locationHierarchy().should('exist').and('contain.text', 'Show location details')
+
+      // Path is revealed only after expanding the details
+      indexPage.locationHierarchy().find('summary').click()
+      indexPage.locationHierarchy().should('contain.text', 'Part of').and('contain.text', 'Houseblock 1')
+      indexPage.locationPath().should('contain.text', 'Houseblock 1 › Gym')
+    })
+
+    it('shows a Parent tag for parent (non-leaf) locations', () => {
+      cy.task('stubNonResidentialLocation', { prisonId: 'TST', isLeafLevel: false })
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+      indexPage.parentTag().should('exist').and('contain.text', 'Parent')
+    })
+
+    it('shows no hierarchy or Parent tag for standalone top-level locations', () => {
+      cy.task('stubNonResidentialLocationWithStatuses', {
+        prisonId: 'TST',
+        locations: [{ id: 'loc-1', localName: 'Solo Room', status: 'ACTIVE' }],
+      })
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+      indexPage.locationsTable().should('contain.text', 'Solo Room')
+      indexPage.locationHierarchy().should('not.exist')
+      indexPage.parentTag().should('not.exist')
+    })
+  })
+
   context('Archive link visibility', () => {
     beforeEach(() => {
       cy.task('reset')
