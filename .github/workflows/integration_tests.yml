@@ -63,7 +63,7 @@ jobs:
 
       - name: restore cache
         id: restore-cache
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
         env:
           cache-name: node-modules
         with:
@@ -86,7 +86,7 @@ jobs:
           sleep 5
 
       - name: Run split Cypress tests 🧪
-        uses: cypress-io/github-action@948d67d3074f1bbb6379c8bdbb04e95d2f8e593f # v7.4.0
+        uses: cypress-io/github-action@fa4a118725a8f001170d49631ea89e5d66fee626 # v7.4.1
         with:
           browser: chrome
         env:
