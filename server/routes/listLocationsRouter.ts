@@ -1,7 +1,9 @@
 import { Router } from 'express'
 
 import type { Services } from '../services'
+import type { Location } from '../@types/locationsApi/locationsApiTypes'
 import logger from '../../logger'
+import deriveLocationHierarchy from '../utils/deriveLocationHierarchy'
 import validateCaseload from '../middleware/validateCaseload'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import logPageView from '../middleware/logPageView'
@@ -241,6 +243,17 @@ export default function routes({ locationsService, auditService }: Services): Ro
       const { locations } = locationsResult
       const { pageable } = locations
 
+      // Attach derived parent/hierarchy display strings so the locations table can show
+      // which parent each (identically-named) child belongs to. Derived from the API's
+      // structured `locationHierarchy` so the Nunjucks template stays presentation-only.
+      const locationsWithHierarchy = {
+        ...locations,
+        content: (locations.content ?? []).map((item: Location) => ({
+          ...item,
+          ...deriveLocationHierarchy(item.locationHierarchy),
+        })),
+      }
+
       const rowFrom = pageable.pageSize * pageable.pageNumber + 1
       const rowTo = rowFrom + locations.numberOfElements - 1
 
@@ -262,7 +275,7 @@ export default function routes({ locationsService, auditService }: Services): Ro
 
       return res.render('pages/index', {
         ...res.locals,
-        locations,
+        locations: locationsWithHierarchy,
         canEdit,
         selectedStatuses,
         selectedServiceFamilyTypes,

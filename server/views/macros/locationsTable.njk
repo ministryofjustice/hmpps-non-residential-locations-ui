@@ -2,6 +2,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% from "./locationStatusTag.njk" import locationStatusTag %}
+{% from "./locationHierarchy.njk" import locationName %}
 
 {% macro locationsTable (locations, pagingData, usageTypesData, canEdit, sort, sortHrefTemplate) %}
 
@@ -14,7 +15,7 @@
       {% if canEdit %}
         {% set rows = (rows.push(
           [
-            { html: item.localName, attributes: { "data-sort-value": item.localName } },
+            { html: locationName(item), attributes: { "data-sort-value": item.localName } },
             { html: locationStatusTag(item), attributes: { "data-sort-value": item.status } },
             { html: usageTypes(item.usedByGroupedServices, usageTypesData) },
             { html: editLink(item) }
@@ -23,7 +24,7 @@
       {% else %}
         {% set rows = (rows.push(
           [
-            { html: item.localName, attributes: { "data-sort-value": item.localName } },
+            { html: locationName(item), attributes: { "data-sort-value": item.localName } },
             { html: locationStatusTag(item), attributes: { "data-sort-value": item.status } },
             { html: usageTypes(item.usedByGroupedServices, usageTypesData) }
           ]

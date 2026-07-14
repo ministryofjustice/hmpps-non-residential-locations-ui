@@ -160,6 +160,24 @@ export default {
                 deactivatedBy: 'string',
                 level: 1,
                 parentId: '57718979-573c-433a-9e51-2d83f887c11c',
+                locationHierarchy: [
+                  {
+                    prisonId: 'MDI',
+                    code: 'A-1',
+                    localName: 'Houseblock 1',
+                    pathHierarchy: 'A-1',
+                    type: 'WING',
+                    level: 1,
+                  },
+                  {
+                    prisonId: 'MDI',
+                    code: '001',
+                    localName: 'Gym',
+                    pathHierarchy: 'A-1-001',
+                    type: 'ADJUDICATION_ROOM',
+                    level: 2,
+                  },
+                ],
                 isLeafLevel,
               },
               ...(includeArchived
