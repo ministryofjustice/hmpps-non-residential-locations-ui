@@ -85,7 +85,7 @@
     "aws-sdk-client-mock": "^4.1.0",
     "chokidar": "^5.0.0",
     "concurrently": "^10.0.0",
-    "cypress": "^15.15.0",
+    "cypress": "^15.18.1",
     "cypress-multi-reporters": "^2.0.5",
     "cypress-split": "^1.24.31",
     "esbuild": "^0.28.1",
