@@ -26,6 +26,7 @@ describe('Confirm (Archive) controller', () => {
   ]
 
   const archiveNonResidentialLocation = jest.fn()
+  const hideNonResidentialLocation = jest.fn()
   const getServiceFamilyTypes = jest.fn()
 
   beforeEach(() => {
@@ -38,6 +39,7 @@ describe('Confirm (Archive) controller', () => {
       services: {
         locationsService: {
           archiveNonResidentialLocation,
+          hideNonResidentialLocation,
           getServiceFamilyTypes,
         },
       },
@@ -56,6 +58,7 @@ describe('Confirm (Archive) controller', () => {
           id: 'loc-123',
           prisonId: 'MDI',
           localName: 'gymnasium',
+          isLeafLevel: true,
           usedByGroupedServices: ['ACTIVITIES_APPOINTMENTS'],
         },
         serviceFamilyTypes: mockServiceFamilyTypes,
@@ -66,6 +69,7 @@ describe('Confirm (Archive) controller', () => {
     jest.clearAllMocks()
     getServiceFamilyTypes.mockResolvedValue(mockServiceFamilyTypes)
     archiveNonResidentialLocation.mockResolvedValue({})
+    hideNonResidentialLocation.mockResolvedValue({})
   })
 
   describe('setOptions()', () => {
@@ -121,14 +125,60 @@ describe('Confirm (Archive) controller', () => {
 
       expect(locals.servicesAffected).toEqual(['Activities and appointments', 'Use of force'])
     })
+
+    describe('for a parent location', () => {
+      beforeEach(() => {
+        res.locals!.locationDetails.isLeafLevel = false
+        res.locals!.locationDetails.canBeHiddenFromList = true
+      })
+
+      it('uses parent wording and lists no affected services', () => {
+        const locals = controller.locals(req as FormWizard.Request, res as Response)
+
+        expect(locals.heading).toBe('Are you sure you want to archive Gymnasium?')
+        expect(locals.hint).toContain('removed from your list')
+        expect(locals.hint).toContain('locations inside it will not be affected')
+        expect(locals.servicesAffected).toEqual([])
+      })
+
+      it('sends Back and Go back to the list, not the archive-or-inactive step', () => {
+        const locals = controller.locals(req as FormWizard.Request, res as Response)
+
+        expect(locals.backLink).toBe('/prison/MDI')
+        expect(locals.goBackLink).toBe('/prison/MDI')
+      })
+    })
   })
 
   describe('saveValues()', () => {
-    it('calls archiveNonResidentialLocation and continues', async () => {
+    it('archives a leaf location and continues', async () => {
       await controller.saveValues(req as FormWizard.Request, res as Response, next)
 
       expect(archiveNonResidentialLocation).toHaveBeenCalledWith('token-123', 'loc-123')
+      expect(hideNonResidentialLocation).not.toHaveBeenCalled()
       expect(next).toHaveBeenCalled()
+    })
+
+    it('hides a parent location from the list instead of archiving it', async () => {
+      res.locals!.locationDetails.isLeafLevel = false
+      res.locals!.locationDetails.canBeHiddenFromList = true
+
+      await controller.saveValues(req as FormWizard.Request, res as Response, next)
+
+      expect(hideNonResidentialLocation).toHaveBeenCalledWith('token-123', 'loc-123')
+      expect(archiveNonResidentialLocation).not.toHaveBeenCalled()
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('fails closed when a parent that cannot be hidden reaches confirmation', async () => {
+      res.locals!.locationDetails.isLeafLevel = false
+      res.locals!.locationDetails.canBeHiddenFromList = false
+
+      await controller.saveValues(req as FormWizard.Request, res as Response, next)
+
+      expect(hideNonResidentialLocation).not.toHaveBeenCalled()
+      expect(archiveNonResidentialLocation).not.toHaveBeenCalled()
+      expect(next).toHaveBeenCalledWith(expect.any(Error))
     })
 
     it('passes error to next on failure', async () => {

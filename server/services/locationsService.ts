@@ -81,6 +81,12 @@ export default class LocationsService {
     )
   }
 
+  // Removes a parent location from the non-residential locations list (MAPB-670). Presented to
+  // users as archiving, but nothing is deactivated - the location and its children are unaffected.
+  async hideNonResidentialLocation(token: string, locationId: string) {
+    return this.locationsApiClient.locations.hideNonResidentialLocation(token, { locationId })
+  }
+
   async getPrisonConfiguration(token: string, prisonId: string) {
     return this.locationsApiClient.locations.prisonConfiguration(token, { prisonId })
   }

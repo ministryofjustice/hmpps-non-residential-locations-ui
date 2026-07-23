@@ -21,30 +21,50 @@ export default class Confirm extends FormInitialStep {
   override locals(req: FormWizard.Request, res: Response): Record<string, unknown> {
     const locals = super.locals(req, res)
     const { locationDetails, serviceFamilyTypes } = res.locals
-    const { localName, id: locationId } = locationDetails
+    const { localName, id: locationId, isLeafLevel } = locationDetails
+
+    const locationNameSentenceCase = capFirst(localName)
+    const title = `Are you sure you want to archive ${locationNameSentenceCase}?`
+    res.locals.title = title
+
+    // A parent location is not archived in the true sense - it is hidden from the list (MAPB-670).
+    // Nothing loses access and, by the time we get here, no service uses it, so the leaf wording
+    // about affected services and lingering document references does not apply.
+    if (!isLeafLevel) {
+      const backLink = backUrl(req, {
+        fallbackUrl: `/prison/${locationDetails.prisonId}`,
+      })
+
+      return {
+        ...locals,
+        backLink,
+        goBackLink: `/prison/${locationDetails.prisonId}`,
+        heading: title,
+        hint: 'It will be removed from your list of non-residential locations. Any locations inside it will not be affected and will stay in the list.',
+        buttonText: 'Archive location',
+        servicesAffected: [] as string[],
+      }
+    }
 
     const backLink = backUrl(req, {
       fallbackUrl: `/location/${locationId}/archive/archive-or-inactive`,
     })
 
-    const locationNameSentenceCase = capFirst(localName)
-
     // Get the services that will be affected
     const servicesAffected = getServicesAffected(locationDetails.usedByGroupedServices, serviceFamilyTypes)
 
     // Build heading - include services list if any
-    let heading = `Are you sure you want to archive ${locationNameSentenceCase}?`
+    let heading = title
     if (servicesAffected.length > 0) {
       heading += '<br><br>These services will not have access:'
     }
-
-    res.locals.title = `Are you sure you want to archive ${locationNameSentenceCase}?`
 
     return {
       ...locals,
       backLink,
       goBackLink: `/location/${locationId}/archive/archive-or-inactive`,
       heading,
+      hint: 'References to the location will remain in existing documents such as use of force reports.',
       buttonText: 'Archive location',
       servicesAffected,
     }
@@ -56,7 +76,16 @@ export default class Confirm extends FormInitialStep {
       const { locationDetails } = res.locals
       const { locationsService } = req.services
 
-      await locationsService.archiveNonResidentialLocation(systemToken, locationDetails.id)
+      // A parent location is hidden from the list rather than genuinely archived. Fail closed if it
+      // somehow reaches here without being eligible, rather than relying on the link being hidden.
+      if (!locationDetails.isLeafLevel) {
+        if (!locationDetails.canBeHiddenFromList) {
+          throw new Error(`Location ${locationDetails.id} cannot be hidden from the list`)
+        }
+        await locationsService.hideNonResidentialLocation(systemToken, locationDetails.id)
+      } else {
+        await locationsService.archiveNonResidentialLocation(systemToken, locationDetails.id)
+      }
 
       next()
     } catch (error) {
