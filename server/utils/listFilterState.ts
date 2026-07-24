@@ -101,10 +101,20 @@ function parseQuery(query: Request['query']): FilterState {
  * choice, so it is parsed as-is and becomes the new memory.
  */
 export default function resolveFilterState(req: Request, prisonId: string): FilterState {
-  const remembered = req.session.nonResidentialListFilters?.[prisonId]
+  const remembered = req.session.nonResidentialListFilters?.[prisonId] as Partial<RememberedFilterState> | undefined
 
   if (remembered && Object.keys(req.query).length === 0) {
-    return { ...remembered, size: DEFAULT_PAGE_SIZE }
+    // Normalise defensively. A filter remembered by an earlier version of this code may not carry
+    // every field - notably the service filter changed from families (serviceFamilyTypes) to types
+    // (serviceTypes) - so fall back to safe defaults rather than returning an incomplete state that
+    // would break callers expecting arrays.
+    return {
+      statuses: Array.isArray(remembered.statuses) ? remembered.statuses : DEFAULT_STATUSES,
+      serviceTypes: Array.isArray(remembered.serviceTypes) ? remembered.serviceTypes : [],
+      sort: parseSort(remembered.sort),
+      localName: remembered.localName ?? null,
+      size: DEFAULT_PAGE_SIZE,
+    }
   }
 
   const filterState = parseQuery(req.query)
