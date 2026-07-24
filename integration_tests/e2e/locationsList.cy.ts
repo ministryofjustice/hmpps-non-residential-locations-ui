@@ -205,6 +205,42 @@ context('Locations List', () => {
     })
   })
 
+  context('Service type filter', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubNonResidentialLocationWithStatuses', {
+        prisonId: 'TST',
+        locations: [{ id: 'loc-1', localName: 'Hearing Room', status: 'ACTIVE' }],
+      })
+      cy.task('stubLocationsConstantsNonResidentialUsageType')
+      cy.task('stubLocationsConstantsServiceTypes')
+      cy.task('stubLocationsConstantsServiceFamilyTypes')
+      cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
+    })
+
+    it('shows a checkbox per service type, not per family', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+      cy.get('[data-qa=service-filter-checkboxes] input[name="serviceType"][value="TEST_TYPE"]').should('exist')
+      cy.get('[data-qa=service-filter-checkboxes]').should('contain.text', 'Test type')
+    })
+
+    it('applies a service type as a serviceType query param and shows a chip', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+
+      cy.get('[data-qa=service-filter-checkboxes] input[value="TEST_TYPE"]').check()
+      cy.get('[data-qa=apply-filter-button]').click()
+
+      cy.url().should('include', 'serviceType=TEST_TYPE')
+      cy.get('[data-qa=selected-service-chips]').should('contain.text', 'Test type')
+    })
+  })
+
   context('Filter memory', () => {
     beforeEach(() => {
       cy.task('reset')

@@ -98,10 +98,10 @@
                 Services that use non-residential locations
               </legend>
               <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes" data-qa="service-filter-checkboxes">
-                {% for option in serviceFamilyOptions %}
+                {% for option in serviceTypeOptions %}
                   <div class="govuk-checkboxes__item">
-                    <input class="govuk-checkboxes__input" id="serviceFamilyType-{{ option.key }}" name="serviceFamilyType" type="checkbox" value="{{ option.key }}" {{ "checked" if option.checked }}>
-                    <label class="govuk-label govuk-checkboxes__label" for="serviceFamilyType-{{ option.key }}">
+                    <input class="govuk-checkboxes__input" id="serviceType-{{ option.key }}" name="serviceType" type="checkbox" value="{{ option.key }}" {{ "checked" if option.checked }}>
+                    <label class="govuk-label govuk-checkboxes__label" for="serviceType-{{ option.key }}">
                       {{ option.description }} ({{ option.count }})
                     </label>
                   </div>

@@ -55,23 +55,21 @@ const mockLocationsResponse: NonResidentialSummary = {
   },
 }
 
-const mockServiceFamilyTypes: Array<{ key: string; description: string; values: never[] }> = [
+const mockServiceTypes: Array<{ key: string; description: string }> = [
   {
-    key: 'ACTIVITIES_APPOINTMENTS',
-    description: 'Activities and appointments',
-    values: [],
+    key: 'APPOINTMENT',
+    description: 'Appointments',
   },
   {
-    key: 'ADJUDICATIONS',
-    description: 'Adjudications',
-    values: [],
+    key: 'HEARING_LOCATION',
+    description: 'Adjudications - hearing location',
   },
 ]
 
 beforeEach(() => {
   // Default mock for location counts - can be overridden in specific tests
   locationsService.getNonResidentialLocationCount.mockResolvedValue(10)
-  locationsService.getServiceFamilyTypes.mockResolvedValue(mockServiceFamilyTypes)
+  locationsService.getServiceTypes.mockResolvedValue(mockServiceTypes)
 })
 
 afterEach(() => {
@@ -304,7 +302,7 @@ describe('GET /prison/TST', () => {
     })
   })
 
-  describe('service family filter', () => {
+  describe('service type filter', () => {
     beforeEach(() => {
       app = appWithAllRoutes({
         services: { auditService, locationsService },
@@ -313,7 +311,7 @@ describe('GET /prison/TST', () => {
       })
     })
 
-    it('should pass no service family filter to API when not provided', () => {
+    it('should pass no service type filter to API when not provided', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
@@ -339,7 +337,7 @@ describe('GET /prison/TST', () => {
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
       return request(app)
-        .get('/prison/TST?serviceFamilyType=ACTIVITIES_APPOINTMENTS')
+        .get('/prison/TST?serviceType=APPOINTMENT')
         .expect(200)
         .expect(() => {
           expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
@@ -348,19 +346,19 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE'],
             'localName,asc',
-            ['ACTIVITIES_APPOINTMENTS'],
+            ['APPOINTMENT'],
             null,
             35,
           )
         })
     })
 
-    it('should pass multiple service family types when more than one provided', () => {
+    it('should pass multiple service types when more than one provided', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
       return request(app)
-        .get('/prison/TST?serviceFamilyType=ACTIVITIES_APPOINTMENTS&serviceFamilyType=ADJUDICATIONS')
+        .get('/prison/TST?serviceType=APPOINTMENT&serviceType=HEARING_LOCATION')
         .expect(200)
         .expect(() => {
           expect(locationsService.getNonResidentialLocations).toHaveBeenCalledWith(
@@ -369,19 +367,19 @@ describe('GET /prison/TST', () => {
             undefined,
             ['ACTIVE'],
             'localName,asc',
-            ['ACTIVITIES_APPOINTMENTS', 'ADJUDICATIONS'],
+            ['APPOINTMENT', 'HEARING_LOCATION'],
             null,
             35,
           )
         })
     })
 
-    it('should render service family checkboxes with counts', () => {
+    it('should render service type checkboxes with counts', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
-      locationsService.getNonResidentialLocationCount.mockImplementation((token, prisonId, status, families) => {
-        if (families && families[0] === 'ACTIVITIES_APPOINTMENTS') return Promise.resolve(15)
-        if (families && families[0] === 'ADJUDICATIONS') return Promise.resolve(42)
+      locationsService.getNonResidentialLocationCount.mockImplementation((token, prisonId, status, serviceTypes) => {
+        if (serviceTypes && serviceTypes[0] === 'APPOINTMENT') return Promise.resolve(15)
+        if (serviceTypes && serviceTypes[0] === 'HEARING_LOCATION') return Promise.resolve(42)
         return Promise.resolve(0)
       })
 
@@ -390,27 +388,27 @@ describe('GET /prison/TST', () => {
         .expect(200)
         .expect(res => {
           expect(res.text).toContain('Services that use non-residential locations')
-          expect(res.text).toContain('value="ACTIVITIES_APPOINTMENTS"')
-          expect(res.text).toContain('value="ADJUDICATIONS"')
-          expect(res.text).toContain('Activities and appointments (15)')
-          expect(res.text).toContain('Adjudications (42)')
+          expect(res.text).toContain('value="APPOINTMENT"')
+          expect(res.text).toContain('value="HEARING_LOCATION"')
+          expect(res.text).toContain('Appointments (15)')
+          expect(res.text).toContain('Adjudications - hearing location (42)')
         })
     })
 
-    it('should mark the selected service family checkboxes as checked', () => {
+    it('should mark the selected service type checkboxes as checked', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
       return request(app)
-        .get('/prison/TST?serviceFamilyType=ADJUDICATIONS')
+        .get('/prison/TST?serviceType=HEARING_LOCATION')
         .expect(200)
         .expect(res => {
-          expect(res.text).toMatch(/value="ADJUDICATIONS"[^>]*checked/)
-          expect(res.text).not.toMatch(/value="ACTIVITIES_APPOINTMENTS"[^>]*checked/)
+          expect(res.text).toMatch(/value="HEARING_LOCATION"[^>]*checked/)
+          expect(res.text).not.toMatch(/value="APPOINTMENT"[^>]*checked/)
         })
     })
 
-    it('should preserve service family filter in pagination links', () => {
+    it('should preserve service type filter in pagination links', () => {
       auditService.logPageView.mockResolvedValue(null)
       const multiPageResponse = {
         ...mockLocationsResponse,
@@ -423,10 +421,10 @@ describe('GET /prison/TST', () => {
       locationsService.getNonResidentialLocations.mockResolvedValue(multiPageResponse)
 
       return request(app)
-        .get('/prison/TST?serviceFamilyType=ACTIVITIES_APPOINTMENTS')
+        .get('/prison/TST?serviceType=APPOINTMENT')
         .expect(200)
         .expect(res => {
-          expect(res.text).toContain('serviceFamilyType=ACTIVITIES_APPOINTMENTS')
+          expect(res.text).toContain('serviceType=APPOINTMENT')
         })
     })
   })
@@ -445,14 +443,14 @@ describe('GET /prison/TST', () => {
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
       return request(app)
-        .get('/prison/TST?status=ACTIVE&serviceFamilyType=ACTIVITIES_APPOINTMENTS')
+        .get('/prison/TST?status=ACTIVE&serviceType=APPOINTMENT')
         .expect(200)
         .expect(res => {
           expect(res.text).toContain('Selected filters')
           expect(res.text).toContain('data-qa="selected-status-chips"')
           expect(res.text).toContain('data-qa="selected-service-chips"')
           expect(res.text).toContain('Active')
-          expect(res.text).toContain('Activities and appointments')
+          expect(res.text).toContain('Appointments')
           expect(res.text).toContain('data-qa="clear-filters-link"')
         })
     })
@@ -474,14 +472,14 @@ describe('GET /prison/TST', () => {
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
       return request(app)
-        .get('/prison/TST?status=ACTIVE&serviceFamilyType=ADJUDICATIONS')
+        .get('/prison/TST?status=ACTIVE&serviceType=HEARING_LOCATION')
         .expect(200)
         .expect(res => {
-          // Clear all should produce status=NONE and no serviceFamilyType
+          // Clear all should produce status=NONE and no serviceType
           const match = res.text.match(/href="([^"]+)"[^>]*data-qa="clear-filters-link"/)
           expect(match).toBeTruthy()
           expect(match[1]).toContain('status=NONE')
-          expect(match[1]).not.toContain('serviceFamilyType=')
+          expect(match[1]).not.toContain('serviceType=')
         })
     })
   })
@@ -760,13 +758,13 @@ describe('GET /prison/TST', () => {
       locationsService.getNonResidentialLocations.mockResolvedValue(multiPageResponse)
 
       return request(app)
-        .get('/prison/TST?status=ACTIVE&serviceFamilyType=ADJUDICATIONS&sort=status,desc')
+        .get('/prison/TST?status=ACTIVE&serviceType=HEARING_LOCATION&sort=status,desc')
         .expect(200)
         .expect(res => {
           const match = res.text.match(/href="([^"]+)"[^>]*data-qa="view-all-results-link"/)
           expect(match).toBeTruthy()
           expect(match[1]).toContain('status=ACTIVE')
-          expect(match[1]).toContain('serviceFamilyType=ADJUDICATIONS')
+          expect(match[1]).toContain('serviceType=HEARING_LOCATION')
           expect(match[1]).toContain('sort=status,desc')
           expect(match[1]).toContain('size=70')
           expect(match[1]).not.toContain('page=')
@@ -901,11 +899,11 @@ describe('GET /prison/TST', () => {
         })
     })
 
-    it('renders the generic error page when serviceFamilyType filter triggers an API error', () => {
+    it('renders the generic error page when serviceType filter triggers an API error', () => {
       locationsService.getNonResidentialLocations.mockRejectedValue(new Error('Bad request'))
 
       return request(app)
-        .get('/prison/TST?serviceFamilyType=xxx')
+        .get('/prison/TST?serviceType=xxx')
         .expect('Content-Type', /html/)
         .expect(500)
         .expect(res => {
@@ -946,7 +944,7 @@ describe('filter memory', () => {
   }
 
   it('re-applies the filters and sort when the user returns to a bare list URL', async () => {
-    await agent.get('/prison/TST?status=ARCHIVED&serviceFamilyType=ADJUDICATIONS&sort=status,desc').expect(200)
+    await agent.get('/prison/TST?status=ARCHIVED&serviceType=HEARING_LOCATION&sort=status,desc').expect(200)
 
     await agent
       .get('/prison/TST')
@@ -958,7 +956,7 @@ describe('filter memory', () => {
           undefined,
           ['ARCHIVED'],
           ['status,desc', 'localName,asc'],
-          ['ADJUDICATIONS'],
+          ['HEARING_LOCATION'],
           null,
           35,
         )

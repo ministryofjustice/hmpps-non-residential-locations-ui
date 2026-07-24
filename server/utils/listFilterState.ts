@@ -13,7 +13,7 @@ const ALLOWED_SORT_KEYS = new Set([DEFAULT_SORT_KEY, 'status'])
 
 export type FilterState = {
   statuses: string[]
-  serviceFamilyTypes: string[]
+  serviceTypes: string[]
   sort: string
   size: number
   localName: string | null
@@ -22,7 +22,7 @@ export type FilterState = {
 // The part of the filter state remembered for the duration of the user's session. The page
 // number and page size are deliberately left out: the list may well have changed while the
 // user was editing a location, so they go back to the first page at the default size.
-export type RememberedFilterState = Pick<FilterState, 'statuses' | 'serviceFamilyTypes' | 'sort' | 'localName'>
+export type RememberedFilterState = Pick<FilterState, 'statuses' | 'serviceTypes' | 'sort' | 'localName'>
 
 export function buildQueryString(state: FilterState, overrides: Partial<{ page: number | null }> = {}): string {
   const parts: string[] = []
@@ -33,7 +33,7 @@ export function buildQueryString(state: FilterState, overrides: Partial<{ page: 
     state.statuses.forEach(s => parts.push(`status=${encodeURIComponent(s)}`))
   }
 
-  state.serviceFamilyTypes.forEach(s => parts.push(`serviceFamilyType=${encodeURIComponent(s)}`))
+  state.serviceTypes.forEach(s => parts.push(`serviceType=${encodeURIComponent(s)}`))
 
   if (state.sort) parts.push(`sort=${state.sort}`)
   if (state.size) parts.push(`size=${state.size}`)
@@ -63,11 +63,11 @@ function parseStatuses(status: unknown): string[] {
   return [status as string]
 }
 
-function parseServiceFamilyTypes(serviceFamilyType: unknown): string[] {
-  if (serviceFamilyType === undefined) return []
-  if (Array.isArray(serviceFamilyType)) return (serviceFamilyType as string[]).filter(s => s && s !== 'ALL')
-  if (serviceFamilyType === '' || serviceFamilyType === 'ALL') return []
-  return [serviceFamilyType as string]
+function parseServiceTypes(serviceType: unknown): string[] {
+  if (serviceType === undefined) return []
+  if (Array.isArray(serviceType)) return (serviceType as string[]).filter(s => s && s !== 'ALL')
+  if (serviceType === '' || serviceType === 'ALL') return []
+  return [serviceType as string]
 }
 
 function parseSort(sort: unknown): string {
@@ -79,11 +79,11 @@ function parseSort(sort: unknown): string {
 }
 
 function parseQuery(query: Request['query']): FilterState {
-  const { status, sort, localName, serviceFamilyType, size } = query
+  const { status, sort, localName, serviceType, size } = query
 
   return {
     statuses: parseStatuses(status),
-    serviceFamilyTypes: parseServiceFamilyTypes(serviceFamilyType),
+    serviceTypes: parseServiceTypes(serviceType),
     sort: parseSort(sort),
     size: size ? Number(size) : DEFAULT_PAGE_SIZE,
     localName: localName === undefined ? null : (localName as string),
@@ -105,11 +105,11 @@ export default function resolveFilterState(req: Request, prisonId: string): Filt
   }
 
   const filterState = parseQuery(req.query)
-  const { statuses, serviceFamilyTypes, sort, localName } = filterState
+  const { statuses, serviceTypes, sort, localName } = filterState
 
   req.session.nonResidentialListFilters = {
     ...req.session.nonResidentialListFilters,
-    [prisonId]: { statuses, serviceFamilyTypes, sort, localName },
+    [prisonId]: { statuses, serviceTypes, sort, localName },
   }
 
   return filterState
