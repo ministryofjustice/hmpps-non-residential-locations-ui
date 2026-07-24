@@ -192,7 +192,7 @@ describe('GET /prison/TST', () => {
             'localName,asc',
             [],
             null,
-            35,
+            150,
           )
         })
     })
@@ -213,7 +213,7 @@ describe('GET /prison/TST', () => {
             'localName,asc',
             [],
             null,
-            35,
+            150,
           )
         })
     })
@@ -234,7 +234,7 @@ describe('GET /prison/TST', () => {
             'localName,asc',
             [],
             null,
-            35,
+            150,
           )
         })
     })
@@ -327,7 +327,7 @@ describe('GET /prison/TST', () => {
             'localName,asc',
             [],
             null,
-            35,
+            150,
           )
         })
     })
@@ -348,7 +348,7 @@ describe('GET /prison/TST', () => {
             'localName,asc',
             ['APPOINTMENT'],
             null,
-            35,
+            150,
           )
         })
     })
@@ -369,7 +369,7 @@ describe('GET /prison/TST', () => {
             'localName,asc',
             ['APPOINTMENT', 'HEARING_LOCATION'],
             null,
-            35,
+            150,
           )
         })
     })
@@ -509,7 +509,7 @@ describe('GET /prison/TST', () => {
             'localName,asc',
             [],
             null,
-            35,
+            150,
           )
         })
     })
@@ -530,7 +530,7 @@ describe('GET /prison/TST', () => {
             ['status,desc', 'localName,asc'],
             [],
             null,
-            35,
+            150,
           )
         })
     })
@@ -551,7 +551,7 @@ describe('GET /prison/TST', () => {
             ['status,asc', 'localName,asc'],
             [],
             null,
-            35,
+            150,
           )
         })
     })
@@ -572,7 +572,7 @@ describe('GET /prison/TST', () => {
             'localName,asc',
             [],
             null,
-            35,
+            150,
           )
         })
     })
@@ -593,7 +593,7 @@ describe('GET /prison/TST', () => {
             ['status,asc', 'localName,asc'],
             [],
             null,
-            35,
+            150,
           )
         })
     })
@@ -958,7 +958,7 @@ describe('filter memory', () => {
           ['status,desc', 'localName,asc'],
           ['HEARING_LOCATION'],
           null,
-          35,
+          150,
         )
       })
   })
@@ -983,7 +983,7 @@ describe('filter memory', () => {
       .expect(200)
       .expect(() => {
         const { calls } = locationsService.getNonResidentialLocations.mock
-        expect(calls[calls.length - 1][7]).toEqual(35)
+        expect(calls[calls.length - 1][7]).toEqual(150)
       })
   })
 

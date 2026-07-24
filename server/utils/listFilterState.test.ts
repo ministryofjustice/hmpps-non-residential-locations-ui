@@ -11,7 +11,7 @@ describe('listFilterState', () => {
     }
 
     it('builds a query string from the filter state', () => {
-      expect(buildQueryString(state)).toEqual('?status=ACTIVE&sort=localName,asc&size=35')
+      expect(buildQueryString(state)).toEqual('?status=ACTIVE&sort=localName,asc&size=150')
     })
 
     it('repeats the status parameter for each selected status', () => {
