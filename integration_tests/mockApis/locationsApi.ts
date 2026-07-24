@@ -307,7 +307,7 @@ export default {
   stubNonResidentialLocationMultiPage: ({
     prisonId,
     totalElements,
-    defaultPageSize = 35,
+    defaultPageSize = 150,
   }: {
     prisonId: string
     totalElements: number
