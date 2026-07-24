@@ -8,7 +8,12 @@ import validateCaseload from '../middleware/validateCaseload'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import logPageView from '../middleware/logPageView'
 import { Page } from '../services/auditService'
-import resolveFilterState, { ALL_STATUSES, apiSortParam, buildQueryString } from '../utils/listFilterState'
+import resolveFilterState, {
+  ALL_STATUSES,
+  DEFAULT_STATUSES,
+  apiSortParam,
+  buildQueryString,
+} from '../utils/listFilterState'
 
 export default function routes({ locationsService, auditService }: Services): Router {
   const router = Router()
@@ -118,7 +123,14 @@ export default function routes({ locationsService, auditService }: Services): Ro
       })
 
       const hasSelectedFilters = statusChips.length > 0 || serviceChips.length > 0
-      const clearAllHref = buildQueryString({ ...filterState, statuses: [], serviceTypes: [] })
+      // "Reset filters" returns to the active-only default (not an empty list): default statuses,
+      // no service filter, no name search. Sort is left as-is.
+      const resetHref = buildQueryString({
+        ...filterState,
+        statuses: DEFAULT_STATUSES,
+        serviceTypes: [],
+        localName: null,
+      })
 
       // If no statuses selected, show an empty result
       if (selectedStatuses.length === 0) {
@@ -152,7 +164,7 @@ export default function routes({ locationsService, auditService }: Services): Ro
           statusChips,
           serviceChips,
           hasSelectedFilters,
-          clearAllHref,
+          resetHref,
           sort: sortParam,
           sortHrefTemplate: `${buildQueryString({ ...filterState, sort: '{sortKey},{sortDirection}' })}`,
           viewAllHref: null as string | null,
@@ -221,7 +233,7 @@ export default function routes({ locationsService, auditService }: Services): Ro
         statusChips,
         serviceChips,
         hasSelectedFilters,
-        clearAllHref,
+        resetHref,
         sort: sortParam,
         sortHrefTemplate,
         viewAllHref,
