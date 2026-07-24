@@ -444,12 +444,25 @@ context('Locations List', () => {
       cy.get('[data-qa=locations-table]').contains('tr', 'Gym').should('contain.text', 'Archive')
     })
 
-    it('should not display Archive link for active parent locations', () => {
+    it('should not display Archive link for a parent still used by a service', () => {
       cy.task('stubNonResidentialLocation', { prisonId: 'TST', includeArchived: true, isLeafLevel: false })
 
       cy.signIn()
       IndexPage.forEditUser()
       cy.get('[data-qa=locations-table]').contains('tr', 'Gym').should('not.contain.text', 'Archive')
+    })
+
+    it('should display Archive link for a parent that can be hidden from the list', () => {
+      cy.task('stubNonResidentialLocation', {
+        prisonId: 'TST',
+        includeArchived: true,
+        isLeafLevel: false,
+        canBeHiddenFromList: true,
+      })
+
+      cy.signIn()
+      IndexPage.forEditUser()
+      cy.get('[data-qa=locations-table]').contains('tr', 'Gym').should('contain.text', 'Archive')
     })
 
     it('should display "No available actions" for archived locations', () => {

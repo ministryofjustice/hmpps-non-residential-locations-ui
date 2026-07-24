@@ -61,12 +61,18 @@ export default {
     prisonId = 'TST',
     status = 'ACTIVE',
     isLeafLevel = true,
+    canBeHiddenFromList = false,
+    usedByGroupedServices = ['ACTIVITIES_APPOINTMENTS'],
+    usedByServices = ['TEST_TYPE'],
   }: {
     locationId: string
     localName?: string
     prisonId?: string
     status?: string
     isLeafLevel?: boolean
+    canBeHiddenFromList?: boolean
+    usedByGroupedServices?: string[]
+    usedByServices?: string[]
   }): SuperAgentRequest =>
     stubFor({
       request: {
@@ -86,11 +92,13 @@ export default {
           pathHierarchy: 'A-1-001',
           locationType: 'ADJUDICATION_ROOM',
           permanentlyInactive: false,
-          usedByGroupedServices: ['ACTIVITIES_APPOINTMENTS'],
-          usedByServices: ['TEST_TYPE'],
+          usedByGroupedServices,
+          usedByServices,
           status,
           level: 1,
           isLeafLevel,
+          hiddenFromList: false,
+          canBeHiddenFromList,
         },
       },
     }),
@@ -120,10 +128,12 @@ export default {
     prisonId,
     includeArchived = false,
     isLeafLevel = true,
+    canBeHiddenFromList = false,
   }: {
     prisonId: string
     includeArchived?: boolean
     isLeafLevel?: boolean
+    canBeHiddenFromList?: boolean
   }): SuperAgentRequest =>
     stubFor({
       request: {
@@ -179,6 +189,8 @@ export default {
                   },
                 ],
                 isLeafLevel,
+                hiddenFromList: false,
+                canBeHiddenFromList,
               },
               ...(includeArchived
                 ? [
@@ -475,6 +487,28 @@ export default {
           localName: 'Archived Location',
           code: '001',
           status: 'ARCHIVED',
+        },
+      },
+    }),
+
+  stubHideNonResidentialLocation: ({ locationId }: { locationId: string }): SuperAgentRequest =>
+    stubFor({
+      request: {
+        method: 'PUT',
+        urlPath: `/locations-api/locations/non-residential/${locationId}/hide`,
+      },
+      response: {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json;charset=UTF-8',
+        },
+        jsonBody: {
+          id: locationId,
+          prisonId: 'TST',
+          localName: 'Parent Location',
+          code: '001',
+          status: 'ACTIVE',
+          hiddenFromList: true,
         },
       },
     }),

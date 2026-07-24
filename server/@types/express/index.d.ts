@@ -1,6 +1,6 @@
 import { HmppsUser } from '../../interfaces/hmppsUser'
 import { FeComponentsMeta } from '../../data/feComponentsClient'
-import { components } from '../locationsApi'
+import { Location } from '../locationsApi/locationsApiTypes'
 import { RememberedFilterState } from '../../utils/listFilterState'
 
 export declare module 'express-session' {
@@ -32,7 +32,7 @@ interface AllLocals {
     href: string
   }[]
   title: string
-  locationDetails: components['schemas']['NonResidentialLocationDTO']
+  locationDetails: Location
   locationId: string
   options: FormWizard.Request['form']['options']
   prisonId: string

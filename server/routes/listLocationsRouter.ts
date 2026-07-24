@@ -176,11 +176,17 @@ export default function routes({ locationsService, auditService }: Services): Ro
       // Attach derived parent/hierarchy display strings so the locations table can show
       // which parent each (identically-named) child belongs to. Derived from the API's
       // structured `locationHierarchy` so the Nunjucks template stays presentation-only.
+      //
+      // A parent hidden from the list (MAPB-670) is shown to users as archived, even though its
+      // real status stays ACTIVE for the sake of consuming services. Mapping the display status
+      // here means the status tag and the "no available actions" branch in the table both fall
+      // out naturally, with no special-casing in the template.
       const locationsWithHierarchy = {
         ...locations,
         content: (locations.content ?? []).map((item: Location) => ({
           ...item,
           ...deriveLocationHierarchy(item.locationHierarchy),
+          status: item.hiddenFromList ? 'ARCHIVED' : item.status,
         })),
       }
 
