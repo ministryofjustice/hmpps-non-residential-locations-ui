@@ -1,5 +1,6 @@
 import LocationsApiClient from '../data/locationsApiClient'
 import { Constant, CompoundConstant } from '../@types/locationsApi/locationsApiTypes'
+import { DEFAULT_PAGE_SIZE } from '../utils/listFilterState'
 
 export default class LocationsService {
   constructor(private readonly locationsApiClient: LocationsApiClient) {}
@@ -12,7 +13,7 @@ export default class LocationsService {
     sort?: string | string[],
     serviceFamilyTypes?: string[],
     localName?: string,
-    pageSize: number = 35,
+    pageSize: number = DEFAULT_PAGE_SIZE,
   ) {
     return this.locationsApiClient.locations.getNonResidentialSummary(token, {
       prisonId,

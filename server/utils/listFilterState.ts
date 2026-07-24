@@ -6,7 +6,10 @@ export const ALL_STATUSES = ['ACTIVE', 'INACTIVE', 'ARCHIVED']
 // locations are still one click away via the status filter.
 export const DEFAULT_STATUSES = ['ACTIVE']
 
-export const DEFAULT_PAGE_SIZE = 35
+// Most prisons have fewer than this many non-residential locations, so the whole list fits on one
+// page and pagination rarely appears. This also means returning to the list (which resets the page
+// size - see resolveFilterState) keeps showing the full list rather than reverting to a paged view.
+export const DEFAULT_PAGE_SIZE = 150
 
 const DEFAULT_SORT_KEY = 'localName'
 const ALLOWED_SORT_KEYS = new Set([DEFAULT_SORT_KEY, 'status'])
