@@ -1,6 +1,7 @@
 import { HmppsUser } from '../../interfaces/hmppsUser'
 import { FeComponentsMeta } from '../../data/feComponentsClient'
 import { components } from '../locationsApi'
+import { RememberedFilterState } from '../../utils/listFilterState'
 
 export declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
@@ -10,6 +11,9 @@ export declare module 'express-session' {
     returnTo: string
     systemToken: string
     prisonId?: string
+    // The locations list filters the user last chose, keyed by prison so switching
+    // caseload does not carry one prison's filters over to another.
+    nonResidentialListFilters?: Record<string, RememberedFilterState>
   }
 }
 

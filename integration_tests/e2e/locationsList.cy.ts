@@ -120,11 +120,11 @@ context('Locations List', () => {
       cy.get('[data-qa=status-filter-form] legend').should('contain.text', 'Location status')
     })
 
-    it('should have Active and Inactive checked by default, Archived unchecked', () => {
+    it('should have only Active checked by default, Inactive and Archived unchecked', () => {
       cy.signIn()
       const indexPage = IndexPage.forViewUser()
       indexPage.statusFilterCheckbox('ACTIVE').should('be.checked')
-      indexPage.statusFilterCheckbox('INACTIVE').should('be.checked')
+      indexPage.statusFilterCheckbox('INACTIVE').should('not.be.checked')
       indexPage.statusFilterCheckbox('ARCHIVED').should('not.be.checked')
     })
 
@@ -153,10 +153,10 @@ context('Locations List', () => {
       // Click Apply filters button
       cy.get('[data-qa=apply-filter-button]').click()
 
-      // URL should contain all status parameters
+      // URL should contain the checked statuses
       cy.url().should('include', 'status=ACTIVE')
-      cy.url().should('include', 'status=INACTIVE')
       cy.url().should('include', 'status=ARCHIVED')
+      cy.url().should('not.include', 'status=INACTIVE')
     })
 
     it('should show empty state message when Clear filters is clicked', () => {
@@ -187,9 +187,8 @@ context('Locations List', () => {
       cy.signIn()
       IndexPage.forViewUser()
 
-      // Uncheck Active and Inactive
+      // Uncheck Active, the only status checked by default
       cy.get('[data-qa=status-filter-form] input[value="ACTIVE"]').uncheck()
-      cy.get('[data-qa=status-filter-form] input[value="INACTIVE"]').uncheck()
 
       // Click Apply filters button
       cy.get('[data-qa=apply-filter-button]').click()
@@ -203,6 +202,60 @@ context('Locations List', () => {
         'contain.text',
         'Improve your results by applying or removing filters.',
       )
+    })
+  })
+
+  context('Filter memory', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubNonResidentialLocationWithStatuses', {
+        prisonId: 'TST',
+        locations: [
+          { id: 'loc-1', localName: 'Active Gym', status: 'ACTIVE' },
+          { id: 'loc-2', localName: 'Inactive Chapel', status: 'INACTIVE' },
+          { id: 'loc-3', localName: 'Archived Library', status: 'ARCHIVED' },
+        ],
+      })
+      cy.task('stubLocationsConstantsNonResidentialUsageType')
+      cy.task('stubLocationsConstantsServiceTypes')
+      cy.task('stubLocationsConstantsServiceFamilyTypes')
+      cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
+    })
+
+    it('should restore the filters and sort when returning to the list', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+
+      // Apply a filter and a sort
+      indexPage.statusFilterCheckbox('ARCHIVED').check()
+      cy.get('[data-qa=apply-filter-button]').click()
+      indexPage.sortableColumnButton('status').click()
+      cy.url().should('include', 'sort=status')
+
+      // Leave the list and come back to it with no query string, as Cancel and Back do
+      cy.visit('/prison/TST')
+
+      indexPage.statusFilterCheckbox('ACTIVE').should('be.checked')
+      indexPage.statusFilterCheckbox('ARCHIVED').should('be.checked')
+      indexPage.statusFilterCheckbox('INACTIVE').should('not.be.checked')
+      indexPage.sortableColumnHeader('status').should('have.attr', 'aria-sort', 'ascending')
+    })
+
+    it('should restore a cleared filter rather than falling back to the default', () => {
+      cy.signIn()
+      const indexPage = IndexPage.forViewUser()
+
+      cy.get('[data-qa=clear-filters-link]').click()
+      cy.get('[data-qa=no-results-heading]').should('exist')
+
+      cy.visit('/prison/TST')
+
+      indexPage.statusFilterCheckbox('ACTIVE').should('not.be.checked')
+      cy.get('[data-qa=no-results-heading]').should('exist')
     })
   })
 
