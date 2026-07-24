@@ -56,7 +56,7 @@ export default function routes({ locationsService, auditService }: Services): Ro
       const filterState = resolveFilterState(req, prisonId)
       const {
         statuses: selectedStatuses,
-        serviceFamilyTypes: selectedServiceFamilyTypes,
+        serviceTypes: selectedServiceTypes,
         sort: sortParam,
         size: pageSize,
         localName: wildcardName,
@@ -65,15 +65,16 @@ export default function routes({ locationsService, auditService }: Services): Ro
       const pageNo = page && !Number.isNaN(Number(page)) ? Number(page) - 1 : null
       const sortParamForApi = apiSortParam(sortParam)
 
-      // Fetch service family types for the service filter
-      const serviceFamilyTypes = await locationsService.getServiceFamilyTypes(systemToken)
+      // Fetch service types for the service filter. The list is filtered at the individual
+      // service-type level (e.g. "Adjudications - hearing location") rather than by service family.
+      const serviceTypes = await locationsService.getServiceTypes(systemToken)
 
-      // Fetch counts for each status and each service family type in parallel
+      // Fetch counts for each status and each service type in parallel
       const statusCountPromises = ALL_STATUSES.map(s =>
         locationsService.getNonResidentialLocationCount(systemToken, prisonId, [s]),
       )
-      const serviceCountPromises = serviceFamilyTypes.map(family =>
-        locationsService.getNonResidentialLocationCount(systemToken, prisonId, ALL_STATUSES, [family.key]),
+      const serviceCountPromises = serviceTypes.map(type =>
+        locationsService.getNonResidentialLocationCount(systemToken, prisonId, ALL_STATUSES, [type.key]),
       )
 
       const [statusCountValues, serviceCountValues] = await Promise.all([
@@ -87,11 +88,11 @@ export default function routes({ locationsService, auditService }: Services): Ro
         ARCHIVED: statusCountValues[2],
       }
 
-      const serviceFamilyOptions = serviceFamilyTypes.map((family, index) => ({
-        key: family.key,
-        description: family.description,
+      const serviceTypeOptions = serviceTypes.map((type, index) => ({
+        key: type.key,
+        description: type.description,
         count: serviceCountValues[index],
-        checked: selectedServiceFamilyTypes.includes(family.key),
+        checked: selectedServiceTypes.includes(type.key),
       }))
 
       const statusLabels: Record<string, string> = {
@@ -105,19 +106,19 @@ export default function routes({ locationsService, auditService }: Services): Ro
         removeHref: buildQueryString({ ...filterState, statuses: selectedStatuses.filter(x => x !== s) }),
       }))
 
-      const serviceChips = selectedServiceFamilyTypes.map(key => {
-        const family = serviceFamilyTypes.find(f => f.key === key)
+      const serviceChips = selectedServiceTypes.map(key => {
+        const type = serviceTypes.find(t => t.key === key)
         return {
-          label: family ? family.description : key,
+          label: type ? type.description : key,
           removeHref: buildQueryString({
             ...filterState,
-            serviceFamilyTypes: selectedServiceFamilyTypes.filter(x => x !== key),
+            serviceTypes: selectedServiceTypes.filter(x => x !== key),
           }),
         }
       })
 
       const hasSelectedFilters = statusChips.length > 0 || serviceChips.length > 0
-      const clearAllHref = buildQueryString({ ...filterState, statuses: [], serviceFamilyTypes: [] })
+      const clearAllHref = buildQueryString({ ...filterState, statuses: [], serviceTypes: [] })
 
       // If no statuses selected, show an empty result
       if (selectedStatuses.length === 0) {
@@ -145,9 +146,9 @@ export default function routes({ locationsService, auditService }: Services): Ro
           locations: emptyLocations,
           canEdit,
           selectedStatuses,
-          selectedServiceFamilyTypes,
+          selectedServiceTypes,
           statusCounts,
-          serviceFamilyOptions,
+          serviceTypeOptions,
           statusChips,
           serviceChips,
           hasSelectedFilters,
@@ -165,7 +166,7 @@ export default function routes({ locationsService, auditService }: Services): Ro
         pageNo ? `${pageNo}` : undefined,
         selectedStatuses,
         sortParamForApi,
-        selectedServiceFamilyTypes,
+        selectedServiceTypes,
         wildcardName,
         pageSize,
       )
@@ -214,9 +215,9 @@ export default function routes({ locationsService, auditService }: Services): Ro
         locations: locationsWithHierarchy,
         canEdit,
         selectedStatuses,
-        selectedServiceFamilyTypes,
+        selectedServiceTypes,
         statusCounts,
-        serviceFamilyOptions,
+        serviceTypeOptions,
         statusChips,
         serviceChips,
         hasSelectedFilters,
