@@ -61,6 +61,13 @@ export default class LocationsApiClient extends BaseApiClient {
       requestType: 'put',
     }),
 
+    // Removes a parent location from the non-residential locations list (MAPB-670). Not a
+    // deactivation - the location and its children are untouched. Presented to users as archiving.
+    hideNonResidentialLocation: this.apiCall<Location, { locationId: string }>({
+      path: '/locations/non-residential/:locationId/hide',
+      requestType: 'put',
+    }),
+
     prisonConfiguration: this.apiCall<PrisonConfiguration, { prisonId: string }>({
       path: '/prison-configuration/:prisonId',
       requestType: 'get',

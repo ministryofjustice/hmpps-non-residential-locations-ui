@@ -173,6 +173,35 @@ describe('Edit Location - Details controller', () => {
       expect(deepReq.canAccess).toHaveBeenCalledWith('edit_non_resi')
     })
 
+    it('offers the Archive action for a leaf location', () => {
+      const locals = controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+
+      const actions = (locals.actions || deepRes.locals!.actions || []) as { text: string; href: string }[]
+      expect(actions.some(a => a.text === 'Archive location' && a.href === '/location/loc-123/archive')).toBe(true)
+    })
+
+    it('offers the Archive action for a parent that can be hidden from the list', () => {
+      deepRes.locals.locationDetails.isLeafLevel = false
+      deepRes.locals.locationDetails.canBeHiddenFromList = true
+      deepRes.locals.serviceTypes = []
+
+      controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+
+      const actions = (deepRes.locals!.actions || []) as { text: string; href: string }[]
+      expect(actions.some(a => a.text === 'Archive location')).toBe(true)
+    })
+
+    it('does not offer the Archive action for a parent still used by a service', () => {
+      deepRes.locals.locationDetails.isLeafLevel = false
+      deepRes.locals.locationDetails.canBeHiddenFromList = false
+      deepRes.locals.serviceTypes = []
+
+      controller.locals(deepReq as FormWizard.Request, deepRes as Response)
+
+      const actions = (deepRes.locals!.actions || []) as { text: string }[]
+      expect(actions.some(a => a.text === 'Archive location')).toBe(false)
+    })
+
     it('should not include locationStatus component for non-leaf level locations', () => {
       deepRes.locals.locationDetails.isLeafLevel = false
       deepRes.locals.serviceTypes = [

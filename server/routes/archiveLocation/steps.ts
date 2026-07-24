@@ -10,7 +10,9 @@ const steps: FormWizard.Steps = {
     reset: true,
     resetJourney: true,
     skip: true,
-    next: 'archive-or-inactive',
+    // A parent location cannot be made inactive - archiving it simply hides it from the list
+    // (MAPB-670) - so skip the archive-or-inactive choice and go straight to confirmation.
+    next: [{ fn: (req, res) => !res.locals.locationDetails.isLeafLevel, next: 'confirm' }, 'archive-or-inactive'],
   },
   '/archive-or-inactive': {
     fields: ['archiveOrInactive'],

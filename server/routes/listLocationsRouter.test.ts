@@ -178,7 +178,7 @@ describe('GET /prison/TST', () => {
       })
     })
 
-    it('should call service with default statuses (ACTIVE, INACTIVE) when no status provided', () => {
+    it('should call service with the default status (ACTIVE) when no status provided', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
@@ -190,7 +190,7 @@ describe('GET /prison/TST', () => {
             undefined,
             'TST',
             undefined,
-            ['ACTIVE', 'INACTIVE'],
+            ['ACTIVE'],
             'localName,asc',
             [],
             null,
@@ -265,7 +265,7 @@ describe('GET /prison/TST', () => {
         })
     })
 
-    it('should have ACTIVE and INACTIVE checked by default', () => {
+    it('should have only ACTIVE checked by default', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
@@ -275,8 +275,8 @@ describe('GET /prison/TST', () => {
         .expect(res => {
           // Check ACTIVE checkbox is checked
           expect(res.text).toMatch(/value="ACTIVE"[^>]*checked/)
-          // Check INACTIVE checkbox is checked
-          expect(res.text).toMatch(/value="INACTIVE"[^>]*checked/)
+          // Check INACTIVE checkbox is NOT checked
+          expect(res.text).not.toMatch(/value="INACTIVE"[^>]*checked/)
           // Check ARCHIVED checkbox is NOT checked (no 'checked' attribute near ARCHIVED value)
           expect(res.text).not.toMatch(/value="ARCHIVED"[^>]*checked/)
         })
@@ -325,7 +325,7 @@ describe('GET /prison/TST', () => {
             undefined,
             'TST',
             undefined,
-            ['ACTIVE', 'INACTIVE'],
+            ['ACTIVE'],
             'localName,asc',
             [],
             null,
@@ -346,7 +346,7 @@ describe('GET /prison/TST', () => {
             undefined,
             'TST',
             undefined,
-            ['ACTIVE', 'INACTIVE'],
+            ['ACTIVE'],
             'localName,asc',
             ['ACTIVITIES_APPOINTMENTS'],
             null,
@@ -367,7 +367,7 @@ describe('GET /prison/TST', () => {
             undefined,
             'TST',
             undefined,
-            ['ACTIVE', 'INACTIVE'],
+            ['ACTIVE'],
             'localName,asc',
             ['ACTIVITIES_APPOINTMENTS', 'ADJUDICATIONS'],
             null,
@@ -507,7 +507,7 @@ describe('GET /prison/TST', () => {
             undefined,
             'TST',
             undefined,
-            ['ACTIVE', 'INACTIVE'],
+            ['ACTIVE'],
             'localName,asc',
             [],
             null,
@@ -528,7 +528,7 @@ describe('GET /prison/TST', () => {
             undefined,
             'TST',
             undefined,
-            ['ACTIVE', 'INACTIVE'],
+            ['ACTIVE'],
             ['status,desc', 'localName,asc'],
             [],
             null,
@@ -549,7 +549,7 @@ describe('GET /prison/TST', () => {
             undefined,
             'TST',
             undefined,
-            ['ACTIVE', 'INACTIVE'],
+            ['ACTIVE'],
             ['status,asc', 'localName,asc'],
             [],
             null,
@@ -570,7 +570,7 @@ describe('GET /prison/TST', () => {
             undefined,
             'TST',
             undefined,
-            ['ACTIVE', 'INACTIVE'],
+            ['ACTIVE'],
             'localName,asc',
             [],
             null,
@@ -591,7 +591,7 @@ describe('GET /prison/TST', () => {
             undefined,
             'TST',
             undefined,
-            ['ACTIVE', 'INACTIVE'],
+            ['ACTIVE'],
             ['status,asc', 'localName,asc'],
             [],
             null,
@@ -924,5 +924,90 @@ describe('GET /prison/TST', () => {
           expect(res.text).toContain('Sorry, there is a problem with this service')
         })
     })
+  })
+})
+
+describe('filter memory', () => {
+  let agent: ReturnType<typeof request.agent>
+
+  beforeEach(() => {
+    app = appWithAllRoutes({
+      services: { auditService, locationsService },
+      userSupplier: () => user,
+    })
+    agent = request.agent(app)
+    auditService.logPageView.mockResolvedValue(null)
+    locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+  })
+
+  const lastStatusesRequested = () => {
+    const { calls } = locationsService.getNonResidentialLocations.mock
+    return calls[calls.length - 1][3]
+  }
+
+  it('re-applies the filters and sort when the user returns to a bare list URL', async () => {
+    await agent.get('/prison/TST?status=ARCHIVED&serviceFamilyType=ADJUDICATIONS&sort=status,desc').expect(200)
+
+    await agent
+      .get('/prison/TST')
+      .expect(200)
+      .expect(() => {
+        expect(locationsService.getNonResidentialLocations).toHaveBeenLastCalledWith(
+          undefined,
+          'TST',
+          undefined,
+          ['ARCHIVED'],
+          ['status,desc', 'localName,asc'],
+          ['ADJUDICATIONS'],
+          null,
+          35,
+        )
+      })
+  })
+
+  it('keeps the remembered checkboxes ticked on return', async () => {
+    await agent.get('/prison/TST?status=ARCHIVED').expect(200)
+
+    await agent
+      .get('/prison/TST')
+      .expect(200)
+      .expect(res => {
+        expect(res.text).toMatch(/value="ARCHIVED"[^>]*checked/)
+        expect(res.text).not.toMatch(/value="ACTIVE"[^>]*checked/)
+      })
+  })
+
+  it('does not remember the page size, so "view all results" is not sticky', async () => {
+    await agent.get('/prison/TST?status=ACTIVE&size=500').expect(200)
+
+    await agent
+      .get('/prison/TST')
+      .expect(200)
+      .expect(() => {
+        const { calls } = locationsService.getNonResidentialLocations.mock
+        expect(calls[calls.length - 1][7]).toEqual(35)
+      })
+  })
+
+  it('lets an explicit filter override what was remembered', async () => {
+    await agent.get('/prison/TST?status=ARCHIVED').expect(200)
+
+    await agent
+      .get('/prison/TST?status=INACTIVE')
+      .expect(200)
+      .expect(() => {
+        expect(lastStatusesRequested()).toEqual(['INACTIVE'])
+      })
+  })
+
+  it('starts a new session from the defaults', async () => {
+    await agent.get('/prison/TST?status=ARCHIVED').expect(200)
+
+    await request(app)
+      .get('/prison/TST')
+      .expect(200)
+      .expect(() => {
+        expect(lastStatusesRequested()).toEqual(['ACTIVE'])
+      })
   })
 })

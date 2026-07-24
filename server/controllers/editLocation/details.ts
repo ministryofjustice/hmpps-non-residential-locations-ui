@@ -76,7 +76,10 @@ export default class Details extends FormInitialStep {
       fallbackUrl: `/prison/${prisonId}`,
     })
 
-    if (req.canAccess('edit_non_resi') && isLeafLevel && locationDetails.status !== 'ARCHIVED') {
+    // A leaf location can be archived; a childless parent can instead be hidden from the list
+    // (MAPB-670), which the user also reaches through the Archive action.
+    const canArchive = isLeafLevel || locationDetails.canBeHiddenFromList
+    if (req.canAccess('edit_non_resi') && canArchive && locationDetails.status !== 'ARCHIVED') {
       addAction({
         text: 'Archive location',
         classes: 'govuk-button--warning',

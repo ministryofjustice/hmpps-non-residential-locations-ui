@@ -186,6 +186,59 @@ context('Archive Location Journey', () => {
     })
   })
 
+  describe('Parent location - hide from list', () => {
+    const PARENT_LOCATION_NAME = 'Houseblock 1'
+
+    beforeEach(() => {
+      cy.task('stubNonResidentialLocationById', {
+        locationId: TEST_LOCATION_ID,
+        localName: PARENT_LOCATION_NAME,
+        prisonId: 'TST',
+        status: 'ACTIVE',
+        isLeafLevel: false,
+        canBeHiddenFromList: true,
+        usedByGroupedServices: [],
+        usedByServices: [],
+      })
+      cy.task('stubHideNonResidentialLocation', { locationId: TEST_LOCATION_ID })
+    })
+
+    it('skips the archive-or-inactive choice and goes straight to confirmation', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+      cy.get('h1').should('contain.text', `Are you sure you want to archive ${PARENT_LOCATION_NAME}?`)
+    })
+
+    it('shows parent-specific wording and no services-affected list', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+
+      const confirmPage = new ArchiveConfirmPage(PARENT_LOCATION_NAME)
+      confirmPage.interruptionCard().should('contain.text', 'removed from your list')
+      confirmPage.interruptionCard().should('contain.text', 'locations inside it will not be affected')
+      confirmPage.servicesAffectedList().should('not.exist')
+    })
+
+    it('hides the location and shows the success banner when confirming', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+
+      const confirmPage = new ArchiveConfirmPage(PARENT_LOCATION_NAME)
+      confirmPage.archiveButton().click()
+      cy.url().should('include', '/prison/TST')
+      cy.get('.moj-alert__content').should('contain.text', `${PARENT_LOCATION_NAME} archived`)
+    })
+
+    it('returns to the list when clicking Go back', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+
+      const confirmPage = new ArchiveConfirmPage(PARENT_LOCATION_NAME)
+      confirmPage.goBackLink().click()
+      cy.url().should('include', '/prison/TST')
+    })
+  })
+
   describe('Archive or Inactive Page - Inactive Location Variant', () => {
     beforeEach(() => {
       cy.task('stubNonResidentialLocationById', {

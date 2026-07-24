@@ -89,7 +89,7 @@
 {% macro editLink(item) %}
     {% if item.status === 'ARCHIVED' %}
         No available actions
-    {% elif item.isLeafLevel %}
+    {% elif item.isLeafLevel or item.canBeHiddenFromList %}
         <span class="locations-table__actions"><a href='/location/{{ item.id }}/edit'>Change</a> | <a href='/location/{{ item.id }}/archive'>Archive</a></span>
     {% else %}
         <a href='/location/{{ item.id }}/edit'>Change</a>
