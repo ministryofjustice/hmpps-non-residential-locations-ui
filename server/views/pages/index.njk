@@ -16,14 +16,6 @@
       <a class="govuk-button govuk-button--secondary govuk-!-margin-bottom-6" href="/add-location" role="button" data-qa="add-location-button">Add a non-residential location</a>
     {% endif %}
 
-    {{ simplePagination(paginationLocals) }}
-
-    {% if paginationLocals.totalPages > 1 %}
-      <p class="govuk-body">
-        <a href="{{ viewAllHref }}" class="govuk-link" data-qa="view-all-results-link">View all results</a>
-      </p>
-    {% endif %}
-
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-quarter locations-filter-column">
         <div class="locations-filter" data-qa="locations-filter">
@@ -119,6 +111,14 @@
       <div class="govuk-grid-column-three-quarters locations-table-column">
         {% if locations.content | length > 0 %}
           {{ locationsTable(locations.content, paginationLocals, serviceFamilyTypes, canEdit, sort, sortHrefTemplate) }}
+
+          {{ simplePagination(paginationLocals) }}
+
+          {% if paginationLocals.totalPages > 1 %}
+            <p class="govuk-body">
+              <a href="{{ viewAllHref }}" class="govuk-link" data-qa="view-all-results-link">View all results</a>
+            </p>
+          {% endif %}
         {% else %}
           <p class="govuk-body-l govuk-!-font-weight-bold" data-qa="no-results-heading">There are no matching results.</p>
           <p class="govuk-body" data-qa="no-results-message">Improve your results by applying or removing filters.</p>
