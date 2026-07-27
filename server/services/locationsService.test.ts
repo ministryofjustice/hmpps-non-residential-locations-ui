@@ -26,7 +26,7 @@ describe('LocationsService', () => {
     expect(locationsApiClient.locations.getNonResidentialSummary).toHaveBeenCalledWith('some-token', {
       page: undefined,
       prisonId: 'MDI',
-      size: '35',
+      size: '150',
       sort: undefined,
     })
   })
@@ -36,7 +36,7 @@ describe('LocationsService', () => {
     expect(locationsApiClient.locations.getNonResidentialSummary).toHaveBeenCalledWith('some-token', {
       page: '0',
       prisonId: 'MDI',
-      size: '35',
+      size: '150',
       sort: 'status,desc',
       status: 'ACTIVE',
     })

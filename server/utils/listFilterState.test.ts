@@ -4,14 +4,14 @@ describe('listFilterState', () => {
   describe('buildQueryString', () => {
     const state = {
       statuses: ['ACTIVE'],
-      serviceFamilyTypes: [] as string[],
+      serviceTypes: [] as string[],
       sort: 'localName,asc',
       size: DEFAULT_PAGE_SIZE,
       localName: null as string | null,
     }
 
     it('builds a query string from the filter state', () => {
-      expect(buildQueryString(state)).toEqual('?status=ACTIVE&sort=localName,asc&size=35')
+      expect(buildQueryString(state)).toEqual('?status=ACTIVE&sort=localName,asc&size=150')
     })
 
     it('repeats the status parameter for each selected status', () => {
@@ -25,9 +25,9 @@ describe('listFilterState', () => {
     })
 
     it('includes the service filter and name search when set', () => {
-      const result = buildQueryString({ ...state, serviceFamilyTypes: ['ADJUDICATIONS'], localName: 'Wing A' })
+      const result = buildQueryString({ ...state, serviceTypes: ['ADJUDICATIONS'], localName: 'Wing A' })
 
-      expect(result).toContain('serviceFamilyType=ADJUDICATIONS')
+      expect(result).toContain('serviceType=ADJUDICATIONS')
       expect(result).toContain('localName=Wing%20A')
     })
 
@@ -58,7 +58,7 @@ describe('listFilterState', () => {
 
       expect(state).toEqual({
         statuses: ['ACTIVE'],
-        serviceFamilyTypes: [],
+        serviceTypes: [],
         sort: 'localName,asc',
         size: DEFAULT_PAGE_SIZE,
         localName: null,
@@ -68,7 +68,7 @@ describe('listFilterState', () => {
     it('parses the filters from the query string', () => {
       req.query = {
         status: ['ACTIVE', 'ARCHIVED'],
-        serviceFamilyType: 'ADJUDICATIONS',
+        serviceType: 'ADJUDICATIONS',
         sort: 'status,desc',
         size: '100',
         localName: 'Gym',
@@ -76,7 +76,7 @@ describe('listFilterState', () => {
 
       expect(resolveFilterState(req, 'TST')).toEqual({
         statuses: ['ACTIVE', 'ARCHIVED'],
-        serviceFamilyTypes: ['ADJUDICATIONS'],
+        serviceTypes: ['ADJUDICATIONS'],
         sort: 'status,desc',
         size: 100,
         localName: 'Gym',
@@ -96,14 +96,14 @@ describe('listFilterState', () => {
     })
 
     it('remembers the filters and sort against the prison', () => {
-      req.query = { status: 'ARCHIVED', serviceFamilyType: 'ADJUDICATIONS', sort: 'status,desc', size: '100' }
+      req.query = { status: 'ARCHIVED', serviceType: 'ADJUDICATIONS', sort: 'status,desc', size: '100' }
 
       resolveFilterState(req, 'TST')
 
       expect(req.session.nonResidentialListFilters).toEqual({
         TST: {
           statuses: ['ARCHIVED'],
-          serviceFamilyTypes: ['ADJUDICATIONS'],
+          serviceTypes: ['ADJUDICATIONS'],
           sort: 'status,desc',
           localName: null,
         },
@@ -114,7 +114,7 @@ describe('listFilterState', () => {
       req.session.nonResidentialListFilters = {
         TST: {
           statuses: ['ARCHIVED'],
-          serviceFamilyTypes: ['ADJUDICATIONS'],
+          serviceTypes: ['ADJUDICATIONS'],
           sort: 'status,desc',
           localName: 'Gym',
         },
@@ -122,7 +122,23 @@ describe('listFilterState', () => {
 
       expect(resolveFilterState(req, 'TST')).toEqual({
         statuses: ['ARCHIVED'],
-        serviceFamilyTypes: ['ADJUDICATIONS'],
+        serviceTypes: ['ADJUDICATIONS'],
+        sort: 'status,desc',
+        size: DEFAULT_PAGE_SIZE,
+        localName: 'Gym',
+      })
+    })
+
+    it('safely restores a filter remembered in an older shape (serviceFamilyTypes, no serviceTypes)', () => {
+      // A session stored before the family-to-type filter change has no serviceTypes field. Restoring
+      // it must not leave serviceTypes undefined (which crashed the list page).
+      req.session.nonResidentialListFilters = {
+        TST: { statuses: ['ARCHIVED'], serviceFamilyTypes: ['ADJUDICATIONS'], sort: 'status,desc', localName: 'Gym' },
+      } as never
+
+      expect(resolveFilterState(req, 'TST')).toEqual({
+        statuses: ['ARCHIVED'],
+        serviceTypes: [],
         sort: 'status,desc',
         size: DEFAULT_PAGE_SIZE,
         localName: 'Gym',
@@ -149,7 +165,7 @@ describe('listFilterState', () => {
 
     it('does not carry one prison’s filters over to another', () => {
       req.session.nonResidentialListFilters = {
-        TST: { statuses: ['ARCHIVED'], serviceFamilyTypes: [], sort: 'localName,asc', localName: null },
+        TST: { statuses: ['ARCHIVED'], serviceTypes: [], sort: 'localName,asc', localName: null },
       }
 
       expect(resolveFilterState(req, 'MDI').statuses).toEqual(['ACTIVE'])
@@ -157,7 +173,7 @@ describe('listFilterState', () => {
 
     it('lets a request with query parameters override what is remembered', () => {
       req.session.nonResidentialListFilters = {
-        TST: { statuses: ['ARCHIVED'], serviceFamilyTypes: [], sort: 'localName,asc', localName: null },
+        TST: { statuses: ['ARCHIVED'], serviceTypes: [], sort: 'localName,asc', localName: null },
       }
       req.query = { status: 'INACTIVE' }
 

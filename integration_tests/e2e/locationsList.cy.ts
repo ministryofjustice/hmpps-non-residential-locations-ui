@@ -136,11 +136,11 @@ context('Locations List', () => {
       indexPage.statusFilterForm().should('contain.text', 'Archived (')
     })
 
-    it('should display Apply filters button and Clear filters link', () => {
+    it('should display Apply filters button and Reset filters link', () => {
       cy.signIn()
       IndexPage.forViewUser()
       cy.get('[data-qa=apply-filter-button]').should('exist').and('contain.text', 'Apply filters')
-      cy.get('[data-qa=clear-filters-link]').should('exist').and('contain.text', 'Clear filters')
+      cy.get('[data-qa=reset-filters-link]').should('exist').and('contain.text', 'Reset filters')
     })
 
     it('should submit filter when Apply filters button is clicked', () => {
@@ -159,28 +159,26 @@ context('Locations List', () => {
       cy.url().should('not.include', 'status=INACTIVE')
     })
 
-    it('should show empty state message when Clear filters is clicked', () => {
+    it('should return to the active-only default when Reset filters is clicked', () => {
       cy.signIn()
       IndexPage.forViewUser()
 
-      // Click Clear filters link
-      cy.get('[data-qa=clear-filters-link]').click()
+      // Apply a non-default filter first
+      cy.get('[data-qa=status-filter-form] input[value="ARCHIVED"]').click()
+      cy.get('[data-qa=apply-filter-button]').click()
+      cy.url().should('include', 'status=ARCHIVED')
 
-      // URL should contain status=NONE
-      cy.url().should('include', 'status=NONE')
+      // Reset returns to active only, not an empty list
+      cy.get('[data-qa=reset-filters-link]').click()
+      cy.url().should('include', 'status=ACTIVE')
+      cy.url().should('not.include', 'status=NONE')
+      cy.url().should('not.include', 'status=ARCHIVED')
 
-      // No status checkboxes should be checked
-      cy.get('[data-qa=status-filter-form] input[name="status"]:checked').should('have.length', 0)
-
-      // Should display empty state message
-      cy.get('[data-qa=no-results-heading]').should('contain.text', 'There are no matching results.')
-      cy.get('[data-qa=no-results-message]').should(
-        'contain.text',
-        'Improve your results by applying or removing filters.',
-      )
-
-      // Locations table should not be present
-      cy.get('[data-qa=locations-table]').should('not.exist')
+      // Only Active is checked, and the table is shown (not the empty state)
+      cy.get('[data-qa=status-filter-form] input[value="ACTIVE"]').should('be.checked')
+      cy.get('[data-qa=status-filter-form] input[value="ARCHIVED"]').should('not.be.checked')
+      cy.get('[data-qa=locations-table]').should('exist')
+      cy.get('[data-qa=no-results-heading]').should('not.exist')
     })
 
     it('should show empty state message when all checkboxes are unchecked and Apply is clicked', () => {
@@ -202,6 +200,42 @@ context('Locations List', () => {
         'contain.text',
         'Improve your results by applying or removing filters.',
       )
+    })
+  })
+
+  context('Service type filter', () => {
+    beforeEach(() => {
+      cy.task('reset')
+      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubManageUsersMe')
+      cy.task('stubManageUsersMeCaseloads')
+      cy.task('stubNonResidentialLocationWithStatuses', {
+        prisonId: 'TST',
+        locations: [{ id: 'loc-1', localName: 'Hearing Room', status: 'ACTIVE' }],
+      })
+      cy.task('stubLocationsConstantsNonResidentialUsageType')
+      cy.task('stubLocationsConstantsServiceTypes')
+      cy.task('stubLocationsConstantsServiceFamilyTypes')
+      cy.task('stubComponents')
+      cy.task('stubGetPrisonConfiguration')
+    })
+
+    it('shows a checkbox per service type, not per family', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+      cy.get('[data-qa=service-filter-checkboxes] input[name="serviceType"][value="TEST_TYPE"]').should('exist')
+      cy.get('[data-qa=service-filter-checkboxes]').should('contain.text', 'Test type')
+    })
+
+    it('applies a service type as a serviceType query param and shows a chip', () => {
+      cy.signIn()
+      IndexPage.forViewUser()
+
+      cy.get('[data-qa=service-filter-checkboxes] input[value="TEST_TYPE"]').check()
+      cy.get('[data-qa=apply-filter-button]').click()
+
+      cy.url().should('include', 'serviceType=TEST_TYPE')
+      cy.get('[data-qa=selected-service-chips]').should('contain.text', 'Test type')
     })
   })
 
@@ -245,11 +279,13 @@ context('Locations List', () => {
       indexPage.sortableColumnHeader('status').should('have.attr', 'aria-sort', 'ascending')
     })
 
-    it('should restore a cleared filter rather than falling back to the default', () => {
+    it('should restore a cleared (empty) filter rather than falling back to the default', () => {
       cy.signIn()
       const indexPage = IndexPage.forViewUser()
 
-      cy.get('[data-qa=clear-filters-link]').click()
+      // Clear every status (unchecking the default Active) so the list is empty
+      cy.get('[data-qa=status-filter-form] input[value="ACTIVE"]').uncheck()
+      cy.get('[data-qa=apply-filter-button]').click()
       cy.get('[data-qa=no-results-heading]').should('exist')
 
       cy.visit('/prison/TST')
@@ -346,7 +382,7 @@ context('Locations List', () => {
       cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
-      cy.task('stubNonResidentialLocationMultiPage', { prisonId: 'TST', totalElements: 70 })
+      cy.task('stubNonResidentialLocationMultiPage', { prisonId: 'TST', totalElements: 200 })
       cy.task('stubLocationsConstantsNonResidentialUsageType')
       cy.task('stubLocationsConstantsServiceTypes')
       cy.task('stubLocationsConstantsServiceFamilyTypes')
@@ -358,21 +394,21 @@ context('Locations List', () => {
       cy.signIn()
       IndexPage.forViewUser()
       cy.get('[data-qa=view-all-results-link]').should('exist').and('contain.text', 'View all results')
-      cy.get('[data-qa=view-all-results-link]').should('have.attr', 'href').and('include', 'size=70')
+      cy.get('[data-qa=view-all-results-link]').should('have.attr', 'href').and('include', 'size=200')
     })
 
     it('should hide pagination and the link after navigating to view all', () => {
       cy.signIn()
       IndexPage.forViewUser()
       cy.get('[data-qa=view-all-results-link]').click()
-      cy.url().should('include', 'size=70')
+      cy.url().should('include', 'size=200')
       cy.get('[data-qa=view-all-results-link]').should('not.exist')
       cy.get('.moj-pagination__list').should('not.exist')
     })
 
     it('should restore pagination and the link when returning to the default page', () => {
       cy.signIn()
-      cy.visit('/prison/TST?size=70')
+      cy.visit('/prison/TST?size=200')
       cy.get('[data-qa=view-all-results-link]').should('not.exist')
       cy.visit('/prison/TST')
       cy.get('[data-qa=view-all-results-link]').should('exist')
