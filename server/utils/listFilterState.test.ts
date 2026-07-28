@@ -129,6 +129,22 @@ describe('listFilterState', () => {
       })
     })
 
+    it('safely restores a filter remembered in an older shape (serviceFamilyTypes, no serviceTypes)', () => {
+      // A session stored before the family-to-type filter change has no serviceTypes field. Restoring
+      // it must not leave serviceTypes undefined (which crashed the list page).
+      req.session.nonResidentialListFilters = {
+        TST: { statuses: ['ARCHIVED'], serviceFamilyTypes: ['ADJUDICATIONS'], sort: 'status,desc', localName: 'Gym' },
+      } as never
+
+      expect(resolveFilterState(req, 'TST')).toEqual({
+        statuses: ['ARCHIVED'],
+        serviceTypes: [],
+        sort: 'status,desc',
+        size: DEFAULT_PAGE_SIZE,
+        localName: 'Gym',
+      })
+    })
+
     it('resets the page size when restoring, so "view all results" is not remembered', () => {
       req.query = { status: 'ACTIVE', size: '500' }
       resolveFilterState(req, 'TST')

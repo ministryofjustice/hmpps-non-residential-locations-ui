@@ -451,7 +451,7 @@ describe('GET /prison/TST', () => {
           expect(res.text).toContain('data-qa="selected-service-chips"')
           expect(res.text).toContain('Active')
           expect(res.text).toContain('Appointments')
-          expect(res.text).toContain('data-qa="clear-filters-link"')
+          expect(res.text).toContain('data-qa="reset-filters-link"')
         })
     })
 
@@ -467,18 +467,19 @@ describe('GET /prison/TST', () => {
         })
     })
 
-    it('clear filters link should remove all status and service filters', () => {
+    it('reset filters link should return to the active-only default', () => {
       auditService.logPageView.mockResolvedValue(null)
       locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
 
       return request(app)
-        .get('/prison/TST?status=ACTIVE&serviceType=HEARING_LOCATION')
+        .get('/prison/TST?status=ARCHIVED&serviceType=HEARING_LOCATION')
         .expect(200)
         .expect(res => {
-          // Clear all should produce status=NONE and no serviceType
-          const match = res.text.match(/href="([^"]+)"[^>]*data-qa="clear-filters-link"/)
+          // Reset returns to the default: active only, no service filter (not an empty status=NONE)
+          const match = res.text.match(/href="([^"]+)"[^>]*data-qa="reset-filters-link"/)
           expect(match).toBeTruthy()
-          expect(match[1]).toContain('status=NONE')
+          expect(match[1]).toContain('status=ACTIVE')
+          expect(match[1]).not.toContain('status=NONE')
           expect(match[1]).not.toContain('serviceType=')
         })
     })
