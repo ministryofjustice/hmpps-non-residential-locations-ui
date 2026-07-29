@@ -12,6 +12,11 @@
     <div id="{{options.id}}-hint" class="govuk-hint">
       Select all that apply
     </div>
+    {% if options.errorMessage %}
+    <p id="{{options.id}}-error" class="govuk-error-message">
+      <span class="govuk-visually-hidden">Error:</span> {{ options.errorMessage.text }}
+    </p>
+    {% endif %}
     <div class="govuk-checkboxes govuk-!-margin-bottom-4" data-module="govuk-checkboxes">
 
 
