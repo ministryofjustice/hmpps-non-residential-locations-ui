@@ -12,10 +12,6 @@ const fields = {
     id: 'localName',
     name: 'localName',
     classes: 'govuk-!-width-full local-name-text-input',
-    label: {
-      text: 'What is the location name?',
-      classes: 'govuk-label--m',
-    },
     hint: {
       text: "Describe the location not what happens there. For example, 'gym' rather than 'exercise'. Avoid using acronyms, unless the acronym is widely recognised.",
     },
