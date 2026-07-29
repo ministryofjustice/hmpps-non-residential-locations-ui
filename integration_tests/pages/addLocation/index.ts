@@ -11,6 +11,8 @@ export default class IndexPage extends Page {
 
   errorSummaryList = (): PageElement => cy.get('[data-module="govuk-error-summary"] ul li')
 
+  servicesErrorLabel = (): PageElement => cy.get('[id="services-error"]')
+
   locationNameInput = (): PageElement => cy.get('[data-qa="location-name"]')
 
   serviceCheckbox = (value: string): PageElement => cy.get(`input[name="services"][value="${value}"]`)
