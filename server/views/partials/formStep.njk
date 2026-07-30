@@ -11,20 +11,21 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "../macros/groupedCheckboxes.njk" import groupedCheckboxes %}
-{% from "moj/components/page-header-actions/macro.njk" import mojPageHeaderActions %}
 
 {% block content %}
   {% set formMethod = options.method | default('post') %}
   {% set formAction = options.action | default('') %}
   {% set formEnctype = options.enctype | default('') %}
-  <div class="govuk-width-container">
-    {{ mojPageHeaderActions({
-      heading: {
-        text: title
-      }, 
-      items: actions
-    })}}
-  </div>
+
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+  {% if actions %}
+    <div class="govuk-button-group">
+      {% for action in actions %}
+        {{ govukButton(action) }}
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <div class="govuk-width-container">
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
