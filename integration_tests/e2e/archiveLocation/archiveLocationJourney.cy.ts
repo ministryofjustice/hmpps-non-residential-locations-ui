@@ -38,6 +38,28 @@ context('Archive Location Journey', () => {
       cy.title().should('contain', `Archive ${TEST_LOCATION_NAME} or make it inactive`)
     })
 
+    it('should include the list of affected services in the warning text section when there are some', () => {
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+      cy.get('.govuk-warning-text__text').should('contain.text', 'continuing to use it:')
+      cy.get('.govuk-warning-text__text').should('contain.text', 'Activities and appointments')
+    })
+
+    it('should not include the list of affected services in the warning text section when there are none', () => {
+      // Return no grouped services
+      cy.task('stubNonResidentialLocationById', {
+        locationId: TEST_LOCATION_ID,
+        localName: TEST_LOCATION_NAME,
+        prisonId: 'TST',
+        status: 'ACTIVE',
+        usedByGroupedServices: [],
+      })
+      cy.signIn()
+      ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
+      cy.get('.govuk-warning-text__text').should('contain.text', 'continuing to use it.')
+      cy.get('.govuk-warning-text__text').contains('Activities and appointments').should('not.exist')
+    })
+
     it('should show error when no option is selected', () => {
       cy.signIn()
       ArchiveOrInactivePage.goTo(TEST_LOCATION_ID)
