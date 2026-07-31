@@ -2,7 +2,6 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% block content %}
@@ -11,24 +10,27 @@
       <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">{{ title }}</h1>
 
-        {{ govukWarningText({
-          text: "If you archive a location, it is permanently removed. Services that currently use the location will no longer be able to use it. However, references to the location will remain in existing documents such as use of force reports.",
-          iconFallbackText: "Warning"
-        }) }}
+        <div class="govuk-warning-text">
+          <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
+          <strong class="govuk-warning-text__text">
+            <span class="govuk-visually-hidden">Warning</span>
+            {% if servicesAffected and servicesAffected.length > 0 %}
+              <p class="govuk-!-font-weight-bold">Archiving or making a location inactive will prevent any associated services from continuing to use it:</p>
+              <ul class="govuk-list govuk-list--bullet">
+                {% for service in servicesAffected %}
+                  <li class="govuk-!-font-weight-bold">{{ service }}</li>
+                {% endfor %}
+              </ul>
+              <span>When you archive a location, it is permanently removed. Existing documents will still reference it such as use of force reports.</span>
+            {% else %}
+              <span>Archiving or making a location inactive will prevent any associated services from continuing to use it.</span>
+              <span>When you archive a location, it is permanently removed. Existing documents will still reference it such as use of force reports.</span>
+            {% endif %}
+          </strong>
+        </div>
 
         <form method="post">
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-
-          {% set servicesConditionalHtml %}
-            {% if servicesAffected and servicesAffected.length > 0 %}
-              <p class="govuk-body govuk-!-font-weight-bold">Services that won't be able to use this location</p>
-              <ul class="govuk-list govuk-list--bullet">
-                {% for service in servicesAffected %}
-                  <li>{{ service }}</li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-          {% endset %}
 
           {% if isInactive %}
             {{ govukRadios({
@@ -48,9 +50,6 @@
                   hint: {
                     text: "Permanently remove this location. Services currently using it will no longer have access to it."
                   },
-                  conditional: {
-                    html: servicesConditionalHtml
-                  },
                   checked: fields.archiveOrInactive.value == "ARCHIVE"
                 },
                 {
@@ -58,9 +57,6 @@
                   text: "Keep this location inactive",
                   hint: {
                     text: "Keep the location in the list but do not allow services to use it until you make it active again."
-                  },
-                  conditional: {
-                    html: servicesConditionalHtml
                   },
                   checked: fields.archiveOrInactive.value == "KEEP_INACTIVE"
                 }
@@ -84,9 +80,6 @@
                   hint: {
                     text: "Permanently remove this location. Services currently using it will no longer have access to it."
                   },
-                  conditional: {
-                    html: servicesConditionalHtml
-                  },
                   checked: fields.archiveOrInactive.value == "ARCHIVE"
                 },
                 {
@@ -94,9 +87,6 @@
                   text: "Make this location inactive",
                   hint: {
                     text: "Keep the location in the list but temporarily remove access for services until you make it active again."
-                  },
-                  conditional: {
-                    html: servicesConditionalHtml
                   },
                   checked: fields.archiveOrInactive.value == "INACTIVE"
                 }
