@@ -4,6 +4,14 @@
 {% from "../partials/simplePagination/macro.njk" import simplePagination %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 
+{% block pageTitle %}
+  {% if paginationLocals.totalRows > 0 %}
+    Showing {{ paginationLocals.rowFrom }} to {{ paginationLocals.rowTo }} of {{ paginationLocals.totalRows }} results - {{ title }} - {{ applicationName }}
+  {% else %}
+    {{ title }} - {{ applicationName }}
+  {% endif %}
+{% endblock %}
+
 {% set mainClasses =
   "app-container govuk-body" ~ (" govuk-!-padding-top-0" if mojBanner else "")
 %}
