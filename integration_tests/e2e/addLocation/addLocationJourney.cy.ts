@@ -34,6 +34,7 @@ context('Start journey', () => {
     const indexPage = Page.verifyOnPage(IndexPage)
     indexPage.errorSummary().should('not.exist')
     indexPage.continueButton().click()
+    cy.title().should('contain', 'Error: Add a non-residential location')
     indexPage.errorSummary().should('exist')
     indexPage.errorSummaryList().should('have.length', 3)
     indexPage.errorSummaryList().eq(0).should('contain.text', 'Enter a location name')
