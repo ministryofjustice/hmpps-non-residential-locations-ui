@@ -5,6 +5,7 @@ import type { Location } from '../@types/locationsApi/locationsApiTypes'
 import logger from '../../logger'
 import deriveLocationHierarchy from '../utils/deriveLocationHierarchy'
 import validateCaseload from '../middleware/validateCaseload'
+import handleCaseloadChange from '../middleware/handleCaseloadChange'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import logPageView from '../middleware/logPageView'
 import { Page } from '../services/auditService'
@@ -28,6 +29,7 @@ export default function routes({ locationsService, auditService }: Services): Ro
       res.locals.prisonId = req.params.prisonId
       next()
     },
+    handleCaseloadChange(),
     validateCaseload(),
     logPageView(auditService, Page.LIST_NON_RESIDENTIAL_LOCATIONS),
     asyncMiddleware(async (req, res, next) => {
