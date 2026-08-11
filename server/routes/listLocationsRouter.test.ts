@@ -127,7 +127,7 @@ describe('GET /prison/TST', () => {
         .expect(200)
         .expect(res => {
           expect(res.text).toMatch(
-            /<title>\s*Showing 1 to 2 of 2 results - View non-residential locations - Non-residential locations\s*<\/title>/,
+            /<title>\s*Showing 2 results\s*-\s*View non-residential locations - Non-residential locations\s*<\/title>/,
           )
         })
     })
@@ -806,7 +806,7 @@ describe('GET /prison/TST', () => {
         .expect(200)
         .expect(res => {
           expect(res.text).toMatch(
-            /<title>\s*Showing 1 to 2 of 2 results - Edit non-residential locations - Non-residential locations\s*<\/title>/,
+            /<title>\s*Showing 2 results\s*-\s*Edit non-residential locations - Non-residential locations\s*<\/title>/,
           )
         })
     })
