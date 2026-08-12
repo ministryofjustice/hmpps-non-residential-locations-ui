@@ -38,8 +38,8 @@
   {% endif %}
 {% endblock %}
 
-{% set pageTitle = title if title === applicationName else title + ' - ' + applicationName %}
-{% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
+{% set pageTitle = ('Error: ' if errorlist.length else '') + (title if title === applicationName else title + ' - ' + applicationName) %}
+{% block pageTitle %}{{ pageTitle | default(applicationName) }}{% endblock %}
 
 {% block header %}
   {% if feComponents.header %}

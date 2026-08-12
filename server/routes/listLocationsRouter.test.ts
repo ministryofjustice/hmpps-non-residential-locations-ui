@@ -126,7 +126,9 @@ describe('GET /prison/TST', () => {
         .get('/prison/TST')
         .expect(200)
         .expect(res => {
-          expect(res.text).toContain('<title>View non-residential locations - Non-residential locations</title>')
+          expect(res.text).toMatch(
+            /<title>\s*Showing 2 results\s*-\s*View non-residential locations - Non-residential locations\s*<\/title>/,
+          )
         })
     })
 
@@ -803,7 +805,9 @@ describe('GET /prison/TST', () => {
         .get('/prison/TST')
         .expect(200)
         .expect(res => {
-          expect(res.text).toContain('<title>Edit non-residential locations - Non-residential locations</title>')
+          expect(res.text).toMatch(
+            /<title>\s*Showing 2 results\s*-\s*Edit non-residential locations - Non-residential locations\s*<\/title>/,
+          )
         })
     })
 

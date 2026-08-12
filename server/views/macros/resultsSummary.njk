@@ -1,0 +1,13 @@
+{%  macro resultsSummaryText(pagingData) %}
+  {% if pagingData.totalRows == 1 %}
+    Showing 1 result
+  {% elseif pagingData.totalPages > 1 %}
+    Showing {{ pagingData.rowFrom }} to {{ pagingData.rowTo }} of {{ pagingData.totalRows }} results
+  {% else %}
+    Showing {{ pagingData.totalRows }} results
+  {% endif %}
+{% endmacro %}
+
+{% macro resultsSummaryTitle(pagingData, title, applicationName) %}
+  {{ resultsSummaryText(pagingData) }} - {{ title }} - {{ applicationName }}
+{% endmacro %}

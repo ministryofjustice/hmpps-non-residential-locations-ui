@@ -55,6 +55,7 @@ context('Edit Location Journey', () => {
       EditDetailsPage.goTo(TEST_LOCATION_ID)
       const page = new EditDetailsPage(TEST_LOCATION_NAME)
       page.continueButton().click()
+      cy.title().should('contain', 'Error: Change')
       page.errorSummary().should('exist')
       page.errorSummaryList().should('contain.text', 'You must change something')
     })
