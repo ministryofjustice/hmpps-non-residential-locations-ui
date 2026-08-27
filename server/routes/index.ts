@@ -39,5 +39,11 @@ export default function routes(services: Services): Router {
   router.use('/location/:locationId/archive', archiveLocationRouter)
   router.use('/add-location', addLocationRouter)
 
+  router.get('/accessibility-statement', (req, res) =>
+    res.render('pages/help/accessibility-statement', {
+      serviceUrl: config.ingressUrl,
+    }),
+  )
+
   return router
 }
