@@ -40,7 +40,7 @@ export default function routes(services: Services): Router {
   router.use('/add-location', addLocationRouter)
 
   router.get('/accessibility-statement', (req, res) =>
-    res.render('pages/help/accessibility-statement', {
+    res.render('pages/accessibility-statement', {
       serviceUrl: config.ingressUrl,
     }),
   )
