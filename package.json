@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.1095.0",
-    "@ministryofjustice/frontend": "10.0.1",
+    "@ministryofjustice/frontend": "11.0.1",
     "@ministryofjustice/hmpps-auth-clients": "^3.0.0",
     "@ministryofjustice/hmpps-monitoring": "^2.1.0",
     "@ministryofjustice/hmpps-rest-client": "^2.2.0",
@@ -60,7 +60,7 @@
     "superagent": "^10.3.0"
   },
   "devDependencies": {
-    "@jgoz/esbuild-plugin-typecheck": "^4.0.4",
+    "@jgoz/esbuild-plugin-typecheck": "^5.0.0",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.6",
     "@ministryofjustice/hmpps-precommit-hooks": "^3.0.1",
@@ -85,7 +85,7 @@
     "aws-sdk-client-mock": "^4.1.0",
     "chokidar": "^5.0.0",
     "concurrently": "^10.0.4",
-    "cypress": "^15.19.0",
+    "cypress": "16.0.0",
     "cypress-multi-reporters": "^2.0.5",
     "cypress-split": "^1.25.0",
     "esbuild": "^0.28.1",
@@ -123,7 +123,7 @@
     "js-yaml": "5.2.2",
     "form-data": "4.0.6",
     "diff": "9.0.0",
-    "qs": "6.15.3",
+    "qs": "6.16.0",
     "tar": "7.5.22",
     "serialize-javascript": "7.0.7",
     "tmp": "0.2.7"
