@@ -72,4 +72,8 @@ export default function nunjucksSetup(app: express.Express): void {
     if (!str) return ''
     return str === yesVal ? 'Yes' : 'No'
   })
+
+  njkEnv.addFilter('stripHttps', function stripHttps(str) {
+    return str.replace(/^https?:\/\//, '')
+  })
 }
