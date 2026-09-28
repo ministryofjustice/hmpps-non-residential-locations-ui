@@ -24,7 +24,11 @@
     "dist",
     "cypress.config.ts",
     "esbuild",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/testutils/**",
+    "**/*.cy.ts"
   ],
   "include": ["**/*.js", "**/*.ts"]
 }
