@@ -126,7 +126,7 @@
     "diff": "9.0.0",
     "qs": "6.16.0",
     "tar": "7.5.22",
-    "serialize-javascript": "7.1.1",
+    "serialize-javascript": "7.1.2",
     "tmp": "0.2.7"
   }
 }
