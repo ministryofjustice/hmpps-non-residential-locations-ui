@@ -21,9 +21,9 @@
     "int-test": "cypress run --config video=false",
     "int-test-ui": "cypress open --e2e --browser chrome",
     "clean": "rm -rf dist test_results",
-    "rebuild": "npm run clean && npm i && npm run build",
+    "rebuild": "npm run clean && npm run setup && npm run build",
     "generate-location-api-types": "openapi-typescript https://locations-inside-prison-api-dev.hmpps.service.justice.gov.uk/v3/api-docs > ./server/@types/locationsApi/index.d.ts",
-    "setup": "npm ci && hmpps-npm-script-run-allowlist"
+    "setup": "npm ci"
   },
   "engines": {
     "node": "^24",
@@ -128,5 +128,13 @@
     "tar": "7.5.22",
     "serialize-javascript": "7.1.2",
     "tmp": "0.2.7"
+  },
+  "allowScripts": {
+    "cypress@16.1.0": true,
+    "@parcel/watcher@2.6.0": true,
+    "dtrace-provider@0.8.8": false,
+    "fsevents@2.3.3": true,
+    "unrs-resolver@1.12.2": true,
+    "esbuild@0.28.2": true
   }
 }
