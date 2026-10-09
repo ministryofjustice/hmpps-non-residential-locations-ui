@@ -27,7 +27,7 @@
   },
   "engines": {
     "node": "^24",
-    "npm": "^11"
+    "npm": "^12"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.1136.0",
@@ -63,7 +63,6 @@
   "devDependencies": {
     "@jgoz/esbuild-plugin-typecheck": "^5.0.0",
     "@ministryofjustice/eslint-config-hmpps": "^1.0.3",
-    "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.6",
     "@ministryofjustice/hmpps-precommit-hooks": "^3.0.2",
     "@tsconfig/node24": "^24.0.5",
     "@types/bunyan": "^1.8.11",
