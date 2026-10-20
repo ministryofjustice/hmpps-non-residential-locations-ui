@@ -18,7 +18,7 @@ context('Accessibility Statement', () => {
   context('View accessibility statement', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
