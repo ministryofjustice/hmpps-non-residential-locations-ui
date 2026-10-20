@@ -5,7 +5,7 @@ import Page from '../../pages/page'
 context('Start journey', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION', 'NONRESI__MAINTAIN_LOCATION'] })
+    cy.task('stubSignIn', { roles: ['NONRESI__MAINTAIN_LOCATION'] })
     cy.task('stubManageUsersMe')
     cy.task('stubManageUsersMeCaseloads')
     cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
