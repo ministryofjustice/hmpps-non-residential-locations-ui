@@ -116,8 +116,8 @@
     "nunjucks": {
       "chokidar": "$chokidar"
     },
-    "@opentelemetry/core": "2.11.0",
-    "@opentelemetry/resources": "2.11.0",
+    "@opentelemetry/core": "3.0.0",
+    "@opentelemetry/resources": "3.0.0",
     "@opentelemetry/sdk-trace-base": "2.11.0",
     "@opentelemetry/sdk-trace-web": "2.11.0",
     "js-yaml": "5.4.2",
