@@ -83,7 +83,7 @@
     "@types/supertest": "^7.2.1",
     "audit-ci": "^7.1.0",
     "aws-sdk-client-mock": "^4.1.0",
-    "chokidar": "^5.0.0",
+    "chokidar": "^6.0.0",
     "concurrently": "^10.0.7",
     "cypress": "16.2.1",
     "cypress-multi-reporters": "^2.1.0",
