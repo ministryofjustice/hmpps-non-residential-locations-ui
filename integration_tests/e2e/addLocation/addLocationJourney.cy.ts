@@ -5,7 +5,7 @@ import Page from '../../pages/page'
 context('Start journey', () => {
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION', 'NONRESI__MAINTAIN_LOCATION'] })
+    cy.task('stubSignIn', { roles: ['NONRESI__MAINTAIN_LOCATION'] })
     cy.task('stubManageUsersMe')
     cy.task('stubManageUsersMeCaseloads')
     cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
@@ -34,14 +34,16 @@ context('Start journey', () => {
     const indexPage = Page.verifyOnPage(IndexPage)
     indexPage.errorSummary().should('not.exist')
     indexPage.continueButton().click()
+    cy.title().should('contain', 'Error: Add a non-residential location')
     indexPage.errorSummary().should('exist')
     indexPage.errorSummaryList().should('have.length', 3)
     indexPage.errorSummaryList().eq(0).should('contain.text', 'Enter a location name')
-    indexPage.errorSummaryList().eq(1).should('contain.text', 'Select at least one service')
+    indexPage.errorSummaryList().eq(1).should('contain.text', 'Select at least one service for this location')
     indexPage
       .errorSummaryList()
       .eq(2)
       .should('contain.text', 'Select \u2018yes\u2019 if the location is already active')
+    indexPage.servicesErrorLabel().should('contain.text', 'Select at least one service for this location')
 
     indexPage.locationNameInput().clear().type('A'.repeat(41))
     indexPage.continueButton().click()
@@ -58,10 +60,12 @@ context('Start journey', () => {
     indexPage.locationStatusRadios().find('input[value="ACTIVE"]').click()
 
     indexPage.errorSummary().should('exist')
-    indexPage.errorSummaryList().eq(1).should('contain.text', 'Select at least one service')
+    indexPage.errorSummaryList().eq(1).should('contain.text', 'Select at least one service for this location')
+    indexPage.servicesErrorLabel().should('contain.text', 'Select at least one service for this location')
     indexPage.serviceCheckbox('TEST_TYPE').click()
     indexPage.continueButton().click()
     indexPage.errorSummaryList().should('not.exist')
+    indexPage.servicesErrorLabel().should('not.exist')
 
     // continue to check your answers page if no errors
     const checkYourAnswersPagePage = Page.verifyOnPage(CheckYourAnswersPage)

@@ -16,6 +16,3 @@ generic-service:
     SERVICE_LOCATIONS_LANDING_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"
     SERVICE_RESIDENTIAL_LOCATIONS_URL: "https://locations-inside-prison.hmpps.service.justice.gov.uk"
     AUDIT_ENABLED: "false"
-
-generic-prometheus-alerts:
-  alertSeverity: move-a-prisoner-alerts-prod

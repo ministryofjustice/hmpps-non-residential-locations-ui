@@ -2352,8 +2352,7 @@ export interface components {
         | 'TABLE'
       /** @description Accommodation Types */
       accommodationTypes?:
-        | ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[]
-        | null
+        ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[] | null
       /** @description Specialist Cell Types */
       specialistCellTypes?:
         | (
@@ -2623,8 +2622,7 @@ export interface components {
       internalMovementAllowed?: boolean | null
       /** @description Accommodation Types */
       accommodationTypes?:
-        | ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[]
-        | null
+        ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[] | null
       /** @description Specialist Cell Types */
       specialistCellTypes?:
         | (
@@ -3797,10 +3795,7 @@ export interface components {
        * @enum {string}
        */
       accommodationType:
-        | 'CARE_AND_SEPARATION'
-        | 'HEALTHCARE_INPATIENTS'
-        | 'NORMAL_ACCOMMODATION'
-        | 'OTHER_NON_RESIDENTIAL'
+        'CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL'
       /** @description Set of cells that are to be created or amended, if the location is for update then missing cells will be removed */
       cells: components['schemas']['CellInformation'][]
     }
@@ -4354,11 +4349,7 @@ export interface components {
        * @enum {string|null}
        */
       accommodationType?:
-        | 'CARE_AND_SEPARATION'
-        | 'HEALTHCARE_INPATIENTS'
-        | 'NORMAL_ACCOMMODATION'
-        | 'OTHER_NON_RESIDENTIAL'
-        | null
+        'CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL' | null
       /** @description Proposed used-for types for a convert-to-cell approval */
       usedForTypes?:
         | (
@@ -4429,8 +4420,7 @@ export interface components {
       currentOtherConvertedCellType?: string | null
       /** @description Current accommodation types on the parent, surfaced for a convert-to-cell approval only when the proposed accommodation type differs */
       currentAccommodationTypes?:
-        | ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[]
-        | null
+        ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[] | null
       /** @description Current used-for types on the parent, surfaced for a convert-to-cell approval only when the proposed used-for types differ */
       currentUsedForTypes?:
         | (
@@ -4455,8 +4445,7 @@ export interface components {
         | null
       /** @description Resulting (post-change) accommodation types at the top-level location (wing), surfaced only when this change alters the set of accommodation types held above the location being approved */
       topLevelAccommodationTypes?:
-        | ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[]
-        | null
+        ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[] | null
       /** @description Resulting (post-change) used-for types at the top-level location (wing), surfaced together with topLevelAccommodationTypes when the change affects the levels above */
       topLevelUsedFor?:
         | (
@@ -4612,8 +4601,7 @@ export interface components {
         | 'TABLE'
       /** @description Accommodation Types */
       accommodationTypes?:
-        | ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[]
-        | null
+        ('CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL')[] | null
       /** @description Current specialist Cell Types */
       currentSpecialistCellTypes?:
         | (
@@ -5446,10 +5434,7 @@ export interface components {
        * @enum {string}
        */
       accommodationType:
-        | 'CARE_AND_SEPARATION'
-        | 'HEALTHCARE_INPATIENTS'
-        | 'NORMAL_ACCOMMODATION'
-        | 'OTHER_NON_RESIDENTIAL'
+        'CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL'
       /**
        * @description Location Type
        * @example CELL
@@ -5695,10 +5680,7 @@ export interface components {
        * @enum {string}
        */
       accommodationType:
-        | 'CARE_AND_SEPARATION'
-        | 'HEALTHCARE_INPATIENTS'
-        | 'NORMAL_ACCOMMODATION'
-        | 'OTHER_NON_RESIDENTIAL'
+        'CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL'
       /** @description Set of cells that are to be created */
       cells?: components['schemas']['CellInformation'][] | null
     }
@@ -5895,11 +5877,7 @@ export interface components {
        * @enum {string|null}
        */
       accommodationType?:
-        | 'CARE_AND_SEPARATION'
-        | 'HEALTHCARE_INPATIENTS'
-        | 'NORMAL_ACCOMMODATION'
-        | 'OTHER_NON_RESIDENTIAL'
-        | null
+        'CARE_AND_SEPARATION' | 'HEALTHCARE_INPATIENTS' | 'NORMAL_ACCOMMODATION' | 'OTHER_NON_RESIDENTIAL' | null
       /** @description used For types */
       usedFor?:
         | (

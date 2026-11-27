@@ -4,7 +4,7 @@ context('Locations List', () => {
   context('Sorting', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocationWithStatuses', {
@@ -89,7 +89,7 @@ context('Locations List', () => {
   context('Status filter', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocationWithStatuses', {
@@ -206,7 +206,7 @@ context('Locations List', () => {
   context('Service type filter', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocationWithStatuses', {
@@ -242,7 +242,7 @@ context('Locations List', () => {
   context('Filter memory', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocationWithStatuses', {
@@ -295,10 +295,10 @@ context('Locations List', () => {
     })
   })
 
-  context('View-only user (VIEW_INTERNAL_LOCATION role)', () => {
+  context('User with no locations roles', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
@@ -339,7 +339,7 @@ context('Locations List', () => {
   context('Edit user (NONRESI__MAINTAIN_LOCATION role)', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION', 'NONRESI__MAINTAIN_LOCATION'] })
+      cy.task('stubSignIn', { roles: ['NONRESI__MAINTAIN_LOCATION'] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
@@ -379,7 +379,7 @@ context('Locations List', () => {
   context('View all results link', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocationMultiPage', { prisonId: 'TST', totalElements: 200 })
@@ -418,7 +418,7 @@ context('Locations List', () => {
   context('Parent and hierarchy display', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
@@ -463,7 +463,7 @@ context('Locations List', () => {
   context('Archive link visibility', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION', 'NONRESI__MAINTAIN_LOCATION'] })
+      cy.task('stubSignIn', { roles: ['NONRESI__MAINTAIN_LOCATION'] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocation', { prisonId: 'TST', includeArchived: true })

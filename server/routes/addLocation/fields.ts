@@ -12,10 +12,6 @@ const fields = {
     id: 'localName',
     name: 'localName',
     classes: 'govuk-!-width-full local-name-text-input',
-    label: {
-      text: 'What is the location name?',
-      classes: 'govuk-label--m',
-    },
     hint: {
       text: "Describe the location not what happens there. For example, 'gym' rather than 'exercise'. Avoid using acronyms, unless the acronym is widely recognised.",
     },
@@ -26,7 +22,7 @@ const fields = {
     component: 'groupedCheckboxes',
     multiple: true,
     validate: ['required'],
-    errorMessages: { required: 'Select at least one service' },
+    errorMessages: { required: 'Select at least one service for this location' },
     id: 'services',
     name: 'services',
     hint: { text: 'Select all that apply.' },

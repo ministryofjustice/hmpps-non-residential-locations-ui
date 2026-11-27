@@ -16,12 +16,13 @@ jest.mock('../../services/auditService')
 export const user: HmppsUser = {
   name: 'FIRST LAST',
   userId: 'id',
+  userUuid: '11111-11111-11111-11111-11111',
   token: 'token',
   username: 'user1',
   displayName: 'First Last',
   authSource: 'nomis',
   staffId: 1234,
-  userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS', 'VIEW_INTERNAL_LOCATION'],
+  userRoles: ['MANAGE_RESIDENTIAL_LOCATIONS'],
   activeCaseload: {
     id: 'TST',
     name: 'Test (HMP)',

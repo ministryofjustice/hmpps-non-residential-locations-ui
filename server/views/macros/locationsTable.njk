@@ -6,8 +6,6 @@
 
 {% macro locationsTable (locations, pagingData, usageTypesData, canEdit, sort, sortHrefTemplate) %}
 
-<h2 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="locations-table-caption">{{ locationType }}</h2>
-
   {% if locations | length %}
     {% set rows = [] %}
 
@@ -67,7 +65,9 @@
       },
       firstCellIsHeader: false,
       head: tableHead,
-      rows: rows
+      rows: rows,
+      caption: "Non-residential location results",
+      captionClasses: "govuk-visually-hidden"
     }) }}
   {% endif %}
 {% endmacro %}

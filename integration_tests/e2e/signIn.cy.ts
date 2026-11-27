@@ -22,10 +22,10 @@ context('Sign In', () => {
     })
   })
 
-  context('With the VIEW_INTERNAL_LOCATION role', () => {
+  context('With no locations roles', () => {
     beforeEach(() => {
       cy.task('reset')
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'] })
+      cy.task('stubSignIn', { roles: [] })
       cy.task('stubManageUsersMe')
       cy.task('stubManageUsersMeCaseloads')
       cy.task('stubNonResidentialLocation', { prisonId: 'TST' })
@@ -93,7 +93,7 @@ context('Sign In', () => {
       Page.verifyOnPage(AuthSignInPage)
 
       cy.task('stubVerifyToken', true)
-      cy.task('stubSignIn', { roles: ['VIEW_INTERNAL_LOCATION'], name: 'bobby brown' })
+      cy.task('stubSignIn', { roles: [], name: 'bobby brown' })
       cy.task('stubComponents', { userName: 'B. Brown' })
       cy.signIn()
       indexPage.headerUserName().contains('B. Brown')
