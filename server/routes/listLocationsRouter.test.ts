@@ -882,6 +882,105 @@ describe('GET /prison/TST', () => {
     })
   })
 
+  describe('caseload change', () => {
+    const userAtCardiff = {
+      ...user,
+      activeCaseload: { id: 'CFI', name: 'Cardiff (HMP)' },
+      caseloads: [
+        { id: 'TST', name: 'Test (HMP)' },
+        { id: 'CFI', name: 'Cardiff (HMP)' },
+      ],
+    }
+
+    beforeEach(() => {
+      auditService.logPageView.mockResolvedValue(null)
+      locationsService.getNonResidentialLocations.mockResolvedValue(mockLocationsResponse)
+    })
+
+    it('redirects to the new caseload when the user has just switched', () => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => userAtCardiff,
+      })
+
+      return request(app)
+        .get('/prison/TST?caseload-switched-from=TST&caseload-switched-to=CFI')
+        .expect(302)
+        .expect('Location', '/prison/CFI')
+    })
+
+    it('drops the previous prison filters when redirecting', () => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => userAtCardiff,
+      })
+
+      return request(app)
+        .get('/prison/TST?status=ARCHIVED&page=3&caseload-switched-from=TST&caseload-switched-to=CFI')
+        .expect(302)
+        .expect('Location', '/prison/CFI')
+    })
+
+    it('only strips the switch parameters when the url already matches the active caseload', () => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => user,
+      })
+
+      return request(app)
+        .get('/prison/TST?status=ARCHIVED&caseload-switched-from=CFI&caseload-switched-to=TST')
+        .expect(302)
+        .expect('Location', '/prison/TST?status=ARCHIVED')
+    })
+
+    it('leaves requests without the switch parameters untouched', () => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => user,
+      })
+
+      return request(app).get('/prison/TST').expect(200)
+    })
+
+    it('resolves a switch on the service root, for users without the header javascript', () => {
+      // Without header.js there is no backUrl, so DPS falls back to the referer, which browsers
+      // reduce to our origin. The root redirect already lands on the active caseload.
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => userAtCardiff,
+      })
+
+      return request(app)
+        .get('/?caseload-switched-from=TST&caseload-switched-to=CFI')
+        .expect(302)
+        .expect('Location', 'prison/CFI')
+    })
+
+    it('does not carry the old prison filters into the new prison', async () => {
+      app = appWithAllRoutes({
+        services: { auditService, locationsService },
+        userSupplier: () => userAtCardiff,
+      })
+      const agent = request.agent(app)
+
+      // Remember a filter against the prison the user is about to leave
+      await agent.get('/prison/TST?status=ARCHIVED').expect(200)
+
+      await agent
+        .get('/prison/TST?status=ARCHIVED&caseload-switched-from=TST&caseload-switched-to=CFI')
+        .expect(302)
+        .expect('Location', '/prison/CFI')
+
+      await agent
+        .get('/prison/CFI')
+        .expect(200)
+        .expect(() => {
+          const { calls } = locationsService.getNonResidentialLocations.mock
+          expect(calls[calls.length - 1][3]).toEqual(['ACTIVE'])
+        })
+    })
+  })
+
   describe('error handling', () => {
     beforeEach(() => {
       app = appWithAllRoutes({
