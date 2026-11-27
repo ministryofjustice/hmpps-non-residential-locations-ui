@@ -903,7 +903,10 @@ describe('GET /prison/TST', () => {
         userSupplier: () => userAtCardiff,
       })
 
-      return request(app).get('/prison/TST?caseloadChanged=true').expect(302).expect('Location', '/prison/CFI')
+      return request(app)
+        .get('/prison/TST?caseload-switched-from=TST&caseload-switched-to=CFI')
+        .expect(302)
+        .expect('Location', '/prison/CFI')
     })
 
     it('drops the previous prison filters when redirecting', () => {
@@ -913,24 +916,24 @@ describe('GET /prison/TST', () => {
       })
 
       return request(app)
-        .get('/prison/TST?status=ARCHIVED&page=3&caseloadChanged=true')
+        .get('/prison/TST?status=ARCHIVED&page=3&caseload-switched-from=TST&caseload-switched-to=CFI')
         .expect(302)
         .expect('Location', '/prison/CFI')
     })
 
-    it('only strips the marker when the url already matches the active caseload', () => {
+    it('only strips the switch parameters when the url already matches the active caseload', () => {
       app = appWithAllRoutes({
         services: { auditService, locationsService },
         userSupplier: () => user,
       })
 
       return request(app)
-        .get('/prison/TST?status=ARCHIVED&caseloadChanged=true')
+        .get('/prison/TST?status=ARCHIVED&caseload-switched-from=CFI&caseload-switched-to=TST')
         .expect(302)
         .expect('Location', '/prison/TST?status=ARCHIVED')
     })
 
-    it('leaves requests without the marker untouched', () => {
+    it('leaves requests without the switch parameters untouched', () => {
       app = appWithAllRoutes({
         services: { auditService, locationsService },
         userSupplier: () => user,
@@ -939,7 +942,7 @@ describe('GET /prison/TST', () => {
       return request(app).get('/prison/TST').expect(200)
     })
 
-    it('resolves the marker on the service root, for users without the header javascript', () => {
+    it('resolves a switch on the service root, for users without the header javascript', () => {
       // Without header.js there is no backUrl, so DPS falls back to the referer, which browsers
       // reduce to our origin. The root redirect already lands on the active caseload.
       app = appWithAllRoutes({
@@ -947,7 +950,10 @@ describe('GET /prison/TST', () => {
         userSupplier: () => userAtCardiff,
       })
 
-      return request(app).get('/?caseloadChanged=true').expect(302).expect('Location', 'prison/CFI')
+      return request(app)
+        .get('/?caseload-switched-from=TST&caseload-switched-to=CFI')
+        .expect(302)
+        .expect('Location', 'prison/CFI')
     })
 
     it('does not carry the old prison filters into the new prison', async () => {
@@ -960,7 +966,10 @@ describe('GET /prison/TST', () => {
       // Remember a filter against the prison the user is about to leave
       await agent.get('/prison/TST?status=ARCHIVED').expect(200)
 
-      await agent.get('/prison/TST?status=ARCHIVED&caseloadChanged=true').expect(302).expect('Location', '/prison/CFI')
+      await agent
+        .get('/prison/TST?status=ARCHIVED&caseload-switched-from=TST&caseload-switched-to=CFI')
+        .expect(302)
+        .expect('Location', '/prison/CFI')
 
       await agent
         .get('/prison/CFI')
